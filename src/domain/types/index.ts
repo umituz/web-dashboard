@@ -177,6 +177,10 @@ export interface DashboardUser {
   email?: string;
   /** Avatar URL */
   avatar?: string;
+  /** Whether user has mobile app access */
+  hasMobileApp?: boolean;
+  /** Whether user has web app access */
+  hasWebApp?: boolean;
 }
 
 // =============================================================================

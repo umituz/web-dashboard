@@ -4,8 +4,6 @@
  * Utility functions for dashboard operations
  */
 
-import type { DashboardNotification } from "../../domain/types";
-
 /**
  * Format notification timestamp to relative time
  *
