@@ -31,7 +31,7 @@ export function useNotifications(initialNotifications: DashboardNotification[] =
   const add = useCallback((notification: Omit<DashboardNotification, "id">) => {
     const newNotification: DashboardNotification = {
       ...notification,
-      id: Math.random().toString(36).substring(7),
+      id: crypto.randomUUID(),
       read: false,
       createdAt: new Date(),
     };

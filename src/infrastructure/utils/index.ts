@@ -92,5 +92,5 @@ export function filterSidebarItems<T extends { enabled?: boolean; requiredApp?: 
  * @returns Unique notification ID
  */
 export function generateNotificationId(): string {
-  return `${Date.now()}-${Math.random().toString(36).substring(7)}`;
+  return crypto.randomUUID();
 }
