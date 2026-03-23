@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import {
   Bell, X, Sun, Moon, Menu, User, Settings, LogOut,
   ChevronDown, CreditCard
@@ -20,8 +20,6 @@ interface DashboardHeaderPropsExtended extends DashboardHeaderProps {
   onMarkAllRead?: () => void;
   /** Dismiss notification function */
   onDismissNotification?: (id: string) => void;
-  /** Format date function */
-  formatDate?: (date: Date | string | number) => string;
   /** Settings route */
   settingsRoute?: string;
   /** Profile route */
@@ -48,7 +46,6 @@ export const DashboardHeader = ({
   onLogout,
   onMarkAllRead,
   onDismissNotification,
-  formatDate,
   settingsRoute = "/dashboard/settings",
   profileRoute = "/dashboard/profile",
   billingRoute = "/dashboard/billing",
@@ -148,7 +145,7 @@ export const DashboardHeader = ({
                         <p className="text-sm text-foreground leading-snug">{n.text}</p>
                         <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
                           <span className="inline-block w-1 h-1 rounded-full bg-muted-foreground/30" />
-                          {formatTimeAgo(n.createdAt)}
+                          {formatNotificationTime(n.createdAt, t)}
                         </p>
                       </div>
                       <button
