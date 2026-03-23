@@ -7,6 +7,7 @@ import { BrandLogo } from "./BrandLogo";
 import { PenTool, Menu, ChevronLeft, ChevronDown, ChevronRight } from "lucide-react";
 import type { DashboardUser, SidebarGroup } from "../../domain/types";
 import type { DashboardSidebarProps } from "../../domain/types";
+import { filterSidebarItems } from "../../infrastructure/utils";
 
 interface DashboardSidebarPropsExtended extends DashboardSidebarProps {
   /** Sidebar groups configuration */
@@ -84,15 +85,7 @@ export const DashboardSidebar = ({
       <nav className="flex-1 overflow-y-auto px-2 py-3 scrollbar-hide">
         <div className="space-y-6">
           {sidebarGroups.map((group) => {
-            const filteredItems = group.items.filter(item => {
-              // Skip disabled items (enabled: false or undefined defaults to true)
-              if (item.enabled === false) return false;
-              // Skip items that require specific app types
-              if (!item.requiredApp) return true;
-              if (item.requiredApp === 'mobile') return (user as any)?.hasMobileApp;
-              if (item.requiredApp === 'web') return (user as any)?.hasWebApp;
-              return true;
-            });
+            const filteredItems = filterSidebarItems(group.items, user);
 
             if (filteredItems.length === 0) return null;
 

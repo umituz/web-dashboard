@@ -7,6 +7,7 @@ import { Button } from "@umituz/web-design-system/atoms";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { DashboardHeaderProps, DashboardUser, DashboardNotification } from "../../domain/types";
+import { formatNotificationTime } from "../../infrastructure/utils";
 
 interface DashboardHeaderPropsExtended extends DashboardHeaderProps {
   /** Auth user */
@@ -63,21 +64,11 @@ export const DashboardHeader = ({
     onMarkAllRead?.();
   };
 
-  const formatTimeAgo = useCallback((createdAt: Date | string | number): string => {
-    if (!formatDate) return "";
-    const date = new Date(createdAt);
-    const secs = Math.floor((Date.now() - date.getTime()) / 1000);
-    if (secs < 60) return t("dashboard.activityFeed.times.justNow");
-    if (secs < 3600) return t("dashboard.activityFeed.times.minutesAgo", { val: Math.floor(secs / 60) });
-    if (secs < 86400) return t("dashboard.activityFeed.times.hoursAgo", { val: Math.floor(secs / 3600) });
-    return t("dashboard.activityFeed.times.daysAgo", { val: Math.floor(secs / 86400) });
-  }, [t, formatDate]);
-
   const handleLogout = async () => {
     try {
       await onLogout?.();
       navigate("/login");
-    } catch (error: unknown) {
+    } catch {
       // Error handling can be added by parent component
     }
   };
@@ -161,7 +152,7 @@ export const DashboardHeader = ({
                         </p>
                       </div>
                       <button
-                        onClick={() => onDismissNotification?.(n.id as string)}
+                        onClick={() => onDismissNotification?.(n.id)}
                         className="text-muted-foreground/50 hover:text-foreground shrink-0 transition-colors"
                       >
                         <X className="h-3 w-3" />

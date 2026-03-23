@@ -11,8 +11,6 @@
 // =============================================================================
 
 export { DashboardLayout } from './presentation/organisms/DashboardLayout';
-export { default as DashboardLayoutDefault } from './presentation/organisms/DashboardLayout';
-
 export { DashboardHeader } from './presentation/organisms/DashboardHeader';
 export { DashboardSidebar } from './presentation/molecules/DashboardSidebar';
 export { BrandLogo } from './presentation/molecules/BrandLogo';
