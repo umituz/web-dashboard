@@ -1,6 +1,6 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Dashboard Layout System - Customizable, themeable dashboard layouts",
   "type": "module",
   "main": "./dist/index.js",
