@@ -41,7 +41,6 @@ export function useNotifications(initialNotifications: DashboardNotification[] =
   return {
     notifications,
     markAllRead,
-    markAllRead: markAllRead,
     dismiss,
     add,
   };

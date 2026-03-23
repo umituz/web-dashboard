@@ -4,7 +4,6 @@ import {
   ChevronDown, CreditCard
 } from "lucide-react";
 import { Button } from "@umituz/web-design-system/atoms";
-import { useToast } from "@umituz/web-design-system/atoms";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { DashboardHeaderProps, DashboardUser, DashboardNotification } from "../../domain/types";
@@ -53,7 +52,6 @@ export const DashboardHeader = ({
   profileRoute = "/dashboard/profile",
   billingRoute = "/dashboard/billing",
 }: DashboardHeaderPropsExtended) => {
-  const { toast } = useToast();
   const navigate = useNavigate();
   const { t } = useTranslation();
   const [notifOpen, setNotifOpen] = useState(false);
@@ -63,10 +61,9 @@ export const DashboardHeader = ({
 
   const markAllRead = () => {
     onMarkAllRead?.();
-    toast({ title: t("common.markAllRead"), description: t("dashboard.notifications.markAllRead") });
   };
 
-  const formatTimeAgo = useCallback((createdAt: Parameters<typeof formatDate>[0]): string => {
+  const formatTimeAgo = useCallback((createdAt: Date | string | number): string => {
     if (!formatDate) return "";
     const date = new Date(createdAt);
     const secs = Math.floor((Date.now() - date.getTime()) / 1000);
@@ -79,14 +76,9 @@ export const DashboardHeader = ({
   const handleLogout = async () => {
     try {
       await onLogout?.();
-      toast({ title: t("common.logout"), description: t("auth.messages.logoutSuccess") });
       navigate("/login");
     } catch (error: unknown) {
-      toast({
-        title: t("auth.messages.authError"),
-        description: error instanceof Error ? error.message : t("auth.messages.errorOccurred"),
-        variant: "destructive"
-      });
+      // Error handling can be added by parent component
     }
   };
 

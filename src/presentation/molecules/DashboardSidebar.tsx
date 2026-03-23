@@ -68,7 +68,7 @@ export const DashboardSidebar = ({
       <div className="px-3 py-4 border-b border-sidebar-border/50">
         <Link to={createPostRoute}>
           <Button
-            variant="hero"
+            variant="default"
             className={`w-full gap-3 shadow-glow transition-all active:scale-95 group overflow-hidden rounded-xl ${
               collapsed ? "px-0 justify-center h-10 w-10 mx-auto" : "justify-start px-4 h-11"
             }`}
@@ -89,8 +89,8 @@ export const DashboardSidebar = ({
               if (item.enabled === false) return false;
               // Skip items that require specific app types
               if (!item.requiredApp) return true;
-              if (item.requiredApp === 'mobile') return user?.hasMobileApp;
-              if (item.requiredApp === 'web') return user?.hasWebApp;
+              if (item.requiredApp === 'mobile') return (user as any)?.hasMobileApp;
+              if (item.requiredApp === 'web') return (user as any)?.hasWebApp;
               return true;
             });
 
