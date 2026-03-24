@@ -5,6 +5,7 @@
  */
 
 import { BrandLogo } from "../../layouts/components";
+import { cn } from "@umituz/web-design-system/utils";
 import type { AuthLayoutProps } from "../types/auth";
 
 export const AuthLayout = ({
