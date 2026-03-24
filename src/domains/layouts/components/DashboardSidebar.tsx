@@ -97,16 +97,18 @@ export const DashboardSidebar = ({
                 {!collapsed && (
                   <button
                     onClick={() => toggleGroup(group.title)}
-                    className="w-full flex items-center justify-between px-3 mb-2 group/header"
+                    className="w-full flex items-center justify-between px-3 py-2 mb-1 rounded-lg hover:bg-sidebar-accent/30 transition-all duration-200 group/header"
                   >
                     <span className="text-[10px] font-bold uppercase tracking-widest text-sidebar-foreground/40 group-hover/header:text-sidebar-foreground/70 transition-colors">
                       {group.title === "sidebar.ai" ? `${brandName} AI` : t(group.title)}
                     </span>
-                    {isGroupCollapsed ? (
-                      <ChevronRight className="h-3 w-3 text-sidebar-foreground/30 flex-shrink-0 group-hover/header:text-sidebar-foreground/50 transition-colors" />
-                    ) : (
-                      <ChevronDown className="h-3 w-3 text-sidebar-foreground/30 flex-shrink-0 group-hover/header:text-sidebar-foreground/50 transition-colors" />
-                    )}
+                    <div className="flex-shrink-0">
+                      {isGroupCollapsed ? (
+                        <ChevronRight className="h-3.5 w-3.5 text-sidebar-foreground/30 transition-transform duration-200 group-hover/header:text-sidebar-foreground/50" />
+                      ) : (
+                        <ChevronDown className="h-3.5 w-3.5 text-sidebar-foreground/30 transition-transform duration-200 group-hover/header:text-sidebar-foreground/50" />
+                      )}
+                    </div>
                   </button>
                 )}
 
@@ -116,14 +118,14 @@ export const DashboardSidebar = ({
                     <Link
                       key={item.path}
                       to={item.path}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                         active
                           ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
                           : "text-sidebar-foreground/70 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
                       } ${collapsed ? "justify-center" : ""}`}
                       title={collapsed ? t(item.label) : undefined}
                     >
-                      <item.icon className={`h-4 w-4 shrink-0 transition-transform ${active && "scale-110"}`} />
+                      <item.icon className={`h-4 w-4 shrink-0 transition-transform duration-200 ${active && "scale-110"}`} />
                       {!collapsed && <span>{t(item.label)}</span>}
                     </Link>
                   );
