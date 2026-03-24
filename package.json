@@ -1,36 +1,52 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "1.0.6",
-  "description": "Dashboard Layout System - Customizable, themeable dashboard layouts",
+  "version": "2.0.2",
+  "description": "Dashboard Layout System - Customizable, themeable dashboard layouts and settings",
   "type": "module",
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+    "./layouts": {
+      "types": "./dist/domains/layouts/index.d.ts",
+      "import": "./dist/domains/layouts/index.js"
     },
-    "./components": {
-      "types": "./dist/components/index.d.ts",
-      "import": "./dist/components/index.js"
+    "./layouts/components": {
+      "types": "./dist/domains/layouts/components/index.d.ts",
+      "import": "./dist/domains/layouts/components/index.js"
     },
-    "./types": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/types/index.js"
+    "./layouts/hooks": {
+      "types": "./dist/domains/layouts/hooks/index.d.ts",
+      "import": "./dist/domains/layouts/hooks/index.js"
     },
-    "./theme": {
-      "types": "./dist/theme/index.d.ts",
-      "import": "./dist/theme/index.js"
+    "./layouts/utils": {
+      "types": "./dist/domains/layouts/utils/index.d.ts",
+      "import": "./dist/domains/layouts/utils/index.js"
     },
-    "./hooks": {
-      "types": "./dist/hooks/index.d.ts",
-      "import": "./dist/hooks/index.js"
+    "./layouts/types": {
+      "types": "./dist/domains/layouts/types/index.d.ts",
+      "import": "./dist/domains/layouts/types/index.js"
     },
-    "./utils": {
-      "types": "./dist/utils/index.d.ts",
-      "import": "./dist/utils/index.js"
+    "./layouts/theme": {
+      "types": "./dist/domains/layouts/theme/index.d.ts",
+      "import": "./dist/domains/layouts/theme/index.js"
+    },
+    "./settings": {
+      "types": "./dist/domains/settings/index.d.ts",
+      "import": "./dist/domains/settings/index.js"
+    },
+    "./settings/components": {
+      "types": "./dist/domains/settings/components/index.d.ts",
+      "import": "./dist/domains/settings/components/index.js"
+    },
+    "./settings/hooks": {
+      "types": "./dist/domains/settings/hooks/index.d.ts",
+      "import": "./dist/domains/settings/hooks/index.js"
+    },
+    "./settings/utils": {
+      "types": "./dist/domains/settings/utils/index.d.ts",
+      "import": "./dist/domains/settings/utils/index.js"
+    },
+    "./settings/types": {
+      "types": "./dist/domains/settings/types/index.d.ts",
+      "import": "./dist/domains/settings/types/index.js"
     },
     "./package.json": "./package.json"
   },
@@ -71,12 +87,14 @@
   "keywords": [
     "dashboard",
     "layout",
+    "settings",
     "react",
     "typescript",
     "components",
     "admin",
     "sidebar",
-    "header"
+    "header",
+    "config-driven"
   ],
   "author": "Umit Uz",
   "license": "MIT",

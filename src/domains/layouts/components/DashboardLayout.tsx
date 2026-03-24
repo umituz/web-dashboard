@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useLocation, Outlet, Navigate } from "react-router-dom";
 import { Skeleton } from "@umituz/web-design-system/atoms";
-import { DashboardSidebar } from "../molecules/DashboardSidebar";
+import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
-import type { DashboardLayoutConfig, DashboardUser, DashboardNotification } from "../../domain/types";
+import type { DashboardLayoutConfig } from "../types/layout";
+import type { DashboardNotification } from "../types/notification";
+import type { DashboardUser } from "../types/user";
 
 interface DashboardLayoutProps {
   /** Layout configuration */
