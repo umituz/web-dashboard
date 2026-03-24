@@ -19,6 +19,7 @@ export const RegisterForm = ({
   showLoginLink = true,
   requirePasswordConfirm = true,
   showSocialLogin,
+  onRegisterAttempt,
   onRegisterSuccess,
   onRegisterError,
   onGoogleLogin,
@@ -61,20 +62,26 @@ export const RegisterForm = ({
     setIsLoading(true);
 
     try {
-      // In production, call your auth API
-      // const user = await register({ email, password, name, metadata });
+      let user: { id: string; email: string; name?: string };
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Use custom register handler if provided (real auth), otherwise use mock auth
+      if (onRegisterAttempt) {
+        // Real authentication flow
+        user = await onRegisterAttempt({ email, password, name });
+      } else {
+        // Mock authentication flow (for development/demo)
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        user = {
+          id: "1",
+          email,
+          name: name || email.split("@")[0],
+        };
+      }
 
-      // Success
-      const mockUser = {
-        id: "1",
-        email,
-        name: name || email.split("@")[0],
-      };
+      // Call success callback
+      await onRegisterSuccess?.(user);
 
-      await onRegisterSuccess?.(mockUser);
+      // Navigate to after-login route
       navigate(config.afterLoginRoute);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Registration failed";

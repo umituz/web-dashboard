@@ -19,6 +19,7 @@ export const LoginForm = ({
   showForgotPassword = true,
   showRegisterLink = true,
   showSocialLogin,
+  onLoginAttempt,
   onLoginSuccess,
   onLoginError,
   onGoogleLogin,
@@ -47,20 +48,26 @@ export const LoginForm = ({
     setIsLoading(true);
 
     try {
-      // In production, call your auth API
-      // const user = await login({ email, password });
+      let user: { id: string; email: string; name?: string };
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Use custom login handler if provided (real auth), otherwise use mock auth
+      if (onLoginAttempt) {
+        // Real authentication flow
+        user = await onLoginAttempt({ email, password });
+      } else {
+        // Mock authentication flow (for development/demo)
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        user = {
+          id: "1",
+          email,
+          name: email.split("@")[0],
+        };
+      }
 
-      // Success
-      const mockUser = {
-        id: "1",
-        email,
-        name: email.split("@")[0],
-      };
+      // Call success callback
+      await onLoginSuccess?.(user);
 
-      await onLoginSuccess?.(mockUser);
+      // Navigate to after-login route
       navigate(config.afterLoginRoute);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "Login failed";
