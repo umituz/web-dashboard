@@ -1,6 +1,15 @@
 import { Check } from "lucide-react";
 import { cn } from "@umituz/web-design-system/utils";
 import type { OnboardingState } from "../types/onboarding";
+import type { ComponentType } from "react";
+
+interface UserTypeOption {
+  id: string;
+  label: string;
+  description: string;
+  icon?: ComponentType<{ className?: string }>;
+  badge?: string;
+}
 
 interface UserTypeStepProps {
   /** Current onboarding state */
@@ -8,13 +17,7 @@ interface UserTypeStepProps {
   /** Update state function */
   updateState: (updates: Partial<OnboardingState>) => void;
   /** User type options */
-  options?: Array<{
-    id: string;
-    label: string;
-    description: string;
-    icon?: React.ComponentType<{ className?: string }>;
-    badge?: string;
-  }>;
+  options?: UserTypeOption[];
 }
 
 /**
@@ -28,7 +31,7 @@ export const UserTypeStep = ({
   options = [],
 }: UserTypeStepProps) => {
   // Default options if not provided
-  const defaultOptions = [
+  const defaultOptions: UserTypeOption[] = [
     {
       id: "founder",
       label: "Founder",
@@ -77,6 +80,8 @@ export const UserTypeStep = ({
       <div className="grid grid-cols-1 gap-3">
         {userTypeOptions.map((option) => {
           const isSelected = state.selectedUserType === option.id;
+          const hasBadge = option.badge != null;
+          const hasIcon = option.icon != null;
 
           return (
             <button
@@ -103,7 +108,7 @@ export const UserTypeStep = ({
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <p className="font-bold text-foreground">{option.label}</p>
-                  {"badge" in option && option.badge && (
+                  {hasBadge && (
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                       {option.badge}
                     </span>
@@ -114,7 +119,7 @@ export const UserTypeStep = ({
                 </p>
               </div>
 
-              {"icon" in option && option.icon && (
+              {hasIcon && option.icon && (
                 <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
                   <option.icon className="h-5 w-5 text-muted-foreground" />
                 </div>
