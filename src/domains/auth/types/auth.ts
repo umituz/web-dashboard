@@ -210,10 +210,16 @@ export interface LoginFormProps {
   showForgotPassword?: boolean;
   /** Show register link */
   showRegisterLink?: boolean;
+  /** Show social login buttons */
+  showSocialLogin?: boolean;
   /** On successful login */
   onLoginSuccess?: (user: User) => void | Promise<void>;
   /** On login error */
   onLoginError?: (error: string) => void;
+  /** Google login handler */
+  onGoogleLogin?: () => void | Promise<void>;
+  /** Apple login handler */
+  onAppleLogin?: () => void | Promise<void>;
 }
 
 /**
@@ -230,10 +236,16 @@ export interface RegisterFormProps {
   showLoginLink?: boolean;
   /** Require password confirmation */
   requirePasswordConfirm?: boolean;
+  /** Show social login buttons */
+  showSocialLogin?: boolean;
   /** On successful registration */
   onRegisterSuccess?: (user: User) => void | Promise<void>;
   /** On registration error */
   onRegisterError?: (error: string) => void;
+  /** Google login handler */
+  onGoogleLogin?: () => void | Promise<void>;
+  /** Apple login handler */
+  onAppleLogin?: () => void | Promise<void>;
 }
 
 /**
