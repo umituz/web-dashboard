@@ -5,7 +5,7 @@
  */
 
 import { useState, useCallback } from "react";
-import type { DashboardNotification } from "../../domain/types";
+import type { DashboardNotification } from "../types/notification";
 
 /**
  * Use Notifications Hook

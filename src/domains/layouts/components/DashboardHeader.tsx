@@ -6,8 +6,10 @@ import {
 import { Button } from "@umituz/web-design-system/atoms";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import type { DashboardHeaderProps, DashboardUser, DashboardNotification } from "../../domain/types";
-import { formatNotificationTime } from "../../infrastructure/utils";
+import type { DashboardHeaderProps } from "../types/layout";
+import type { DashboardNotification } from "../types/notification";
+import type { DashboardUser } from "../types/user";
+import { formatNotificationTime } from "../utils/dashboard";
 
 interface DashboardHeaderPropsExtended extends DashboardHeaderProps {
   /** Auth user */

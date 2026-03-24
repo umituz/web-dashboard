@@ -5,9 +5,10 @@ import { useTranslation } from "react-i18next";
 import { Button } from "@umituz/web-design-system/atoms";
 import { BrandLogo } from "./BrandLogo";
 import { PenTool, Menu, ChevronLeft, ChevronDown, ChevronRight } from "lucide-react";
-import type { DashboardUser, SidebarGroup } from "../../domain/types";
-import type { DashboardSidebarProps } from "../../domain/types";
-import { filterSidebarItems } from "../../infrastructure/utils";
+import type { DashboardSidebarProps } from "../types/layout";
+import type { DashboardUser } from "../types/user";
+import type { SidebarGroup } from "../types/sidebar";
+import { filterSidebarItems } from "../utils/dashboard";
 
 interface DashboardSidebarPropsExtended extends DashboardSidebarProps {
   /** Sidebar groups configuration */
