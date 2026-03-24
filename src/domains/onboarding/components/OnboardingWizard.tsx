@@ -225,17 +225,19 @@ export const OnboardingWizard = ({
       {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-4xl">
-          {StepContent && typeof StepContent === 'function' ? (
-            <StepContent
-              state={state}
-              updateState={updateState}
-              goToNext={goToNext}
-              goToPrev={goToPrev}
-              goToStep={goToStep}
-              config={config}
-            />
-          ) : StepContent ? (
-            <>{StepContent}</>
+          {StepContent ? (
+            typeof StepContent === 'function' ? (
+              <StepContent
+                state={state}
+                updateState={updateState}
+                goToNext={goToNext}
+                goToPrev={goToPrev}
+                goToStep={goToStep}
+                config={config}
+              />
+            ) : (
+              <>{StepContent}</>
+            )
           ) : null}
         </div>
       </main>
