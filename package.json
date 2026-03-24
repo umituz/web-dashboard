@@ -1,6 +1,6 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "2.0.9",
+  "version": "2.1.0",
   "description": "Dashboard Layout System - Customizable, themeable dashboard layouts and settings",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -23,6 +23,11 @@
     "./onboarding/hooks": "./src/domains/onboarding/hooks/index.ts",
     "./onboarding/utils": "./src/domains/onboarding/utils/index.ts",
     "./onboarding/types": "./src/domains/onboarding/types/index.ts",
+    "./auth": "./src/domains/auth/index.ts",
+    "./auth/components": "./src/domains/auth/components/index.ts",
+    "./auth/hooks": "./src/domains/auth/hooks/index.ts",
+    "./auth/utils": "./src/domains/auth/utils/index.ts",
+    "./auth/types": "./src/domains/auth/types/index.ts",
     "./package.json": "./package.json"
   },
   "files": [
@@ -64,6 +69,10 @@
     "settings",
     "onboarding",
     "wizard",
+    "auth",
+    "authentication",
+    "login",
+    "register",
     "react",
     "typescript",
     "components",
