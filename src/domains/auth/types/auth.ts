@@ -212,7 +212,9 @@ export interface LoginFormProps {
   showRegisterLink?: boolean;
   /** Show social login buttons */
   showSocialLogin?: boolean;
-  /** On successful login */
+  /** Custom login handler (receives credentials, returns user) - overrides mock auth */
+  onLoginAttempt?: (credentials: LoginCredentials) => Promise<User>;
+  /** On successful login (called after onLoginAttempt or mock auth succeeds) */
   onLoginSuccess?: (user: User) => void | Promise<void>;
   /** On login error */
   onLoginError?: (error: string) => void;
@@ -238,7 +240,9 @@ export interface RegisterFormProps {
   requirePasswordConfirm?: boolean;
   /** Show social login buttons */
   showSocialLogin?: boolean;
-  /** On successful registration */
+  /** Custom register handler (receives register data, returns user) - overrides mock auth */
+  onRegisterAttempt?: (data: RegisterData) => Promise<User>;
+  /** On successful registration (called after onRegisterAttempt or mock auth succeeds) */
   onRegisterSuccess?: (user: User) => void | Promise<void>;
   /** On registration error */
   onRegisterError?: (error: string) => void;
