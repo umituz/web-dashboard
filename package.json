@@ -48,6 +48,26 @@
       "types": "./dist/domains/settings/types/index.d.ts",
       "import": "./dist/domains/settings/types/index.js"
     },
+    "./onboarding": {
+      "types": "./dist/domains/onboarding/index.d.ts",
+      "import": "./dist/domains/onboarding/index.js"
+    },
+    "./onboarding/components": {
+      "types": "./dist/domains/onboarding/components/index.d.ts",
+      "import": "./dist/domains/onboarding/components/index.js"
+    },
+    "./onboarding/hooks": {
+      "types": "./dist/domains/onboarding/hooks/index.d.ts",
+      "import": "./dist/domains/onboarding/hooks/index.js"
+    },
+    "./onboarding/utils": {
+      "types": "./dist/domains/onboarding/utils/index.d.ts",
+      "import": "./dist/domains/onboarding/utils/index.js"
+    },
+    "./onboarding/types": {
+      "types": "./dist/domains/onboarding/types/index.d.ts",
+      "import": "./dist/domains/onboarding/types/index.js"
+    },
     "./package.json": "./package.json"
   },
   "files": [
@@ -88,6 +108,8 @@
     "dashboard",
     "layout",
     "settings",
+    "onboarding",
+    "wizard",
     "react",
     "typescript",
     "components",
