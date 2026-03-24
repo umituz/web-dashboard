@@ -1,6 +1,6 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "Dashboard Layout System - Customizable, themeable dashboard layouts and settings",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
