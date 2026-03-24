@@ -103,9 +103,9 @@ export const UserTypeStep = ({
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <p className="font-bold text-foreground">{option.label}</p>
-                  {(option as any).badge && (
+                  {"badge" in option && option.badge && (
                     <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-primary/10 text-primary">
-                      {(option as any).badge}
+                      {option.badge}
                     </span>
                   )}
                 </div>
@@ -114,9 +114,9 @@ export const UserTypeStep = ({
                 </p>
               </div>
 
-              {(option as any).icon && (
+              {"icon" in option && option.icon && (
                 <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                  <(option as any).icon className="h-5 w-5 text-muted-foreground" />
+                  <option.icon className="h-5 w-5 text-muted-foreground" />
                 </div>
               )}
             </button>
