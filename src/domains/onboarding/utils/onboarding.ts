@@ -33,7 +33,7 @@ export function validateStep(
 
     case 2:
       // App focus step
-      return state.hasMobileApp || state.hasWebApp;
+      return !!(state.hasMobileApp || state.hasWebApp);
 
     case 3:
       // Platforms step

@@ -226,6 +226,7 @@ export const OnboardingWizard = ({
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
         <div className="w-full max-w-4xl">
           {StepContent ? (
+            // Check if it's a function component (has call signature)
             typeof StepContent === 'function' ? (
               <StepContent
                 state={state}
@@ -236,7 +237,8 @@ export const OnboardingWizard = ({
                 config={config}
               />
             ) : (
-              <>{StepContent}</>
+              // Otherwise it's a ReactElement
+              StepContent
             )
           ) : null}
         </div>

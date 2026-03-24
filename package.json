@@ -1,89 +1,45 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "2.0.5",
+  "version": "2.0.8",
   "description": "Dashboard Layout System - Customizable, themeable dashboard layouts and settings",
-  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "sideEffects": false,
   "exports": {
-    "./layouts": {
-      "types": "./dist/domains/layouts/index.d.ts",
-      "import": "./dist/domains/layouts/index.js"
-    },
-    "./layouts/components": {
-      "types": "./dist/domains/layouts/components/index.d.ts",
-      "import": "./dist/domains/layouts/components/index.js"
-    },
-    "./layouts/hooks": {
-      "types": "./dist/domains/layouts/hooks/index.d.ts",
-      "import": "./dist/domains/layouts/hooks/index.js"
-    },
-    "./layouts/utils": {
-      "types": "./dist/domains/layouts/utils/index.d.ts",
-      "import": "./dist/domains/layouts/utils/index.js"
-    },
-    "./layouts/types": {
-      "types": "./dist/domains/layouts/types/index.d.ts",
-      "import": "./dist/domains/layouts/types/index.js"
-    },
-    "./layouts/theme": {
-      "types": "./dist/domains/layouts/theme/index.d.ts",
-      "import": "./dist/domains/layouts/theme/index.js"
-    },
-    "./settings": {
-      "types": "./dist/domains/settings/index.d.ts",
-      "import": "./dist/domains/settings/index.js"
-    },
-    "./settings/components": {
-      "types": "./dist/domains/settings/components/index.d.ts",
-      "import": "./dist/domains/settings/components/index.js"
-    },
-    "./settings/hooks": {
-      "types": "./dist/domains/settings/hooks/index.d.ts",
-      "import": "./dist/domains/settings/hooks/index.js"
-    },
-    "./settings/utils": {
-      "types": "./dist/domains/settings/utils/index.d.ts",
-      "import": "./dist/domains/settings/utils/index.js"
-    },
-    "./settings/types": {
-      "types": "./dist/domains/settings/types/index.d.ts",
-      "import": "./dist/domains/settings/types/index.js"
-    },
-    "./onboarding": {
-      "types": "./dist/domains/onboarding/index.d.ts",
-      "import": "./dist/domains/onboarding/index.js"
-    },
-    "./onboarding/components": {
-      "types": "./dist/domains/onboarding/components/index.d.ts",
-      "import": "./dist/domains/onboarding/components/index.js"
-    },
-    "./onboarding/hooks": {
-      "types": "./dist/domains/onboarding/hooks/index.d.ts",
-      "import": "./dist/domains/onboarding/hooks/index.js"
-    },
-    "./onboarding/utils": {
-      "types": "./dist/domains/onboarding/utils/index.d.ts",
-      "import": "./dist/domains/onboarding/utils/index.js"
-    },
-    "./onboarding/types": {
-      "types": "./dist/domains/onboarding/types/index.d.ts",
-      "import": "./dist/domains/onboarding/types/index.js"
-    },
+    ".": "./src/index.ts",
+    "./layouts": "./src/domains/layouts/index.ts",
+    "./layouts/components": "./src/domains/layouts/components/index.ts",
+    "./layouts/hooks": "./src/domains/layouts/hooks/index.ts",
+    "./layouts/utils": "./src/domains/layouts/utils/index.ts",
+    "./layouts/types": "./src/domains/layouts/types/index.ts",
+    "./layouts/theme": "./src/domains/layouts/theme/index.ts",
+    "./settings": "./src/domains/settings/index.ts",
+    "./settings/components": "./src/domains/settings/components/index.ts",
+    "./settings/hooks": "./src/domains/settings/hooks/index.ts",
+    "./settings/utils": "./src/domains/settings/utils/index.ts",
+    "./settings/types": "./src/domains/settings/types/index.ts",
+    "./onboarding": "./src/domains/onboarding/index.ts",
+    "./onboarding/components": "./src/domains/onboarding/components/index.ts",
+    "./onboarding/hooks": "./src/domains/onboarding/hooks/index.ts",
+    "./onboarding/utils": "./src/domains/onboarding/utils/index.ts",
+    "./onboarding/types": "./src/domains/onboarding/types/index.ts",
     "./package.json": "./package.json"
   },
   "files": [
-    "dist",
+    "src",
     "README.md"
   ],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint src",
-    "test": "vitest",
-    "prepublishOnly": "npm run build"
+    "version:patch": "npm version patch -m 'chore: release v%s'",
+    "version:minor": "npm version minor -m 'chore: release v%s'",
+    "version:major": "npm version major -m 'chore: release v%s'"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
-    "react-dom": "^18.0.0 || ^19.0.0"
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "react-router-dom": "^7.0.0"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",
@@ -100,9 +56,7 @@
     "eslint": "^10.0.2",
     "react-i18next": "^16.5.4",
     "react-router-dom": "^7.13.1",
-    "tsup": "^8.4.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "typescript": "^5.9.3"
   },
   "keywords": [
     "dashboard",
@@ -116,10 +70,14 @@
     "admin",
     "sidebar",
     "header",
-    "config-driven"
+    "config-driven",
+    "package-driven"
   ],
-  "author": "Umit Uz",
+  "author": "umituz",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/umituz/web-dashboard.git"

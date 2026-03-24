@@ -5,7 +5,7 @@
  */
 
 import type { LucideIcon } from "lucide-react";
-import type { ReactNode } from "react";
+import type { ComponentType, ReactElement, ReactNode } from "react";
 
 /**
  * User type option for first step
@@ -62,6 +62,24 @@ export interface PlanOption {
 }
 
 /**
+ * Props for onboarding step components
+ */
+export interface OnboardingStepContentProps {
+  /** Current onboarding state */
+  state: OnboardingState;
+  /** Update state function */
+  updateState: (updates: Partial<OnboardingState>) => void;
+  /** Go to next step */
+  goToNext: () => void;
+  /** Go to previous step */
+  goToPrev: () => void;
+  /** Go to specific step */
+  goToStep: (step: number) => void;
+  /** Onboarding configuration */
+  config: OnboardingConfig;
+}
+
+/**
  * Onboarding step configuration
  */
 export interface OnboardingStep {
@@ -73,8 +91,8 @@ export interface OnboardingStep {
   title: string;
   /** Step description */
   description?: string;
-  /** Custom component */
-  component?: ReactNode;
+  /** Custom component - either a function component with props or a direct React node */
+  component?: ComponentType<OnboardingStepContentProps> | ReactElement;
   /** Whether this step can be skipped */
   skippable?: boolean;
   /** Validation function */
