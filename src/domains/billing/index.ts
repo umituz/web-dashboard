@@ -12,6 +12,7 @@ export {
   UsageCard,
   BillingPortal,
   BillingLayout,
+  BillingPage,
 } from "./components";
 
 // Hooks
@@ -42,6 +43,8 @@ export {
   formatFeature,
   isPopularPlan,
   getTrialDaysText,
+  transformPolarProductToPlan,
+  transformPolarProducts,
 } from "./utils";
 
 // Types
@@ -66,4 +69,5 @@ export type {
   BillingPortalProps,
   BillingLayoutProps,
   BillingConfig,
+  BillingPageProps,
 } from "./types";

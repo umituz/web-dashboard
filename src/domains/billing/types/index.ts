@@ -26,3 +26,5 @@ export type {
   BillingLayoutProps,
   BillingConfig,
 } from "./billing";
+
+export type { BillingPageProps } from "../components/BillingPage";

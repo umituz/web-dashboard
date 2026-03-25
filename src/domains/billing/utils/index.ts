@@ -27,3 +27,5 @@ export {
   isPopularPlan,
   getTrialDaysText,
 } from "./billing";
+
+export { transformPolarProductToPlan, transformPolarProducts } from "./polar";

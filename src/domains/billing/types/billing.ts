@@ -23,9 +23,9 @@ export type SubscriptionStatus = typeof SUBSCRIPTION_STATUS[keyof typeof SUBSCRI
 export type InvoiceStatus = typeof INVOICE_STATUS[keyof typeof INVOICE_STATUS];
 
 /**
- * Plan type
+ * Plan type - dynamic string from product provider
  */
-export type PlanType = "free" | "basic" | "pro" | "enterprise" | "custom";
+export type PlanType = string;
 
 /**
  * Currency
@@ -38,8 +38,8 @@ export type Currency = typeof CURRENCY[keyof typeof CURRENCY];
 export interface PlanTier {
   /** Plan ID */
   id: string;
-  /** Plan type */
-  type: PlanType;
+  /** Plan type - optional, from product metadata */
+  type?: PlanType;
   /** Plan name */
   name: string;
   /** Plan description */
