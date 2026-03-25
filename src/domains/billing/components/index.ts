@@ -10,3 +10,4 @@ export { InvoiceCard } from "./InvoiceCard";
 export { UsageCard } from "./UsageCard";
 export { BillingPortal } from "./BillingPortal";
 export { BillingLayout } from "./BillingLayout";
+export { BillingPage } from "./BillingPage";
