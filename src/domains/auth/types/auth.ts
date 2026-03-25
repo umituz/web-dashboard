@@ -91,9 +91,9 @@ export interface User {
  */
 export interface AuthActions {
   /** Login with email/password */
-  login: (credentials: LoginCredentials) => Promise<void>;
+  login: (credentials: LoginCredentials) => Promise<User>;
   /** Register new account */
-  register: (data: RegisterData) => Promise<void>;
+  register: (data: RegisterData) => Promise<User>;
   /** Logout current user */
   logout: () => Promise<void>;
   /** Send password reset email */
@@ -101,9 +101,9 @@ export interface AuthActions {
   /** Reset password with token */
   resetPassword: (data: ResetPasswordData) => Promise<void>;
   /** Update user profile */
-  updateProfile: (data: Partial<User>) => Promise<void>;
+  updateProfile: (data: Partial<User>) => Promise<User>;
   /** Refresh authentication session */
-  refresh: () => Promise<void>;
+  refresh: () => Promise<User | null>;
 }
 
 /**

@@ -219,7 +219,7 @@ export function getDateRangePresets(): DateRangePreset[] {
 export function aggregateByPeriod(
   data: Array<{ date: string; [key: string]: number | string }>,
   period: "day" | "week" | "month" = "day"
-): Array<{ date: string; [key: string]: number }> {
+): Array<{ date: string; [key: string]: number | string }> {
   const grouped = new Map<string, Array<typeof data[0]>>();
 
   data.forEach((item) => {
