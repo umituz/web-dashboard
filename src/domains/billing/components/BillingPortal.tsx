@@ -11,7 +11,7 @@ import type { BillingPortalProps } from "../types/billing";
 import { UsageCard } from "./UsageCard";
 import { PaymentMethodsList } from "./PaymentMethodsList";
 import { InvoiceCard } from "./InvoiceCard";
-import { getDaysRemaining, getStatusColor, getStatusLabel, formatPrice } from "../utils/billing";
+import { getDaysRemaining, getStatusColor, getStatusLabel, formatPrice, getPlanPrice } from "../utils/billing";
 
 export const BillingPortal = ({
   billing,

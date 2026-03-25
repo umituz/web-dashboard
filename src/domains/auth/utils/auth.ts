@@ -62,7 +62,7 @@ export function validateLogin(credentials: LoginCredentials): {
  * @returns Validation result with error message
  */
 export function validateRegister(
-  data: RegisterData,
+  data: RegisterData & { confirmPassword?: string },
   requireName: boolean = false,
   requirePasswordConfirm?: boolean
 ): {
@@ -195,7 +195,7 @@ export function isEmailVerified(user: User | null): boolean {
  * @returns Formatted date string or empty string
  */
 export function formatUserCreatedAt(user: User | null, locale: string = "en-US"): string {
-  if (!user.createdAt) return "";
+  if (!user || !user.createdAt) return "";
   return new Date(user.createdAt).toLocaleDateString(locale, {
     year: "numeric",
     month: "long",

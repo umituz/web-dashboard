@@ -228,15 +228,25 @@ export function useAuth(options: UseAuthOptions = {}) {
 
     try {
       // Update local user state
-      setAuthState((prev) => ({
-        ...prev,
-        user: prev.user ? { ...prev.user, ...data } : null,
-        isLoading: false,
-        error: null,
-      }));
+      let updatedUser: User | null = null;
+      setAuthState((prev) => {
+        updatedUser = prev.user ? { ...prev.user, ...data } : null;
+        return {
+          ...prev,
+          user: updatedUser,
+          isLoading: false,
+          error: null,
+        };
+      });
 
       // In production, call your API here
       // await authProvider?.updateProfile(data);
+
+      if (!updatedUser) {
+        throw new Error("No user to update");
+      }
+
+      return updatedUser;
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to update profile";
       updateState({

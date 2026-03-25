@@ -9,11 +9,23 @@ import type {
   Currency,
   PlanTier,
   Subscription,
+  SubscriptionStatus,
   PaymentMethod,
   Invoice,
   InvoiceStatus,
   UsageMetric,
 } from "../types/billing";
+
+/**
+ * Format number with thousand separators
+ *
+ * @param num - Number to format
+ * @param locale - Locale (default: en-US)
+ * @returns Formatted number string
+ */
+export function formatNumber(num: number, locale: string = "en-US"): string {
+  return new Intl.NumberFormat(locale).format(num);
+}
 
 /**
  * Format price with currency
@@ -114,6 +126,7 @@ export function getStatusColor(status: SubscriptionStatus): string {
     canceled: "text-gray-600 dark:text-gray-500",
     unpaid: "text-red-600 dark:text-red-500",
     incomplete: "text-yellow-600 dark:text-yellow-500",
+    revoked: "text-purple-600 dark:text-purple-500",
   };
 
   return colorMap[status] || "text-gray-600";
@@ -133,6 +146,7 @@ export function getStatusLabel(status: SubscriptionStatus): string {
     canceled: "Canceled",
     unpaid: "Unpaid",
     incomplete: "Incomplete",
+    revoked: "Revoked",
   };
 
   return labelMap[status] || status;
@@ -151,6 +165,7 @@ export function getInvoiceStatusColor(status: InvoiceStatus): string {
     paid: "text-green-600 dark:text-green-500",
     void: "text-gray-600 dark:text-gray-500",
     uncollectible: "text-red-600 dark:text-red-500",
+    refunded: "text-blue-600 dark:text-blue-500",
   };
 
   return colorMap[status] || "text-gray-600";
@@ -169,6 +184,7 @@ export function getInvoiceStatusLabel(status: InvoiceStatus): string {
     paid: "Paid",
     void: "Void",
     uncollectible: "Uncollectible",
+    refunded: "Refunded",
   };
 
   return labelMap[status] || status;
