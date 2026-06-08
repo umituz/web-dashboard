@@ -10,7 +10,9 @@ import type { AuthLayoutProps } from "../types/auth";
 
 export const AuthLayout = ({
   config,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   authState,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   authActions,
   children,
 }: AuthLayoutProps) => {

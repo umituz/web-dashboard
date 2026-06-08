@@ -24,3 +24,5 @@ export {
   generateColor,
   generateChartColors,
 } from "./analytics";
+
+export { ANALYTICS_KEYS } from "./i18nKeys";

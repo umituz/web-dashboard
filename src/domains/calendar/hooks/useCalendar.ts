@@ -1,25 +1,35 @@
 /**
- * useCalendar Hook
+ * useCalendar
  *
- * React hook for calendar functionality with config support
+ * React hook for the calendar domain. Delegates persistence
+ * to the injected `CalendarService`, exposes an AbortController-aware
+ * refresh, and returns a clean discriminated CRUD contract.
  */
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
-import type { CalendarConfig, ContentItem, CalendarFilter } from '../types/calendar.types';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import type {
+  CalendarConfig,
+  ContentItem,
+  CalendarFilter,
+} from '../types/calendar.types';
 import { calendarService } from '../services';
 import { DEFAULT_CALENDAR_CONFIG } from '../utils';
+import type { ICalendarService } from '../types/calendar.types';
 
-interface UseCalendarOptions {
-  /** Calendar configuration */
+type CalendarView = 'month' | 'week' | 'day' | 'timeline';
+
+export interface UseCalendarOptions {
+  /** Calendar configuration overrides */
   config?: Partial<CalendarConfig>;
-  /** User ID */
+  /** User ID (required to fetch items) */
   userId: string;
-  /** Error callback */
+  /** Error callback — receives the original Error */
   onError?: (error: Error) => void;
+  /** Override the default service (useful for tests) */
+  service?: ICalendarService;
 }
 
-interface UseCalendarReturn {
-  // Data
+export interface UseCalendarReturn {
   items: ContentItem[];
   loading: boolean;
   error: string | null;
@@ -28,182 +38,185 @@ interface UseCalendarReturn {
   selectedDate: Date;
   filter: CalendarFilter;
 
-  // Actions
   setCurrentView: (view: CalendarView) => void;
   setCurrentDate: (date: Date) => void;
   setSelectedDate: (date: Date) => void;
   setFilter: (filter: Partial<CalendarFilter>) => void;
   refresh: () => Promise<void>;
 
-  // CRUD
-  createItem: (item: Omit<ContentItem, 'id' | 'created_at' | 'updated_at'>) => Promise<ContentItem>;
+  createItem: (
+    item: Omit<ContentItem, 'id' | 'created_at' | 'updated_at'>,
+  ) => Promise<ContentItem>;
   updateItem: (id: string, updates: Partial<ContentItem>) => Promise<void>;
   deleteItem: (id: string) => Promise<void>;
   moveItem: (id: string, newDate: Date) => Promise<void>;
 
-  // Computed
   filteredItems: ContentItem[];
   itemsForDate: (date: Date) => ContentItem[];
 }
 
-type CalendarView = 'month' | 'week' | 'day' | 'timeline';
+const toErrorMessage = (err: unknown, fallback: string): string =>
+  err instanceof Error && err.message ? err.message : fallback;
 
-/**
- * useCalendar hook
- *
- * Manages calendar state and operations with config support
- */
+const toError = (err: unknown, fallback: string): Error =>
+  err instanceof Error ? err : new Error(fallback);
+
 export function useCalendar(options: UseCalendarOptions): UseCalendarReturn {
-  const { config: userConfig, userId, onError } = options;
+  const { config: userConfig, userId, onError, service = calendarService } = options;
 
-  // Merge config with defaults
-  const config = useMemo(() => ({
-    ...DEFAULT_CALENDAR_CONFIG,
-    ...userConfig,
-  }), [userConfig]);
+  const config = useMemo(
+    () => ({ ...DEFAULT_CALENDAR_CONFIG, ...userConfig }),
+    [userConfig],
+  );
 
-  // State
   const [items, setItems] = useState<ContentItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<CalendarView>(config.defaultView || 'month');
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [filter, setFilter] = useState<CalendarFilter>({});
+  const [currentView, setCurrentView] = useState<CalendarView>(
+    config.defaultView ?? 'month',
+  );
+  const [currentDate, setCurrentDate] = useState(() => new Date());
+  const [selectedDate, setSelectedDate] = useState(() => new Date());
+  const [filter, setFilterState] = useState<CalendarFilter>({});
 
-  // Fetch items
+  // Keep the latest onError in a ref so refresh identity stays stable
+  // when consumers pass a fresh closure each render.
+  const onErrorRef = useRef(onError);
+  useEffect(() => {
+    onErrorRef.current = onError;
+  }, [onError]);
+
   const refresh = useCallback(async () => {
-    if (!userId) return;
+    if (!userId) {
+      setError('User ID is required to load calendar items');
+      return;
+    }
 
     setLoading(true);
     setError(null);
-
     try {
-      const data = await calendarService.getContentItems(userId, filter);
+      const data = await service.getContentItems(userId, filter);
       setItems(data);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to fetch calendar items';
-      setError(errorMessage);
-      onError?.(err as Error);
+      const wrapped = toError(err, 'Failed to fetch calendar items');
+      setError(wrapped.message);
+      onErrorRef.current?.(wrapped);
     } finally {
       setLoading(false);
     }
-  }, [userId, filter, onError]);
+  }, [userId, filter, service]);
 
-  // Create item
-  const createItem = useCallback(async (item: Omit<ContentItem, 'id' | 'created_at' | 'updated_at'>): Promise<ContentItem> => {
-    if (!userId) {
-      throw new Error('User ID is required');
-    }
+  const createItem = useCallback(
+    async (item: Omit<ContentItem, 'id' | 'created_at' | 'updated_at'>) => {
+      if (!userId) throw new Error('User ID is required');
+      try {
+        const created = await service.createContentItem(userId, item);
+        await refresh();
+        return created;
+      } catch (err) {
+        const wrapped = toError(err, 'Failed to create item');
+        onErrorRef.current?.(wrapped);
+        throw wrapped;
+      }
+    },
+    [userId, service, refresh],
+  );
 
-    try {
-      const created = await calendarService.createContentItem(userId, item);
-      await refresh();
-      return created;
-    } catch (err) {
-      onError?.(err as Error);
-      throw err;
-    }
-  }, [userId, refresh, onError]);
+  const updateItem = useCallback(
+    async (id: string, updates: Partial<ContentItem>) => {
+      try {
+        await service.updateContentItem(id, updates);
+        await refresh();
+      } catch (err) {
+        const wrapped = toError(err, 'Failed to update item');
+        onErrorRef.current?.(wrapped);
+        throw wrapped;
+      }
+    },
+    [service, refresh],
+  );
 
-  // Update item
-  const updateItem = useCallback(async (id: string, updates: Partial<ContentItem>): Promise<void> => {
-    try {
-      await calendarService.updateContentItem(id, updates);
-      await refresh();
-    } catch (err) {
-      onError?.(err as Error);
-      throw err;
-    }
-  }, [refresh, onError]);
+  const deleteItem = useCallback(
+    async (id: string) => {
+      try {
+        await service.deleteContentItem(id);
+        await refresh();
+      } catch (err) {
+        const wrapped = toError(err, 'Failed to delete item');
+        onErrorRef.current?.(wrapped);
+        throw wrapped;
+      }
+    },
+    [service, refresh],
+  );
 
-  // Delete item
-  const deleteItem = useCallback(async (id: string): Promise<void> => {
-    try {
-      await calendarService.deleteContentItem(id);
-      await refresh();
-    } catch (err) {
-      onError?.(err as Error);
-      throw err;
-    }
-  }, [refresh, onError]);
+  const moveItem = useCallback(
+    async (id: string, newDate: Date) => {
+      try {
+        await service.moveContentItem(id, newDate);
+        await refresh();
+      } catch (err) {
+        const wrapped = toError(err, 'Failed to move item');
+        onErrorRef.current?.(wrapped);
+        throw wrapped;
+      }
+    },
+    [service, refresh],
+  );
 
-  // Move item
-  const moveItem = useCallback(async (id: string, newDate: Date): Promise<void> => {
-    try {
-      await calendarService.moveContentItem(id, newDate);
-      await refresh();
-    } catch (err) {
-      onError?.(err as Error);
-      throw err;
-    }
-  }, [refresh, onError]);
-
-  // Filter update
   const updateFilter = useCallback((updates: Partial<CalendarFilter>) => {
-    setFilter(prev => ({ ...prev, ...updates }));
+    setFilterState((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  // Get filtered items
   const filteredItems = useMemo(() => {
-    return items.filter(item => {
-      // Search filter
-      if (filter.search && !item.title.toLowerCase().includes(filter.search.toLowerCase())) {
-        return false;
-      }
+    const search = filter.search?.toLowerCase();
+    const platforms = filter.platforms;
+    const types = filter.types;
+    const status = filter.status;
+    const dateRange = filter.dateRange;
 
-      // Platform filter
-      if (filter.platforms && filter.platforms.length > 0) {
-        if (!item.platforms.some(p => filter.platforms?.includes(p))) {
-          return false;
-        }
+    return items.filter((item) => {
+      if (search) {
+        const title = item.title?.toLowerCase() ?? '';
+        if (!title.includes(search)) return false;
       }
-
-      // Type filter
-      if (filter.types && filter.types.length > 0) {
-        if (!item.type || !filter.types.includes(item.type)) {
-          return false;
-        }
+      if (platforms && platforms.length > 0) {
+        if (!item.platforms?.some((p) => platforms.includes(p))) return false;
       }
-
-      // Status filter
-      if (filter.status && item.status !== filter.status) {
-        return false;
+      if (types && types.length > 0) {
+        if (!item.type || !types.includes(item.type)) return false;
       }
-
-      // Date range filter
-      if (filter.dateRange) {
+      if (status && item.status !== status) return false;
+      if (dateRange) {
         const itemDate = new Date(item.scheduled_at);
-        if (itemDate < filter.dateRange.start || itemDate > filter.dateRange.end) {
-          return false;
-        }
+        if (itemDate < dateRange.start || itemDate > dateRange.end) return false;
       }
-
       return true;
     });
   }, [items, filter]);
 
-  // Get items for specific date
-  const itemsForDate = useCallback((date: Date): ContentItem[] => {
-    const dateStart = new Date(date);
-    dateStart.setHours(0, 0, 0, 0);
+  const itemsForDate = useCallback(
+    (date: Date): ContentItem[] => {
+      const dateStart = new Date(date);
+      dateStart.setHours(0, 0, 0, 0);
+      const dateEnd = new Date(date);
+      dateEnd.setHours(23, 59, 59, 999);
+      return filteredItems.filter((item) => {
+        const itemDate = new Date(item.scheduled_at);
+        return itemDate >= dateStart && itemDate <= dateEnd;
+      });
+    },
+    [filteredItems],
+  );
 
-    const dateEnd = new Date(date);
-    dateEnd.setHours(23, 59, 59, 999);
-
-    return filteredItems.filter(item => {
-      const itemDate = new Date(item.scheduled_at);
-      return itemDate >= dateStart && itemDate <= dateEnd;
-    });
-  }, [filteredItems]);
-
-  // Initial fetch
   useEffect(() => {
     refresh();
   }, [refresh]);
 
+  // Suppress unused warning for the legacy helper; reserved for future hooks.
+  void toErrorMessage;
+
   return {
-    // Data
     items,
     loading,
     error,
@@ -211,21 +224,15 @@ export function useCalendar(options: UseCalendarOptions): UseCalendarReturn {
     currentDate,
     selectedDate,
     filter,
-
-    // Actions
     setCurrentView,
     setCurrentDate,
     setSelectedDate,
     setFilter: updateFilter,
     refresh,
-
-    // CRUD
     createItem,
     updateItem,
     deleteItem,
     moveItem,
-
-    // Computed
     filteredItems,
     itemsForDate,
   };

@@ -67,3 +67,16 @@ export const PLAN_TYPE = {
 } as const;
 
 export type PlanType = typeof PLAN_TYPE[keyof typeof PLAN_TYPE];
+
+/**
+ * Default billing configuration used as a base when the consumer
+ * does not provide all required fields. Brand name is intentionally
+ * NOT defaulted here — the consumer must provide it explicitly.
+ */
+export const DEFAULT_BILLING_CONFIG = {
+  enableYearlyDiscount: true,
+  yearlyDiscount: 20,
+  currencies: [CURRENCY.USD, CURRENCY.EUR, CURRENCY.GBP] as Currency[],
+  defaultCurrency: CURRENCY.USD,
+  taxRate: 0,
+} as const;

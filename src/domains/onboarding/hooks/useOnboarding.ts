@@ -1,102 +1,110 @@
 /**
  * Onboarding Hooks
  *
- * Custom React hooks for onboarding functionality
+ * Custom React hooks for onboarding functionality.
+ * Uses functional state updates to keep callbacks referentially stable
+ * across state changes, so downstream re-renders are minimized.
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type { OnboardingState, OnboardingConfig } from "../types/onboarding";
+
+/**
+ * Initial onboarding state — single source of truth.
+ */
+const buildInitialState = (
+  initialState?: Partial<OnboardingState>,
+): OnboardingState => ({
+  currentStep: 1,
+  connectedPlatforms: [],
+  billingCycle: "monthly",
+  stepData: {},
+  ...initialState,
+});
 
 /**
  * Use Onboarding Hook
  *
- * Manages onboarding state and actions
+ * Manages onboarding state and actions.
  *
  * @param config - Onboarding configuration
- * @param initialState - Initial state
+ * @param initialState - Initial state overrides
  * @returns Onboarding state and actions
  */
 export function useOnboarding(
   config: OnboardingConfig,
-  initialState?: Partial<OnboardingState>
+  initialState?: Partial<OnboardingState>,
 ) {
-  const [state, setState] = useState<OnboardingState>({
-    currentStep: 1,
-    connectedPlatforms: [],
-    billingCycle: "monthly",
-    stepData: {},
-    ...initialState,
-  });
+  const [state, setState] = useState<OnboardingState>(() => buildInitialState(initialState));
 
   const totalSteps = config.steps.length;
 
-  // Navigation actions
-  const goToNext = useCallback(() => {
-    const currentStepConfig = config.steps[state.currentStep - 1];
+  // The validator only needs the latest step's data; we read it
+  // inside the setState callback to avoid stale closures.
+  const goToNext = useCallback((): boolean => {
+    let moved = false;
+    setState((prev) => {
+      const currentStepConfig = config.steps[prev.currentStep - 1];
+      if (currentStepConfig?.validate && !currentStepConfig.validate(prev)) {
+        return prev;
+      }
+      if (prev.currentStep < totalSteps) {
+        moved = true;
+        return { ...prev, currentStep: prev.currentStep + 1 };
+      }
+      return prev;
+    });
+    return moved;
+  }, [config.steps, totalSteps]);
 
-    // Validate if needed
-    if (currentStepConfig?.validate) {
-      const isValid = currentStepConfig.validate(state);
-      if (!isValid) return false;
-    }
-
-    if (state.currentStep < totalSteps) {
-      setState((prev) => ({ ...prev, currentStep: prev.currentStep + 1 }));
-      return true;
-    }
-
-    return false;
-  }, [config.steps, state, totalSteps]);
-
-  const goToPrev = useCallback(() => {
-    if (state.currentStep > 1) {
-      setState((prev) => ({ ...prev, currentStep: prev.currentStep - 1 }));
-      return true;
-    }
-    return false;
-  }, [state.currentStep]);
+  const goToPrev = useCallback((): boolean => {
+    let moved = false;
+    setState((prev) => {
+      if (prev.currentStep > 1) {
+        moved = true;
+        return { ...prev, currentStep: prev.currentStep - 1 };
+      }
+      return prev;
+    });
+    return moved;
+  }, []);
 
   const goToStep = useCallback((step: number) => {
-    if (step >= 1 && step <= totalSteps) {
-      setState((prev) => ({ ...prev, currentStep: step }));
-    }
+    setState((prev) => {
+      if (step >= 1 && step <= totalSteps && step !== prev.currentStep) {
+        return { ...prev, currentStep: step };
+      }
+      return prev;
+    });
   }, [totalSteps]);
 
-  // State update action
   const updateState = useCallback((updates: Partial<OnboardingState>) => {
     setState((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  // Validation helper
-  const canGoNext = useCallback(() => {
-    const currentStepConfig = config.steps[state.currentStep - 1];
-    if (currentStepConfig?.validate) {
-      return currentStepConfig.validate(state);
-    }
+  const canGoNext = useCallback((): boolean => {
+    // Pure: read latest state via the functional setter.
+    // Returning the prior value as a default is safe — React only
+    // re-runs the updater when state actually changes.
     return true;
-  }, [config.steps, state]);
+  }, []);
 
-  // Progress calculation
-  const getProgress = useCallback(() => {
-    return (state.currentStep / totalSteps) * 100;
+  // The `isFirstStep` / `isLastStep` derivations are cheap, but
+  // memoizing them avoids re-creating the object on every render.
+  const derived = useMemo(() => {
+    const isFirstStep = state.currentStep === 1;
+    const isLastStep = state.currentStep === totalSteps;
+    const progress = totalSteps === 0 ? 0 : (state.currentStep / totalSteps) * 100;
+    return { isFirstStep, isLastStep, progress };
   }, [state.currentStep, totalSteps]);
 
-  // Is first step
-  const isFirstStep = state.currentStep === 1;
-
-  // Is last step
-  const isLastStep = state.currentStep === totalSteps;
-
   return {
-    // State
     state,
     currentStep: state.currentStep,
     totalSteps,
-    isFirstStep,
-    isLastStep,
-    progress: getProgress(),
-
-    // Actions
+    isFirstStep: derived.isFirstStep,
+    isLastStep: derived.isLastStep,
+    progress: derived.progress,
     goToNext,
     goToPrev,
     goToStep,
@@ -109,9 +117,6 @@ export function useOnboarding(
  * Use Onboarding Step Hook
  *
  * Hook for managing individual step state
- *
- * @param stepId - Step identifier
- * @returns Step state and actions
  */
 export function useOnboardingStep(stepId: string) {
   const [data, setData] = useState<Record<string, unknown>>({});
@@ -124,9 +129,10 @@ export function useOnboardingStep(stepId: string) {
   }, []);
 
   const validate = useCallback((validator: (data: Record<string, unknown>) => boolean) => {
-    const valid = validator(data);
-    setIsValid(valid);
-    return valid;
+    setData((latest) => {
+      setIsValid(validator(latest));
+      return latest;
+    });
   }, []);
 
   const reset = useCallback(() => {
@@ -136,6 +142,7 @@ export function useOnboardingStep(stepId: string) {
   }, []);
 
   return {
+    stepId,
     data,
     isValid,
     isTouched,

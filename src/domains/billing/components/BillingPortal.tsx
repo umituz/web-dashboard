@@ -1,17 +1,29 @@
 /**
- * Billing Portal Component
+ * Billing Portal
  *
- * Main billing portal with tabs
+ * Main billing portal with tabs.
+ * Uses proper a11y semantics (role=tablist, role=tab, aria-selected, aria-controls)
+ * and delegates tab content to dedicated subcomponents.
  */
 
 import { CreditCard, FileText, BarChart3, Settings, Loader2, AlertCircle } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@umituz/web-design-system/utils";
-import { Button } from "@umituz/web-design-system/atoms";
-import type { BillingPortalProps } from "../types/billing";
-import { UsageCard } from "./UsageCard";
+import type { BillingPortalProps, BillingTabId } from "../types/billing";
+import { BILLING_KEYS } from "../utils/i18nKeys";
 import { PaymentMethodsList } from "./PaymentMethodsList";
 import { InvoiceCard } from "./InvoiceCard";
-import { getDaysRemaining, getStatusColor, getStatusLabel, formatPrice, getPlanPrice } from "../utils/billing";
+import { PlanTab } from "./PlanTab";
+import { OverviewTab } from "./OverviewTab";
+
+const TABS: ReadonlyArray<{ id: BillingTabId; labelKey: string; icon: typeof BarChart3 }> = [
+  { id: "overview", labelKey: BILLING_KEYS.portal.tabs.overview, icon: BarChart3 },
+  { id: "payment-methods", labelKey: BILLING_KEYS.portal.tabs.paymentMethods, icon: CreditCard },
+  { id: "invoices", labelKey: BILLING_KEYS.portal.tabs.invoices, icon: FileText },
+  { id: "plan", labelKey: BILLING_KEYS.portal.tabs.plan, icon: Settings },
+];
+
+const LOCALE = 'en-US';
 
 export const BillingPortal = ({
   billing,
@@ -20,26 +32,35 @@ export const BillingPortal = ({
   showTabs = true,
   activeTab = "overview",
   onTabChange,
+  onAddPaymentMethod,
+  onSetDefaultPaymentMethod,
+  onRemovePaymentMethod,
+  onViewInvoice,
+  onChangePlan,
+  onCancelSubscription,
 }: BillingPortalProps) => {
-  const tabs = [
-    { id: "overview", label: "Overview", icon: BarChart3 },
-    { id: "payment-methods", label: "Payment Methods", icon: CreditCard },
-    { id: "invoices", label: "Invoices", icon: FileText },
-    { id: "plan", label: "Plan", icon: Settings },
-  ];
+  const { t } = useTranslation();
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-24">
-        <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+      <div
+        className="flex items-center justify-center py-24"
+        role="status"
+        aria-live="polite"
+      >
+        <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" aria-hidden="true" />
+        <span className="sr-only">{t(BILLING_KEYS.common.loading)}</span>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-24 gap-4 text-destructive">
-        <AlertCircle className="h-6 w-6" />
+      <div
+        className="flex items-center justify-center py-24 gap-4 text-destructive"
+        role="alert"
+      >
+        <AlertCircle className="h-6 w-6" aria-hidden="true" />
         <p>{error}</p>
       </div>
     );
@@ -50,112 +71,26 @@ export const BillingPortal = ({
   const renderContent = () => {
     switch (activeTab) {
       case "overview":
-        return (
-          <div className="space-y-6">
-            {/* Current Subscription */}
-            <div className="p-6 rounded-xl border border-border bg-background">
-              <h3 className="text-lg font-semibold text-foreground mb-4">
-                Current Subscription
-              </h3>
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-2xl font-bold text-foreground">
-                    {billing.subscription.plan.name}
-                  </p>
-                  <p className={cn("text-sm font-medium", getStatusColor(billing.subscription.status))}>
-                    {getStatusLabel(billing.subscription.status)}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    {formatPrice(
-                      getPlanPrice(billing.subscription.plan, billing.subscription.cycle),
-                      billing.subscription.plan.currency
-                    )}
-                    /{billing.subscription.cycle}
-                  </p>
-                </div>
-                <div className="text-right">
-                  {billing.subscription.status === "trialing" && billing.subscription.trialEnd && (
-                    <p className="text-sm text-muted-foreground">
-                      {getDaysRemaining(billing.subscription.trialEnd)} days left in trial
-                    </p>
-                  )}
-                  {billing.upcomingInvoice && (
-                    <p className="text-sm text-muted-foreground">
-                      Next billing:{" "}
-                      {new Date(billing.upcomingInvoice.date).toLocaleDateString()}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Usage Metrics */}
-            {billing.usage.length > 0 && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {billing.usage.map((metric) => (
-                  <UsageCard key={metric.id} metric={metric} />
-                ))}
-              </div>
-            )}
-
-            {/* Upcoming Invoice */}
-            {billing.upcomingInvoice && (
-              <div className="p-6 rounded-xl border border-border bg-background">
-                <h3 className="text-lg font-semibold text-foreground mb-2">
-                  Upcoming Invoice
-                </h3>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-3xl font-bold text-foreground">
-                      {formatPrice(billing.upcomingInvoice.amount, billing.upcomingInvoice.currency)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Due {new Date(billing.upcomingInvoice.date).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-
+        return <OverviewTab billing={billing} locale={LOCALE} />;
       case "payment-methods":
         return (
           <PaymentMethodsList
             paymentMethods={billing.paymentMethods}
-            onAddNew={() => console.log("Add payment method")}
-            onSetDefault={(id) => console.log("Set default:", id)}
-            onRemove={(id) => console.log("Remove:", id)}
+            onAddNew={onAddPaymentMethod}
+            onSetDefault={onSetDefaultPaymentMethod}
+            onRemove={onRemovePaymentMethod}
           />
         );
-
       case "invoices":
-        return (
-          <div className="space-y-4">
-            {billing.recentInvoices.length > 0 ? (
-              billing.recentInvoices.map((invoice) => (
-                <InvoiceCard
-                  key={invoice.id}
-                  invoice={invoice}
-                  onClick={(inv) => console.log("View invoice:", inv)}
-                />
-              ))
-            ) : (
-              <div className="text-center py-12 text-muted-foreground">
-                <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>No invoices yet</p>
-              </div>
-            )}
-          </div>
-        );
-
+        return <InvoiceList invoices={billing.recentInvoices} onView={onViewInvoice} locale={LOCALE} />;
       case "plan":
         return (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Plan management coming soon...</p>
-          </div>
+          <PlanTab
+            subscription={billing.subscription}
+            onChangePlan={onChangePlan}
+            onCancelSubscription={onCancelSubscription}
+          />
         );
-
       default:
         return null;
     }
@@ -163,25 +98,42 @@ export const BillingPortal = ({
 
   return (
     <div className="w-full">
-      {/* Tabs */}
       {showTabs && (
-        <div className="border-b border-border mb-6">
+        <div className="border-b border-border mb-6" role="tablist" aria-orientation="horizontal">
           <div className="flex gap-6">
-            {tabs.map((tab) => {
+            {TABS.map((tab) => {
               const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
+                  id={`billing-tab-${tab.id}`}
+                  role="tab"
+                  type="button"
+                  aria-selected={isActive}
+                  aria-controls="billing-tab-panel"
+                  tabIndex={isActive ? 0 : -1}
                   onClick={() => onTabChange?.(tab.id)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
+                      e.preventDefault();
+                      const idx = TABS.findIndex((tt) => tt.id === activeTab);
+                      const nextIdx =
+                        e.key === 'ArrowRight'
+                          ? (idx + 1) % TABS.length
+                          : (idx - 1 + TABS.length) % TABS.length;
+                      onTabChange?.(TABS[nextIdx].id);
+                    }
+                  }}
                   className={cn(
                     "flex items-center gap-2 pb-4 border-b-2 transition-colors",
-                    activeTab === tab.id
+                    isActive
                       ? "border-primary text-foreground"
-                      : "border-transparent text-muted-foreground hover:text-foreground"
+                      : "border-transparent text-muted-foreground hover:text-foreground",
                   )}
                 >
-                  <Icon className="h-4 w-4" />
-                  <span className="font-medium">{tab.label}</span>
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                  <span className="font-medium">{t(tab.labelKey)}</span>
                 </button>
               );
             })}
@@ -189,8 +141,45 @@ export const BillingPortal = ({
         </div>
       )}
 
-      {/* Content */}
-      {renderContent()}
+      <div
+        id="billing-tab-panel"
+        role="tabpanel"
+        aria-labelledby={`billing-tab-${activeTab}`}
+      >
+        {renderContent()}
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Invoices list — extracted inline so BillingPortal stays focused on layout.
+ */
+const InvoiceList = ({
+  invoices,
+  onView,
+  locale,
+}: {
+  invoices: NonNullable<BillingPortalProps['billing']>['recentInvoices'];
+  onView?: (invoice: NonNullable<BillingPortalProps['billing']>['recentInvoices'][number]) => void;
+  locale: string;
+}) => {
+  const { t } = useTranslation();
+
+  if (invoices.length === 0) {
+    return (
+      <div className="text-center py-12 text-muted-foreground">
+        <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" aria-hidden="true" />
+        <p>{t(BILLING_KEYS.portal.invoices.empty)}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {invoices.map((invoice) => (
+        <InvoiceCard key={invoice.id} invoice={invoice} onClick={onView} locale={locale} />
+      ))}
     </div>
   );
 };

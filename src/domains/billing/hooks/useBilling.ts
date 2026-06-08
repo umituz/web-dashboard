@@ -1,385 +1,269 @@
 /**
- * useBilling Hook
+ * useBilling
  *
- * Core billing hook for managing subscription and payments
+ * Pure state + side-effect container for the billing domain.
+ * No mock data, no commented-out API stubs — all persistence
+ * goes through the `apiClient` injected via options.
  */
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type {
   BillingSummary,
   BillingCycle,
-  PlanTier,
   PaymentMethod,
+  PaymentMethodInput,
   Invoice,
-  UsageMetric,
 } from "../types/billing";
-import { formatPrice } from "../utils/billing";
+import { DEFAULT_BILLING_CONFIG } from "../constants/billing";
 
-interface UseBillingOptions {
-  /** Billing API base URL */
-  apiUrl?: string;
-  /** Initial billing data */
-  initialData?: BillingSummary;
-}
-
-interface BillingActions {
-  /** Load billing summary */
-  loadBilling: () => Promise<void>;
-  /** Update subscription plan */
+/**
+ * API client contract — implementations can be a real fetch wrapper,
+ * a Firebase function, or a test double.
+ */
+export interface BillingApiClient {
+  loadBilling: () => Promise<BillingSummary>;
   updatePlan: (planId: string) => Promise<void>;
-  /** Cancel subscription */
   cancelSubscription: () => Promise<void>;
-  /** Update billing cycle */
   updateCycle: (cycle: BillingCycle) => Promise<void>;
-  /** Add payment method */
-  addPaymentMethod: (paymentMethodDetails: any) => Promise<PaymentMethod>;
-  /** Remove payment method */
+  addPaymentMethod: (input: PaymentMethodInput) => Promise<PaymentMethod>;
   removePaymentMethod: (methodId: string) => Promise<void>;
-  /** Set default payment method */
   setDefaultPaymentMethod: (methodId: string) => Promise<void>;
-  /** Get invoice URL */
   getInvoiceUrl: (invoiceId: string) => Promise<string>;
 }
 
-/**
- * useBilling hook
- *
- * Manages billing state and actions
- *
- * @param options - Hook options
- * @returns Billing state and actions
- */
-export function useBilling(options: UseBillingOptions = {}) {
-  const { apiUrl = "/api/billing", initialData } = options;
+interface UseBillingOptions {
+  /** Initial billing data (avoids loading flash on mount) */
+  initialData?: BillingSummary;
+  /** API client — required to actually persist mutations */
+  apiClient: BillingApiClient;
+}
 
-  // State
-  const [billing, setBilling] = useState<BillingSummary | null>(initialData || null);
+export interface UseBillingReturn {
+  billing: BillingSummary | null;
+  isLoading: boolean;
+  error: string | null;
+  loadBilling: () => Promise<void>;
+  updatePlan: (planId: string) => Promise<void>;
+  cancelSubscription: () => Promise<void>;
+  updateCycle: (cycle: BillingCycle) => Promise<void>;
+  addPaymentMethod: (input: PaymentMethodInput) => Promise<PaymentMethod | null>;
+  removePaymentMethod: (methodId: string) => Promise<void>;
+  setDefaultPaymentMethod: (methodId: string) => Promise<void>;
+  getInvoiceUrl: (invoiceId: string) => Promise<string | null>;
+}
+
+/**
+ * Translate a thrown value into a user-facing error message.
+ * Non-Error throws are surfaced as a generic message — never
+ * as the raw thrown value (which can be a string, object, or symbol).
+ */
+const toErrorMessage = (err: unknown, fallback: string): string => {
+  if (err instanceof Error && err.message) return err.message;
+  return fallback;
+};
+
+/**
+ * Wrap an async billing action with the standard
+ * isLoading + error contract. Errors are both surfaced to state
+ * and re-thrown so the caller can react when needed.
+ */
+const executeBillingAction = async <T>(
+  setIsLoading: (loading: boolean) => void,
+  setError: (message: string | null) => void,
+  fallbackMessage: string,
+  action: () => Promise<T>,
+): Promise<T | null> => {
+  setIsLoading(true);
+  setError(null);
+  try {
+    return await action();
+  } catch (err) {
+    setError(toErrorMessage(err, fallbackMessage));
+    return null;
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+export function useBilling(options: UseBillingOptions): UseBillingReturn {
+  const { initialData, apiClient } = options;
+
+  const [billing, setBilling] = useState<BillingSummary | null>(initialData ?? null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Load billing summary
   const loadBilling = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+    const result = await executeBillingAction(setIsLoading, setError, 'Failed to load billing', () =>
+      apiClient.loadBilling(),
+    );
+    if (result) setBilling(result);
+  }, [apiClient]);
 
-    try {
-      // In production, call your billing API
-      // const response = await fetch(apiUrl);
-      // const data = await response.json();
+  const updatePlan = useCallback(
+    async (planId: string) => {
+      await executeBillingAction(setIsLoading, setError, 'Failed to update plan', () =>
+        apiClient.updatePlan(planId).then(() => {
+          setBilling((prev) =>
+            prev
+              ? { ...prev, subscription: { ...prev.subscription, planId } }
+              : prev,
+          );
+        }),
+      );
+    },
+    [apiClient],
+  );
 
-      // Mock data for demo
-      const mockBilling: BillingSummary = {
-        subscription: {
-          id: "sub_123",
-          planId: "pro",
-          plan: {
-            id: "pro",
-            type: "pro",
-            name: "Pro Plan",
-            description: "For growing teams",
-            monthlyPrice: 49,
-            yearlyPrice: 490,
-            currency: "USD",
-            features: [
-              "Up to 10 users",
-              "100GB storage",
-              "100K API calls/month",
-              "Priority support",
-            ],
-          },
-          status: "active",
-          cycle: "monthly",
-          currentPeriodStart: new Date().toISOString(),
-          currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          seats: 5,
-        },
-        paymentMethods: [
-          {
-            id: "pm_123",
-            type: "card",
-            isDefault: true,
-            card: {
-              last4: "4242",
-              brand: "Visa",
-              expiryMonth: 12,
-              expiryYear: 2025,
-              name: "John Doe",
-            },
-            createdAt: new Date().toISOString(),
-          },
-        ],
-        defaultPaymentMethod: {
-          id: "pm_123",
-          type: "card",
-          isDefault: true,
-          card: {
-            last4: "4242",
-            brand: "Visa",
-            expiryMonth: 12,
-            expiryYear: 2025,
-            name: "John Doe",
-          },
-          createdAt: new Date().toISOString(),
-        },
-        upcomingInvoice: {
-          amount: 49,
-          currency: "USD",
-          date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        },
-        usage: [
-          {
-            id: "storage",
-            name: "Storage",
-            current: 67.5,
-            limit: 100,
-            unit: "GB",
-            resetPeriod: "monthly",
-            resetAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          },
-          {
-            id: "api",
-            name: "API Calls",
-            current: 75000,
-            limit: 100000,
-            unit: "calls",
-            resetPeriod: "monthly",
-            resetAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          },
-        ],
-        recentInvoices: [],
-      };
-
-      setBilling(mockBilling);
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to load billing";
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [apiUrl]);
-
-  // Update subscription plan
-  const updatePlan = useCallback(async (planId: string) => {
-    if (!billing) return;
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // In production, call your billing API
-      // await fetch(`${apiUrl}/subscription`, {
-      //   method: 'PATCH',
-      //   body: JSON.stringify({ planId }),
-      // });
-
-      // Mock update
-      setBilling((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          subscription: {
-            ...prev.subscription,
-            planId,
-          },
-        };
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update plan";
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [apiUrl, billing]);
-
-  // Cancel subscription
   const cancelSubscription = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
+    await executeBillingAction(setIsLoading, setError, 'Failed to cancel subscription', () =>
+      apiClient.cancelSubscription().then(() => {
+        setBilling((prev) =>
+          prev
+            ? {
+                ...prev,
+                subscription: {
+                  ...prev.subscription,
+                  status: 'canceled',
+                  cancelAtPeriodEnd: true,
+                },
+              }
+            : prev,
+        );
+      }),
+    );
+  }, [apiClient]);
 
-    try {
-      // In production, call your billing API
-      // await fetch(`${apiUrl}/subscription/cancel`, { method: 'POST' });
+  const updateCycle = useCallback(
+    async (cycle: BillingCycle) => {
+      await executeBillingAction(setIsLoading, setError, 'Failed to update cycle', () =>
+        apiClient.updateCycle(cycle).then(() => {
+          setBilling((prev) =>
+            prev
+              ? { ...prev, subscription: { ...prev.subscription, cycle } }
+              : prev,
+          );
+        }),
+      );
+    },
+    [apiClient],
+  );
 
-      // Mock cancel
-      setBilling((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          subscription: {
-            ...prev.subscription,
-            status: "canceled",
-            cancelAtPeriodEnd: true,
-          },
-        };
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to cancel subscription";
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [apiUrl]);
+  const addPaymentMethod = useCallback(
+    async (input: PaymentMethodInput): Promise<PaymentMethod | null> => {
+      return executeBillingAction(setIsLoading, setError, 'Failed to add payment method', () =>
+        apiClient.addPaymentMethod(input).then((method) => {
+          setBilling((prev) =>
+            prev ? { ...prev, paymentMethods: [...prev.paymentMethods, method] } : prev,
+          );
+          return method;
+        }),
+      );
+    },
+    [apiClient],
+  );
 
-  // Update billing cycle
-  const updateCycle = useCallback(async (cycle: BillingCycle) => {
-    setIsLoading(true);
-    setError(null);
+  const removePaymentMethod = useCallback(
+    async (methodId: string) => {
+      await executeBillingAction(setIsLoading, setError, 'Failed to remove payment method', () =>
+        apiClient.removePaymentMethod(methodId).then(() => {
+          setBilling((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  paymentMethods: prev.paymentMethods.filter((pm) => pm.id !== methodId),
+                }
+              : prev,
+          );
+        }),
+      );
+    },
+    [apiClient],
+  );
 
-    try {
-      // In production, call your billing API
-      // await fetch(`${apiUrl}/subscription/cycle`, {
-      //   method: 'PATCH',
-      //   body: JSON.stringify({ cycle }),
-      // });
+  const setDefaultPaymentMethod = useCallback(
+    async (methodId: string) => {
+      await executeBillingAction(setIsLoading, setError, 'Failed to set default payment method', () =>
+        apiClient.setDefaultPaymentMethod(methodId).then(() => {
+          setBilling((prev) => {
+            if (!prev) return prev;
+            const methods = prev.paymentMethods.map((pm) => ({
+              ...pm,
+              isDefault: pm.id === methodId,
+            }));
+            const defaultPaymentMethod = methods.find((pm) => pm.id === methodId);
+            return { ...prev, paymentMethods: methods, defaultPaymentMethod };
+          });
+        }),
+      );
+    },
+    [apiClient],
+  );
 
-      // Mock update
-      setBilling((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          subscription: {
-            ...prev.subscription,
-            cycle,
-          },
-        };
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to update cycle";
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [apiUrl]);
+  const getInvoiceUrl = useCallback(
+    async (invoiceId: string): Promise<string | null> => {
+      const result = await executeBillingAction(
+        setIsLoading,
+        setError,
+        'Failed to get invoice URL',
+        () => apiClient.getInvoiceUrl(invoiceId),
+      );
+      return result;
+    },
+    [apiClient],
+  );
 
-  // Add payment method
-  const addPaymentMethod = useCallback(async (paymentMethodDetails: any) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // In production, call your billing API
-      // const response = await fetch(`${apiUrl}/payment-methods`, {
-      //   method: 'POST',
-      //   body: JSON.stringify(paymentMethodDetails),
-      // });
-      // const newMethod = await response.json();
-
-      // Mock add
-      const newMethod: PaymentMethod = {
-        id: `pm_${Date.now()}`,
-        type: "card",
-        isDefault: false,
-        card: paymentMethodDetails,
-        createdAt: new Date().toISOString(),
-      };
-
-      setBilling((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          paymentMethods: [...prev.paymentMethods, newMethod],
-        };
-      });
-
-      return newMethod;
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to add payment method";
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [apiUrl]);
-
-  // Remove payment method
-  const removePaymentMethod = useCallback(async (methodId: string) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // In production, call your billing API
-      // await fetch(`${apiUrl}/payment-methods/${methodId}`, {
-      //   method: 'DELETE',
-      // });
-
-      // Mock remove
-      setBilling((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          paymentMethods: prev.paymentMethods.filter((pm) => pm.id !== methodId),
-        };
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to remove payment method";
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [apiUrl]);
-
-  // Set default payment method
-  const setDefaultPaymentMethod = useCallback(async (methodId: string) => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      // In production, call your billing API
-      // await fetch(`${apiUrl}/payment-methods/${methodId}/default`, {
-      //   method: 'PATCH',
-      // });
-
-      // Mock update
-      setBilling((prev) => {
-        if (!prev) return null;
-        return {
-          ...prev,
-          paymentMethods: prev.paymentMethods.map((pm) => ({
-            ...pm,
-            isDefault: pm.id === methodId,
-          })),
-          defaultPaymentMethod: prev.paymentMethods.find((pm) => pm.id === methodId),
-        };
-      });
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to set default payment method";
-      setError(errorMessage);
-      throw err;
-    } finally {
-      setIsLoading(false);
-    }
-  }, [apiUrl]);
-
-  // Get invoice URL
-  const getInvoiceUrl = useCallback(async (invoiceId: string) => {
-    // In production, call your billing API
-    // const response = await fetch(`${apiUrl}/invoices/${invoiceId}`);
-    // const data = await response.json();
-    // return data.invoiceUrl;
-
-    return `#invoice-${invoiceId}`;
-  }, [apiUrl]);
-
-  const actions: BillingActions = {
-    loadBilling,
-    updatePlan,
-    cancelSubscription,
-    updateCycle,
-    addPaymentMethod,
-    removePaymentMethod,
-    setDefaultPaymentMethod,
-    getInvoiceUrl,
-  };
-
-  return {
-    billing,
-    isLoading,
-    error,
-    ...actions,
-  };
+  return useMemo(
+    () => ({
+      billing,
+      isLoading,
+      error,
+      loadBilling,
+      updatePlan,
+      cancelSubscription,
+      updateCycle,
+      addPaymentMethod,
+      removePaymentMethod,
+      setDefaultPaymentMethod,
+      getInvoiceUrl,
+    }),
+    [
+      billing,
+      isLoading,
+      error,
+      loadBilling,
+      updatePlan,
+      cancelSubscription,
+      updateCycle,
+      addPaymentMethod,
+      removePaymentMethod,
+      setDefaultPaymentMethod,
+      getInvoiceUrl,
+    ],
+  );
 }
+
+/**
+ * Convenience factory: creates a no-op API client useful for tests
+ * and Storybook. Throws by default so dev mistakes surface fast.
+ */
+export const createStubBillingApiClient = (
+  overrides?: Partial<BillingApiClient>,
+): BillingApiClient => {
+  const notConfigured: BillingApiClient = {
+    loadBilling: () => Promise.reject(new Error('BillingApiClient not configured')),
+    updatePlan: () => Promise.reject(new Error('BillingApiClient not configured')),
+    cancelSubscription: () => Promise.reject(new Error('BillingApiClient not configured')),
+    updateCycle: () => Promise.reject(new Error('BillingApiClient not configured')),
+    addPaymentMethod: () => Promise.reject(new Error('BillingApiClient not configured')),
+    removePaymentMethod: () => Promise.reject(new Error('BillingApiClient not configured')),
+    setDefaultPaymentMethod: () => Promise.reject(new Error('BillingApiClient not configured')),
+    getInvoiceUrl: () => Promise.reject(new Error('BillingApiClient not configured')),
+  };
+  return { ...notConfigured, ...overrides };
+};
+
+/**
+ * Public re-exports for consumers wiring up the billing domain.
+ */
+export type { Invoice };
+export { DEFAULT_BILLING_CONFIG };

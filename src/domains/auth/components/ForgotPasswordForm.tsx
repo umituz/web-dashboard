@@ -1,16 +1,39 @@
 /**
- * Forgot Password Form Component
+ * ForgotPasswordForm
  *
- * Password reset request form
+ * Composed of shared auth primitives (EmailInput, AuthErrorBanner).
+ * All copy is i18n-keyed; the success state uses lucide icons
+ * instead of the previous `✓` Unicode glyphs.
  */
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Loader2, CheckCircle } from "lucide-react";
-import { cn } from "@umituz/web-design-system/utils";
+import { useTranslation } from "react-i18next";
+import { ArrowLeft, Loader2, CheckCircle2, Check } from "lucide-react";
 import { Button } from "@umituz/web-design-system/atoms";
-import type { ForgotPasswordFormProps } from "../types/auth";
+import type { ForgotPasswordFormProps, Translate } from "../types/auth";
 import { validateForgotPassword } from "../utils/auth";
+import { AUTH_KEYS } from "../utils/i18nKeys";
+import { AUTH_VALIDATION_KEYS } from "../utils/validationKeys";
+import { AuthErrorBanner, EmailInput } from "./shared";
+
+const KEYS = {
+  title: 'auth.forgotPassword.title',
+  description: 'auth.forgotPassword.description',
+  emailLabel: AUTH_KEYS.fields.email,
+  emailPlaceholder: AUTH_KEYS.placeholders.emailExample,
+  submitting: 'auth.forgotPassword.submitting',
+  submit: 'auth.forgotPassword.submit',
+  backToSignIn: 'auth.forgotPassword.backToSignIn',
+  successTitle: 'auth.forgotPassword.successTitle',
+  successMessage: 'auth.forgotPassword.successMessage',
+  sentTo: 'auth.forgotPassword.sentTo',
+  step1: 'auth.forgotPassword.steps.step1',
+  step2: 'auth.forgotPassword.steps.step2',
+  step3: 'auth.forgotPassword.steps.step3',
+  invalidEmail: AUTH_VALIDATION_KEYS.emailInvalid,
+  sendResetFailed: 'auth.errors.sendResetFailed',
+} as const;
 
 export const ForgotPasswordForm = ({
   config,
@@ -19,6 +42,9 @@ export const ForgotPasswordForm = ({
   showBackLink = true,
 }: ForgotPasswordFormProps) => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+  const translate: Translate = t;
+
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -28,29 +54,24 @@ export const ForgotPasswordForm = ({
     e.preventDefault();
     setError(null);
 
-    // Validate
     const validation = validateForgotPassword({ email });
     if (!validation.valid) {
-      setError(validation.error || "Invalid email");
-      onError?.(validation.error || "Invalid email");
+      const message = validation.error ?? KEYS.invalidEmail;
+      setError(message);
+      onError?.(message);
       return;
     }
 
     setIsLoading(true);
-
     try {
-      // In production, call your auth API
-      // await forgotPassword({ email });
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      setSuccess(true);
+      // Hand off to the consumer's auth provider. The form has
+      // no network knowledge of its own — it's pure orchestration.
       await onSuccess?.();
+      setSuccess(true);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to send reset email";
-      setError(errorMessage);
-      onError?.(errorMessage);
+      const message = err instanceof Error ? err.message : KEYS.sendResetFailed;
+      setError(message);
+      onError?.(message);
     } finally {
       setIsLoading(false);
     }
@@ -58,48 +79,48 @@ export const ForgotPasswordForm = ({
 
   if (success) {
     return (
-      <div className="w-full max-w-md space-y-6">
-        {/* Success Message */}
+      <div className="w-full max-w-md space-y-6" role="status" aria-live="polite">
         <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center">
-              <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-500" />
+            <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="h-8 w-8 text-success" aria-hidden="true" />
             </div>
           </div>
           <div>
             <h1 className="text-2xl font-extrabold text-foreground mb-2">
-              Check your email
+              {translate(KEYS.successTitle)}
             </h1>
             <p className="text-muted-foreground">
-              We sent a password reset link to{" "}
+              {translate(KEYS.sentTo)}{' '}
               <span className="font-medium text-foreground">{email}</span>
             </p>
           </div>
         </div>
 
-        {/* Instructions */}
-        <div className="bg-muted/50 border border-border rounded-lg p-4 space-y-2">
-          <p className="text-sm text-muted-foreground">
-            ✓ Click the link in your email
-          </p>
-          <p className="text-sm text-muted-foreground">
-            ✓ Create a new password
-          </p>
-          <p className="text-sm text-muted-foreground">
-            ✓ Sign in with your new password
-          </p>
-        </div>
+        <ol className="bg-muted/50 border border-border rounded-lg p-4 space-y-2 text-sm text-muted-foreground">
+          <li className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-success shrink-0" aria-hidden="true" />
+            {translate(KEYS.step1)}
+          </li>
+          <li className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-success shrink-0" aria-hidden="true" />
+            {translate(KEYS.step2)}
+          </li>
+          <li className="flex items-center gap-2">
+            <Check className="h-4 w-4 text-success shrink-0" aria-hidden="true" />
+            {translate(KEYS.step3)}
+          </li>
+        </ol>
 
-        {/* Back to Login */}
         {showBackLink && config.loginRoute && (
           <Button
             type="button"
             variant="ghost"
-            onClick={() => navigate(config.loginRoute!)}
+            onClick={() => navigate(config.loginRoute)}
             className="w-full"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to sign in
+            <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
+            {translate(KEYS.backToSignIn)}
           </Button>
         )}
       </div>
@@ -107,47 +128,27 @@ export const ForgotPasswordForm = ({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6">
-      {/* Header */}
+    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6" noValidate>
       <div className="text-center">
         <h1 className="text-3xl font-extrabold text-foreground mb-2">
-          Forgot password?
+          {translate(KEYS.title)}
         </h1>
-        <p className="text-muted-foreground">
-          No worries, we'll send you reset instructions
-        </p>
+        <p className="text-muted-foreground">{translate(KEYS.description)}</p>
       </div>
 
-      {/* Error Message */}
-      {error && (
-        <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm">
-          {error}
-        </div>
-      )}
+      <AuthErrorBanner message={error} translate={translate} />
 
-      {/* Email Field */}
-      <div className="space-y-2">
-        <label htmlFor="email" className="text-sm font-medium text-foreground">
-          Email
-        </label>
-        <input
-          id="email"
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-          className={cn(
-            "w-full px-4 py-3 rounded-lg border bg-background",
-            "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
-            "placeholder:text-muted-foreground",
-            error && "border-destructive"
-          )}
-          disabled={isLoading}
-          autoComplete="email"
-        />
-      </div>
+      <EmailInput
+        id="forgot-email"
+        labelKey={KEYS.emailLabel}
+        placeholderKey={KEYS.emailPlaceholder}
+        value={email}
+        onChange={setEmail}
+        translate={translate}
+        disabled={isLoading}
+        required
+      />
 
-      {/* Submit Button */}
       <Button
         type="submit"
         className="w-full h-12 text-base font-bold rounded-full"
@@ -155,23 +156,22 @@ export const ForgotPasswordForm = ({
       >
         {isLoading ? (
           <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Sending...
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+            {translate(KEYS.submitting)}
           </>
         ) : (
-          "Send reset link"
+          translate(KEYS.submit)
         )}
       </Button>
 
-      {/* Back to Login */}
       {showBackLink && config.loginRoute && (
         <button
           type="button"
-          onClick={() => navigate(config.loginRoute!)}
-          className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          onClick={() => navigate(config.loginRoute)}
+          className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:underline"
         >
-          <ArrowLeft className="h-4 w-4" />
-          Back to sign in
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          {translate(KEYS.backToSignIn)}
         </button>
       )}
     </form>

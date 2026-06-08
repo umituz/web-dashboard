@@ -4,36 +4,20 @@
 
 import type { CalendarConfig } from '../types/calendar.types';
 
-/**
- * Default calendar configuration
- */
-export const DEFAULT_CALENDAR_CONFIG: CalendarConfig = {
-  defaultView: 'month',
-  showWeekends: true,
-  startOfWeek: 0, // Sunday
-  hourRange: {
-    start: 0,
-    end: 23,
-  },
-  enableDragDrop: true,
-  showPlatformFilters: true,
-  platforms: ['instagram', 'facebook', 'twitter', 'linkedin', 'tiktok'],
-  slotDuration: 30, // 30 minutes
-};
+export { mapCalendarDocument, mapPostDocument } from './contentItemMapper';
+export type { FirestoreDocument } from './contentItemMapper';
 
 /**
  * Get week dates for a given date
  */
 export function getWeekDates(date: Date, startOfWeek: number = 0): Date[] {
-  const week = [];
+  const week: Date[] = [];
   const current = new Date(date);
 
-  // Find the first day of the week
   const day = current.getDay();
   const diff = (day < startOfWeek ? 7 : 0) + day - startOfWeek;
   current.setDate(current.getDate() - diff);
 
-  // Get 7 days
   for (let i = 0; i < 7; i++) {
     week.push(new Date(current));
     current.setDate(current.getDate() + 1);
@@ -68,17 +52,22 @@ export function isDateInRange(date: Date, range: { start: Date; end: Date }): bo
 }
 
 /**
- * Format date for display
+ * Format date for display.
+ * The locale is taken as a parameter so the consumer can decide.
  */
-export function formatDate(date: Date, format: 'short' | 'long' | 'time' = 'short'): string {
+export function formatDate(
+  date: Date,
+  format: 'short' | 'long' | 'time' = 'short',
+  locale: string = 'en-US',
+): string {
   if (format === 'time') {
-    return date.toLocaleTimeString('en-US', {
+    return date.toLocaleTimeString(locale, {
       hour: '2-digit',
       minute: '2-digit',
     });
   }
 
-  return date.toLocaleDateString('en-US', {
+  return date.toLocaleDateString(locale, {
     month: format === 'long' ? 'long' : 'short',
     day: 'numeric',
     year: 'numeric',
@@ -99,25 +88,32 @@ export function isSameDay(date1: Date, date2: Date): boolean {
 /**
  * Get date range for a view
  */
-export function getViewRange(view: 'month' | 'week', date: Date): { start: Date; end: Date } {
+export function getViewRange(
+  view: 'month' | 'week',
+  date: Date,
+): { start: Date; end: Date } {
   if (view === 'month') {
     const start = new Date(date.getFullYear(), date.getMonth(), 1);
     const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
     return { start, end };
   }
 
-  // Week view
   const week = getWeekDates(date);
-  return {
-    start: new Date(week[0].setHours(0, 0, 0, 0)),
-    end: new Date(week[6].setHours(23, 59, 59, 999)),
-  };
+  const firstDay = new Date(week[0]);
+  firstDay.setHours(0, 0, 0, 0);
+  const lastDay = new Date(week[6]);
+  lastDay.setHours(23, 59, 59, 999);
+  return { start: firstDay, end: lastDay };
 }
 
 /**
  * Generate time slots
  */
-export function generateTimeSlots(startHour: number, endHour: number, slotDuration: number): string[] {
+export function generateTimeSlots(
+  startHour: number,
+  endHour: number,
+  slotDuration: number,
+): string[] {
   const slots: string[] = [];
 
   for (let hour = startHour; hour < endHour; hour++) {
@@ -129,3 +125,10 @@ export function generateTimeSlots(startHour: number, endHour: number, slotDurati
 
   return slots;
 }
+
+/**
+ * Re-export the default calendar config from the central config module
+ * so consumers using only the calendar domain still get sensible defaults.
+ */
+export { DEFAULT_CALENDAR_CONFIG } from '../../../domain/config/CalendarConfig';
+export type { CalendarConfig };

@@ -1,47 +1,33 @@
 /**
- * BillingPage Component
+ * BillingPage
  *
- * Complete billing page for displaying subscription, invoices, and plan management
- * Data fetching should be handled by passing billing summary
- *
- * @example
- * ```tsx
- * <BillingPage
- *   billing={billingData}
- *   loading={false}
- *   activeTab="overview"
- *   onTabChange={(tab) => setActiveTab(tab)}
- * />
- * ```
+ * Compose BillingLayout + BillingPortal. Brand name and support
+ * contact are required — there's no silent "Growth Factory" fallback
+ * that pretends everything is fine when the consumer forgets to
+ * provide them.
  */
 
 import { BillingLayout, BillingPortal } from ".";
-import type { BillingPortalProps } from "../types/billing";
+import type {
+  BillingConfig,
+  BillingPortalProps,
+} from "../types/billing";
+import { DEFAULT_BILLING_CONFIG } from "../constants/billing";
 
 export interface BillingPageProps extends Omit<BillingPortalProps, "showTabs"> {
   /** Billing configuration */
-  config?: {
-    brandName?: string;
-    supportEmail?: string;
-  };
+  config: BillingConfig;
 }
 
-/**
- * BillingPage Component
- *
- * Ready-to-use billing page component
- * Combine BillingLayout with BillingPortal
- */
 export const BillingPage = ({ config, ...portalProps }: BillingPageProps) => {
-  const billingConfig = {
-    brandName: config?.brandName || "Growth Factory",
-    supportEmail: config?.supportEmail,
-    plans: [],
+  const mergedConfig: BillingConfig = {
+    ...DEFAULT_BILLING_CONFIG,
+    ...config,
   };
 
   return (
-    <BillingLayout config={billingConfig}>
-      <BillingPortal showTabs={true} {...portalProps} />
+    <BillingLayout config={mergedConfig}>
+      <BillingPortal showTabs {...portalProps} />
     </BillingLayout>
   );
 };

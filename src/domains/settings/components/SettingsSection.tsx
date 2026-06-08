@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@umituz/web-design-system/utils";
@@ -18,8 +19,8 @@ interface SettingsSectionProps {
  * Settings Section Component
  *
  * Displays a section of settings items.
- *
- * @param props - Settings section props
+ * Items without a path and without an onClick handler are hidden
+ * (an empty interactive element violates a11y and is dead code).
  */
 export const SettingsSection = ({
   section,
@@ -27,7 +28,10 @@ export const SettingsSection = ({
   onNavigate,
   collapsed = false,
 }: SettingsSectionProps) => {
-  const filteredItems = section.items.filter((item) => item.enabled !== false);
+  const filteredItems = useMemo(
+    () => section.items.filter((item) => item.enabled !== false),
+    [section.items],
+  );
 
   if (filteredItems.length === 0) return null;
 
@@ -42,6 +46,12 @@ export const SettingsSection = ({
       <div className="space-y-1">
         {filteredItems.map((item) => {
           const isActive = currentPath === item.path;
+          const hasNavigation = Boolean(item.path) || Boolean(item.onClick);
+
+          // Skip rendering items that have neither a path nor a click handler.
+          if (!hasNavigation) {
+            return null;
+          }
 
           const itemContent = (
             <>
@@ -49,7 +59,7 @@ export const SettingsSection = ({
                 <item.icon
                   className={cn(
                     "h-4 w-4 shrink-0",
-                    isActive && "scale-110"
+                    isActive && "scale-110",
                   )}
                 />
               )}
@@ -57,11 +67,19 @@ export const SettingsSection = ({
                 <>
                   <span className="flex-1 text-left">{item.label}</span>
                   {item.badge !== undefined && item.badge > 0 && (
-                    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground">
+                    <span
+                      className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-[10px] font-bold text-destructive-foreground"
+                      aria-label={`${item.badge} notifications`}
+                    >
                       {item.badge > 99 ? "99+" : item.badge}
                     </span>
                   )}
-                  {item.path && <ChevronRight className="h-4 w-4 text-muted-foreground" />}
+                  {item.path && (
+                    <ChevronRight
+                      className="h-4 w-4 text-muted-foreground"
+                      aria-hidden="true"
+                    />
+                  )}
                 </>
               )}
             </>
@@ -71,7 +89,7 @@ export const SettingsSection = ({
             "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 w-full",
             "hover:bg-accent hover:text-accent-foreground",
             isActive && "bg-accent text-accent-foreground",
-            collapsed ? "justify-center" : "justify-start"
+            collapsed ? "justify-center" : "justify-start",
           );
 
           if (item.path) {
@@ -79,9 +97,10 @@ export const SettingsSection = ({
               <Link
                 key={item.key}
                 to={item.path}
-                onClick={() => onNavigate?.(item.path!)}
+                onClick={() => onNavigate?.(item.path as string)}
                 className={itemClassName}
                 title={collapsed ? item.label : undefined}
+                aria-current={isActive ? "page" : undefined}
               >
                 {itemContent}
               </Link>
@@ -92,9 +111,10 @@ export const SettingsSection = ({
             <button
               key={item.key}
               type="button"
-              onClick={() => {}}
+              onClick={item.onClick}
               className={itemClassName}
               title={collapsed ? item.label : undefined}
+              aria-current={isActive ? "page" : undefined}
             >
               {itemContent}
             </button>

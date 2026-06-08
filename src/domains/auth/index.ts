@@ -14,9 +14,7 @@ export {
 } from "./components";
 
 // Hooks
-export {
-  useAuth,
-} from "./hooks";
+export { useAuth, type AuthProvider } from "./hooks";
 
 // Utils
 export {
@@ -33,8 +31,13 @@ export {
   maskEmail,
   generateResetToken,
   calculatePasswordStrength,
-  getPasswordStrengthLabel,
+  getPasswordStrengthBand,
   sanitizeInput,
+  AUTH_KEYS,
+  AUTH_VALIDATION_KEYS,
+  type ValidationResult,
+  type PasswordStrengthBand,
+  type AuthValidationKey,
 } from "./utils";
 
 // Types
@@ -55,4 +58,5 @@ export type {
   RegisterFormProps,
   ForgotPasswordFormProps,
   ResetPasswordFormProps,
+  Translate,
 } from "./types";

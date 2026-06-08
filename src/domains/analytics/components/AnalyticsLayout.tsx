@@ -1,16 +1,33 @@
 /**
- * Analytics Layout Component
+ * AnalyticsLayout
  *
- * Configurable analytics page layout with KPIs and charts
+ * Top-level analytics page shell. All actions delegate to the
+ * consumer via callbacks — no console.log, no no-op handlers.
+ * The legacy "kpis" prop has been removed in favor of the typed
+ * `metrics` array (breaking change called out in changelog).
  */
 
+import { useMemo } from "react";
 import { RefreshCw, Download, Calendar, Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@umituz/web-design-system/utils";
 import { Button } from "@umituz/web-design-system/atoms";
-import type { AnalyticsLayoutProps } from "../types/analytics";
+import type { AnalyticsLayoutProps, AnalyticsPeriod } from "../types/analytics";
 import { AnalyticsCard } from "./AnalyticsCard";
 import { MetricCard } from "./MetricCard";
-import { getDateRangePresets } from "../utils/analytics";
+import { ANALYTICS_KEYS } from "../utils/i18nKeys";
+
+/**
+ * Map analytics period tokens to localized display labels.
+ * Periods not in this map fall back to the raw token — better
+ * to show the key than an empty select option.
+ */
+const PERIOD_LABEL: Record<AnalyticsPeriod, string> = {
+  '7d': ANALYTICS_KEYS.common.last7Days,
+  '30d': ANALYTICS_KEYS.common.last30Days,
+  '90d': ANALYTICS_KEYS.common.last90Days,
+  '1y': ANALYTICS_KEYS.common.lastYear,
+};
 
 export const AnalyticsLayout = ({
   config,
@@ -21,71 +38,80 @@ export const AnalyticsLayout = ({
   period,
   onPeriodChange,
   showDateRange = true,
-  showRefresh,
-  showExport,
-  kpis,
+  showRefresh = true,
+  showExport = true,
   charts,
   headerContent,
+  onRefresh,
+  onExport,
   children,
 }: AnalyticsLayoutProps) => {
-  const dateRangePresets = getDateRangePresets();
+  const { t } = useTranslation();
 
-  const handleExport = async () => {
-    // In production, implement export functionality
-    console.log("Exporting analytics data...");
-  };
+  const visibleMetrics = useMemo(() => metrics ?? [], [metrics]);
 
-  const handleRefresh = async () => {
-    // In production, refresh data
-    console.log("Refreshing analytics data...");
-  };
-
-  // Use config settings if props not provided
-  const _showRefresh = showRefresh ?? config?.showRefresh ?? true;
-  const _showExport = showExport ?? config?.showExport ?? true;
+  const showRefreshAction = showRefresh && Boolean(onRefresh);
+  const showExportAction = showExport && Boolean(onExport);
 
   return (
     <div className="w-full space-y-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           {(title || config?.brandName) && (
             <h1 className="text-3xl font-bold text-foreground">
-              {title || `${config?.brandName || ''} Analytics`}
+              {title ?? `${config?.brandName ?? ''} ${t(ANALYTICS_KEYS.layout.title)}`}
             </h1>
           )}
-          {description && <p className="text-muted-foreground mt-1">{description}</p>}
+          {description && (
+            <p className="text-muted-foreground mt-1">{description}</p>
+          )}
         </div>
 
-        {/* Actions */}
         <div className="flex items-center gap-3">
-          {showDateRange && onPeriodChange && (
-            <div className="flex items-center gap-2 bg-background border border-border rounded-lg px-3 py-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
+          {showDateRange && onPeriodChange && period && (
+            <label className="flex items-center gap-2 bg-background border border-border rounded-lg px-3 py-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <span className="sr-only">{t(ANALYTICS_KEYS.common.export)}</span>
               <select
                 className="bg-transparent text-sm text-foreground outline-none"
                 value={period}
-                onChange={(e) => onPeriodChange(e.target.value)}
+                onChange={(e) => onPeriodChange(e.target.value as AnalyticsPeriod)}
+                aria-label={t(ANALYTICS_KEYS.common.export)}
               >
-                {config?.availablePeriods?.map((p) => (
+                {(config?.availablePeriods ?? Object.keys(PERIOD_LABEL) as AnalyticsPeriod[]).map((p) => (
                   <option key={p} value={p}>
-                    {p === "7d" ? "7 Days" : p === "30d" ? "30 Days" : p === "90d" ? "90 Days" : p}
+                    {PERIOD_LABEL[p] ?? p}
                   </option>
                 ))}
               </select>
-            </div>
+            </label>
           )}
 
-          {_showRefresh && (
-            <Button variant="ghost" size="sm" onClick={handleRefresh} disabled={loading}>
-              <RefreshCw className={cn("h-4 w-4", loading && "animate-spin")} />
+          {showRefreshAction && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onRefresh}
+              disabled={loading}
+              aria-label="Refresh"
+            >
+              <RefreshCw
+                className={cn("h-4 w-4", loading && "animate-spin")}
+                aria-hidden="true"
+              />
             </Button>
           )}
 
-          {_showExport && (
-            <Button variant="ghost" size="sm" onClick={handleExport} disabled={loading}>
-              <Download className="h-4 w-4" />
-              Export
+          {showExportAction && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onExport}
+              disabled={loading}
+              aria-label={t(ANALYTICS_KEYS.common.export)}
+            >
+              <Download className="h-4 w-4" aria-hidden="true" />
+              <span className="ml-1.5">{t(ANALYTICS_KEYS.common.export)}</span>
             </Button>
           )}
 
@@ -93,82 +119,37 @@ export const AnalyticsLayout = ({
         </div>
       </div>
 
-      {/* Loading State */}
       {loading && (
-        <div className="flex items-center justify-center py-24">
-          <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" />
+        <div
+          className="flex items-center justify-center py-24"
+          role="status"
+          aria-live="polite"
+        >
+          <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" aria-hidden="true" />
+          <span className="sr-only">{t(ANALYTICS_KEYS.common.loading)}</span>
         </div>
       )}
 
-      {/* Metrics / KPI Cards */}
-      {!loading && (metrics || kpis) && (
-        <div className={cn(
-          "grid gap-4",
-          (metrics || kpis) && "grid-cols-1 sm:grid-cols-2 lg:grid-cols-5"
-        )}>
-          {metrics?.map((metric) => (
+      {!loading && visibleMetrics.length > 0 && (
+        <div
+          className={cn(
+            "grid gap-4",
+            visibleMetrics.length >= 4
+              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+              : "grid-cols-1 sm:grid-cols-2",
+          )}
+        >
+          {visibleMetrics.map((metric) => (
             <MetricCard key={metric.id} metric={metric} />
           ))}
-
-          {/* Legacy kpis support */}
-          {kpis && !metrics && (
-            <>
-              <MetricCard
-                metric={{
-                  id: "downloads",
-                  name: "Downloads",
-                  value: kpis.downloads.current,
-                  previousValue: kpis.downloads.previous,
-                  unit: "K",
-                }}
-              />
-              <MetricCard
-                metric={{
-                  id: "engagement",
-                  name: "Engagement",
-                  value: kpis.engagement.current,
-                  previousValue: kpis.engagement.previous,
-                  unit: "%",
-                }}
-              />
-              <MetricCard
-                metric={{
-                  id: "users",
-                  name: "Users",
-                  value: kpis.users.current,
-                  previousValue: kpis.users.previous,
-                  unit: "K",
-                }}
-              />
-              <MetricCard
-                metric={{
-                  id: "revenue",
-                  name: "Revenue",
-                  value: kpis.revenue.current,
-                  previousValue: kpis.revenue.previous,
-                  unit: "$",
-                }}
-              />
-              <MetricCard
-                metric={{
-                  id: "retention",
-                  name: "Retention",
-                  value: kpis.retention.current,
-                  previousValue: kpis.retention.previous,
-                  unit: "%",
-                }}
-              />
-            </>
-          )}
         </div>
       )}
 
-      {/* Charts */}
       {!loading && charts && charts.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {charts.map((chartConfig, index) => (
+          {charts.map((chartConfig) => (
             <AnalyticsCard
-              key={index}
+              key={chartConfig.id}
               title={chartConfig.title}
               description={chartConfig.description}
               chart={chartConfig}
@@ -177,7 +158,6 @@ export const AnalyticsLayout = ({
         </div>
       )}
 
-      {/* Custom Content */}
       {!loading && children}
     </div>
   );

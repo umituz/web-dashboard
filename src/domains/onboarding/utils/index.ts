@@ -13,3 +13,5 @@ export {
   isValidEmail,
   isValidPassword,
 } from './onboarding';
+
+export { ONBOARDING_KEYS } from './i18nKeys';
