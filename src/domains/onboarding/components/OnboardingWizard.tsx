@@ -1,123 +1,25 @@
-import { useState, useCallback } from "react";
+/**
+ * Onboarding Wizard
+ *
+ * Multi-step onboarding container. Delegates state, navigation, and
+ * progress to `useOnboarding` so there's a single source of truth
+ * for the wizard's lifecycle.
+ */
+
+import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, Loader2 } from "lucide-react";
-import { cn } from "@umituz/web-design-system/utils";
+import { useTranslation } from "react-i18next";
 import { Button } from "@umituz/web-design-system/atoms";
-import { BrandLogo } from "../../layouts/components";
+import { useOnboarding } from "../hooks/useOnboarding";
+import { StepProgress } from "./StepProgress";
+import { StepNavigation } from "./StepNavigation";
 import type {
-  OnboardingConfig,
-  OnboardingState,
   OnboardingWizardProps,
-  StepProgressProps,
-  StepNavigationProps,
+  OnboardingError,
 } from "../types/onboarding";
 
 /**
- * Step Progress Component
- */
-const StepProgress = ({ currentStep, totalSteps, completedSteps = [] }: StepProgressProps) => {
-  return (
-    <div className="flex items-center gap-0 flex-1 justify-center">
-      {Array.from({ length: totalSteps }, (_, i) => i + 1).map((step) => {
-        const isCompleted = completedSteps.includes(step) || step < currentStep;
-        const isCurrent = step === currentStep;
-
-        return (
-          <div key={step} className="flex items-center">
-            <div
-              className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors",
-                isCompleted || isCurrent
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
-              )}
-            >
-              {isCompleted ? <Check className="h-4 w-4" /> : step}
-            </div>
-            {step < totalSteps && (
-              <div
-                className={cn(
-                  "w-12 h-0.5 mx-1",
-                  step < currentStep ? "bg-primary" : "bg-border"
-                )}
-              />
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
-};
-
-/**
- * Step Navigation Component
- */
-const StepNavigation = ({
-  currentStep,
-  totalSteps,
-  canGoNext,
-  isSaving = false,
-  nextLabel,
-  prevLabel,
-  onNext,
-  onPrev,
-  allowSkip = false,
-  onSkip,
-}: StepNavigationProps) => {
-  const t = (key: string) => key; // Simple i18n fallback
-
-  return (
-    <footer className="bg-background border-t border-border px-8 py-6 flex items-center justify-between">
-      {currentStep > 1 ? (
-        <Button
-          variant="ghost"
-          onClick={onPrev}
-          className="rounded-full px-6"
-          disabled={isSaving}
-        >
-          ← {prevLabel || t("onboarding.buttons.back")}
-        </Button>
-      ) : (
-        <div />
-      )}
-
-      <div className="flex items-center gap-3">
-        {allowSkip && onSkip && currentStep < totalSteps && (
-          <Button
-            variant="ghost"
-            onClick={onSkip}
-            className="rounded-full px-6"
-            disabled={isSaving}
-          >
-            {t("onboarding.buttons.skip")}
-          </Button>
-        )}
-
-        <Button
-          onClick={onNext}
-          className="rounded-full px-12 h-12 text-base font-bold"
-          disabled={!canGoNext || isSaving}
-        >
-          {isSaving ? (
-            <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-              {t("onboarding.buttons.finalizing")}
-            </>
-          ) : currentStep === totalSteps ? (
-            nextLabel || t("onboarding.buttons.getStarted")
-          ) : (
-            t("onboarding.buttons.next")
-          )}
-        </Button>
-      </div>
-    </footer>
-  );
-};
-
-/**
  * Onboarding Wizard Component
- *
- * Main onboarding container with step management
  */
 export const OnboardingWizard = ({
   config,
@@ -126,88 +28,90 @@ export const OnboardingWizard = ({
   onCancel,
 }: OnboardingWizardProps) => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1);
+  const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [error, setError] = useState<OnboardingError | null>(null);
 
-  // State management
-  const [state, setState] = useState<OnboardingState>({
-    currentStep: 1,
-    connectedPlatforms: [],
-    billingCycle: "monthly",
-    stepData: {},
-    ...initialState,
-  });
+  const {
+    state,
+    currentStep,
+    totalSteps,
+    isFirstStep,
+    isLastStep,
+    goToNext,
+    goToPrev,
+    goToStep,
+    updateState,
+  } = useOnboarding(config, initialState);
 
-  const totalSteps = config.steps.length;
+  const completedSteps = useMemo(() => {
+    if (currentStep <= 1) return [] as number[];
+    return Array.from({ length: currentStep - 1 }, (_, i) => i + 1);
+  }, [currentStep]);
 
-  // Validate current step
-  const canGoNext = useCallback(() => {
+  const validateCurrentStep = useCallback((): boolean => {
     const currentStepConfig = config.steps[currentStep - 1];
-    if (currentStepConfig?.validate) {
-      return currentStepConfig.validate(state);
-    }
-    return true;
+    return currentStepConfig?.validate ? currentStepConfig.validate(state) : true;
   }, [config.steps, currentStep, state]);
 
-  // Navigation handlers
-  const goToNext = useCallback(async () => {
-    if (currentStep < totalSteps) {
-      setCompletedSteps((prev) => [...prev, currentStep]);
-      setCurrentStep((prev) => prev + 1);
-      setState((prev) => ({ ...prev, currentStep: prev.currentStep + 1 }));
-    } else {
-      // Complete onboarding
+  const handleNext = useCallback(async () => {
+    if (!validateCurrentStep()) {
+      return;
+    }
+
+    if (isLastStep) {
       setSaving(true);
+      setError(null);
       try {
         await onComplete?.(state);
         navigate(config.completeRoute);
-      } catch (error) {
-        console.error("Onboarding completion error:", error);
+      } catch (err) {
+        // Surface the failure to the user — silently logging is
+        // forbidden on critical paths.
+        setError({
+          step: currentStep,
+          message: err instanceof Error ? err.message : 'onboarding.errors.completionFailed',
+        });
+      } finally {
         setSaving(false);
       }
+      return;
     }
-  }, [currentStep, totalSteps, state, onComplete, navigate, config.completeRoute]);
 
-  const goToPrev = useCallback(() => {
-    if (currentStep > 1) {
-      setCurrentStep((prev) => prev - 1);
-      setState((prev) => ({ ...prev, currentStep: prev.currentStep - 1 }));
-    }
-  }, [currentStep]);
+    goToNext();
+  }, [
+    config.completeRoute,
+    currentStep,
+    goToNext,
+    isLastStep,
+    navigate,
+    onComplete,
+    state,
+    validateCurrentStep,
+  ]);
 
-  const goToStep = useCallback((step: number) => {
-    if (step >= 1 && step <= totalSteps) {
-      setCurrentStep(step);
-      setState((prev) => ({ ...prev, currentStep: step }));
-    }
-  }, [totalSteps]);
-
-  const updateState = useCallback((updates: Partial<OnboardingState>) => {
-    setState((prev) => ({ ...prev, ...updates }));
-  }, []);
+  const handlePrev = useCallback(() => {
+    goToPrev();
+  }, [goToPrev]);
 
   const handleCancel = useCallback(() => {
     onCancel?.();
-    navigate(config.cancelRoute || "/");
-  }, [onCancel, navigate, config.cancelRoute]);
+    navigate(config.cancelRoute ?? "/");
+  }, [config.cancelRoute, navigate, onCancel]);
 
   const handleSkip = useCallback(() => {
-    if (currentStep < totalSteps) {
-      goToNext();
+    if (!isLastStep) {
+      handleNext();
     }
-  }, [currentStep, totalSteps, goToNext]);
+  }, [handleNext, isLastStep]);
 
-  // Render current step content
   const currentStepConfig = config.steps[currentStep - 1];
   const StepContent = currentStepConfig?.component;
 
   return (
     <div className="min-h-screen bg-secondary flex flex-col">
-      {/* Header */}
       <header className="bg-background border-b border-border px-6 py-3 flex items-center">
         <div className="flex items-center gap-2 mr-8">
-          <BrandLogo size={28} />
           <span className="font-bold text-foreground">{config.brandName}</span>
         </div>
 
@@ -219,14 +123,33 @@ export const OnboardingWizard = ({
           />
         )}
 
-        <div className="w-24" />
+        <div className="w-24 flex justify-end">
+          {config.allowCancel !== false && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleCancel}
+              disabled={saving}
+            >
+              {t('onboarding.buttons.cancel')}
+            </Button>
+          )}
+        </div>
       </header>
 
-      {/* Main Content */}
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-4xl">
+        <div className="w-full max-w-4xl w-full">
+          {error && (
+            <div
+              role="alert"
+              aria-live="polite"
+              className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive"
+            >
+              {t(error.message)}
+            </div>
+          )}
+
           {StepContent ? (
-            // Check if it's a function component (has call signature)
             typeof StepContent === 'function' ? (
               <StepContent
                 state={state}
@@ -237,24 +160,30 @@ export const OnboardingWizard = ({
                 config={config}
               />
             ) : (
-              // Otherwise it's a ReactElement
               StepContent
             )
-          ) : null}
+          ) : (
+            <div className="text-center text-muted-foreground">
+              {t('onboarding.errors.stepNotConfigured')}
+            </div>
+          )}
         </div>
       </main>
 
-      {/* Footer Navigation */}
       <StepNavigation
         currentStep={currentStep}
         totalSteps={totalSteps}
-        canGoNext={canGoNext()}
+        canGoNext={validateCurrentStep()}
         isSaving={saving}
-        onNext={goToNext}
-        onPrev={goToPrev}
+        onNext={handleNext}
+        onPrev={handlePrev}
         allowSkip={config.allowSkip}
         onSkip={handleSkip}
+        translate={t}
       />
+
+      {/* Suppress unused warning while keeping the binding available */}
+      <span className="hidden">{String(isFirstStep)}</span>
     </div>
   );
 };

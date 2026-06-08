@@ -4,7 +4,7 @@
  * Type definitions for analytics system
  */
 
-import type { ComponentType, ReactElement } from "react";
+import type { ComponentType } from "react";
 
 /**
  * Metric card data
@@ -153,6 +153,8 @@ export type ChartType =
  * Chart configuration
  */
 export interface ChartConfig {
+  /** Stable identifier — used as React key, also for telemetry */
+  id: string;
   /** Chart type */
   type: ChartType;
   /** Chart title */
@@ -165,7 +167,7 @@ export interface ChartConfig {
   xAxisKey?: string;
   /** Y-axis keys */
   yAxisKeys?: string[];
-  /** Color scheme */
+  /** Color scheme (CSS variable names, e.g. "hsl(var(--primary))") */
   colors?: string[];
   /** Show legend */
   showLegend?: boolean;
@@ -178,6 +180,12 @@ export interface ChartConfig {
   /** Chart aspect ratio */
   aspectRatio?: string;
 }
+
+/**
+ * Supported analytics period tokens.
+ * Typed union to prevent stringly-typed comparison elsewhere.
+ */
+export type AnalyticsPeriod = '7d' | '30d' | '90d' | '1y' | (string & {});
 
 /**
  * Metric card props
@@ -236,19 +244,21 @@ export interface AnalyticsLayoutProps {
   /** Loading state */
   loading?: boolean;
   /** Current period */
-  period?: string;
+  period?: AnalyticsPeriod;
   /** Period change handler */
-  onPeriodChange?: (period: string) => void;
+  onPeriodChange?: (period: AnalyticsPeriod) => void;
   /** Date range selector */
   showDateRange?: boolean;
   /** Refresh button */
   showRefresh?: boolean;
   /** Export button */
   showExport?: boolean;
-  /** KPI cards */
-  kpis?: KPIs;
   /** Charts configuration */
   charts?: ChartConfig[];
+  /** Refresh handler — required when showRefresh is true */
+  onRefresh?: () => void;
+  /** Export handler — required when showExport is true */
+  onExport?: () => void;
   /** Custom header content */
   headerContent?: React.ReactNode;
   /** Children content */

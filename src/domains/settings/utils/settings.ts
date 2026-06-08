@@ -52,12 +52,19 @@ export function filterSettingsByPermission<T extends SettingsItem>(
 }
 
 /**
+ * Fallback route when no default or first available route can be resolved.
+ * Caller should treat this as an explicit "no route configured" signal
+ * rather than a silent success.
+ */
+export const SETTINGS_FALLBACK_ROUTE = "/settings";
+
+/**
  * Get default route from settings config
  *
- * @param config - Settings configuration
- * @returns Default route or first available route
+ * Returns null when no default route is resolvable. The caller is
+ * responsible for handling that case (e.g. redirect, error).
  */
-export function getSettingsDefaultRoute(config: SettingsConfig): string {
+export function getSettingsDefaultRoute(config: SettingsConfig): string | null {
   if (config.defaultRoute) return config.defaultRoute;
 
   for (const section of config.sections) {
@@ -65,7 +72,7 @@ export function getSettingsDefaultRoute(config: SettingsConfig): string {
     if (firstEnabled?.path) return firstEnabled.path;
   }
 
-  return "/settings";
+  return null;
 }
 
 /**

@@ -5,38 +5,66 @@
  */
 
 import type { LucideIcon } from "lucide-react";
-import type { ComponentType, ReactElement, ReactNode } from "react";
+import type { ComponentType, ReactElement } from "react";
 
 /**
- * User type option for first step
+ * Onboarding error — the message is an i18n key.
+ */
+export interface OnboardingError {
+  /** Step where the error occurred */
+  step: number;
+  /** i18n key for the localized error message */
+  message: string;
+}
+
+/**
+ * User type option for first step.
+ * Either supply `label`/`description` directly (already translated) or
+ * supply `labelKey`/`descriptionKey` to be resolved by the consumer's i18n.
  */
 export interface UserTypeOption {
   /** Unique identifier */
   id: string;
-  /** Display label */
-  label: string;
-  /** Description text */
-  description: string;
-  /** Icon component */
+  /** Display label (already-translated string) */
+  label?: string;
+  /** Description text (already-translated) */
+  description?: string;
+  /** i18n key for the label */
+  labelKey?: string;
+  /** i18n key for the description */
+  descriptionKey?: string;
+  /** Icon component (Lucide) */
   icon?: LucideIcon;
   /** Badge text */
   badge?: string;
 }
 
 /**
- * Platform connection option
+ * Platform connection option.
+ * Icons must be Lucide components — emoji is not allowed.
  */
 export interface PlatformOption {
   /** Unique identifier */
   id: string;
   /** Display name */
   name: string;
-  /** Icon/emoji */
-  icon: string;
-  /** Color theme */
+  /** Lucide icon component */
+  icon: LucideIcon;
+  /** Tailwind color class (e.g. "from-purple-500 to-pink-500") */
   color?: string;
   /** Connection status */
   connected?: boolean;
+}
+
+/**
+ * App type option for the AppFocusStep.
+ * Same shape as PlatformOption (icon as component, not emoji).
+ */
+export interface AppTypeOption {
+  id: string;
+  name: string;
+  description: string;
+  icon: LucideIcon;
 }
 
 /**
@@ -45,10 +73,12 @@ export interface PlatformOption {
 export interface PlanOption {
   /** Unique identifier */
   id: string;
-  /** Plan name */
+  /** Plan name (already translated) */
   name: string;
-  /** Badge text */
+  /** Badge text (already translated) — preferred for static labels */
   badge?: string;
+  /** i18n key for the badge — resolved via `translate` in the consumer */
+  badgeKey?: string;
   /** Badge color class */
   badgeColor?: string;
   /** Description text */
@@ -115,6 +145,8 @@ export interface OnboardingConfig {
   cancelRoute?: string;
   /** Allow skipping steps */
   allowSkip?: boolean;
+  /** Allow canceling the wizard from the header */
+  allowCancel?: boolean;
   /** Show progress indicator */
   showProgress?: boolean;
   /** Enable user menu in header */
@@ -199,9 +231,9 @@ export interface StepNavigationProps {
   canGoNext: boolean;
   /** Is saving/completing */
   isSaving?: boolean;
-  /** Next button label */
+  /** Next button label (overrides the i18n key) */
   nextLabel?: string;
-  /** Previous button label */
+  /** Previous button label (overrides the i18n key) */
   prevLabel?: string;
   /** On next */
   onNext: () => void;
@@ -211,4 +243,6 @@ export interface StepNavigationProps {
   allowSkip?: boolean;
   /** On skip */
   onSkip?: () => void;
+  /** Translation function */
+  translate: (key: string) => string;
 }

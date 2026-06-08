@@ -1,10 +1,12 @@
 /**
  * useAuth Hook
  *
- * Core authentication hook for managing auth state and actions
+ * Core authentication hook for managing auth state and actions.
+ * Centralizes the try/catch+loading+error pattern via a single helper
+ * to keep individual actions focused on their unique logic.
  */
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import type {
   AuthState,
   User,
@@ -21,278 +23,195 @@ import {
   validateResetPassword,
 } from "../utils/auth";
 
-interface UseAuthOptions {
-  /** Initial authenticated state */
-  initialAuthenticated?: boolean;
-  /** Current user data */
-  initialUser?: User | null;
-  /** Auth implementation (connects to your backend) */
-  authProvider?: {
-    login: (credentials: LoginCredentials) => Promise<User>;
-    register: (data: RegisterData) => Promise<User>;
-    logout: () => Promise<void>;
-    forgotPassword: (data: ForgotPasswordData) => Promise<void>;
-    resetPassword: (data: ResetPasswordData) => Promise<void>;
-    refreshAuth: () => Promise<User | null>;
-  };
+/**
+ * Auth provider contract — single source of truth for backend integration.
+ */
+export interface AuthProvider {
+  login: (credentials: LoginCredentials) => Promise<User>;
+  register: (data: RegisterData) => Promise<User>;
+  logout: () => Promise<void>;
+  forgotPassword: (data: ForgotPasswordData) => Promise<void>;
+  resetPassword: (data: ResetPasswordData) => Promise<void>;
+  refreshAuth: () => Promise<User | null>;
 }
+
+interface UseAuthOptions {
+  /** Auth implementation (connects to your backend) */
+  authProvider?: AuthProvider;
+}
+
+/**
+ * Wrap a side-effectful async function with the standard
+ * isLoading + error + throw contract.
+ *
+ * Important: the wrapped function is the SINGLE point of truth for
+ * setting isLoading=false, ensuring errors are surfaced (not swallowed),
+ * and re-throwing for callers that need to react.
+ */
+const executeAuthAction = async <T>(
+  updateState: (updates: Partial<AuthState>) => void,
+  fallbackErrorMessage: string,
+  action: () => Promise<T>,
+): Promise<T> => {
+  updateState({ isLoading: true, error: null });
+  try {
+    return await action();
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error && error.message ? error.message : fallbackErrorMessage;
+    updateState({ isLoading: false, error: errorMessage });
+    throw error instanceof Error ? error : new Error(errorMessage);
+  }
+};
 
 /**
  * useAuth hook
  *
- * Manages authentication state and provides auth actions
- *
- * @param options - Hook options
- * @returns Auth state and actions
+ * Manages authentication state and provides auth actions.
+ * Each action surfaces errors to the caller AND to the auth state.
  */
 export function useAuth(options: UseAuthOptions = {}) {
-  const {
-    initialAuthenticated = false,
-    initialUser = null,
-    authProvider,
-  } = options;
+  const { authProvider } = options;
 
-  // State
   const [authState, setAuthState] = useState<AuthState>({
-    isAuthenticated: initialAuthenticated,
-    user: initialUser,
+    isAuthenticated: false,
+    user: null,
     isLoading: false,
     error: null,
   });
 
-  // Update auth state helper
   const updateState = useCallback((updates: Partial<AuthState>) => {
     setAuthState((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  // Login action
-  const login = useCallback(async (credentials: LoginCredentials) => {
-    // Validate credentials
-    const validation = validateLogin(credentials);
-    if (!validation.valid) {
-      updateState({ error: validation.error });
-      throw new Error(validation.error);
+  const requireProvider = useCallback((): AuthProvider => {
+    if (!authProvider) {
+      throw new Error("Auth provider not configured");
     }
+    return authProvider;
+  }, [authProvider]);
 
-    updateState({ isLoading: true, error: null });
-
-    try {
-      if (!authProvider) {
-        throw new Error("Auth provider not configured");
+  const login = useCallback(
+    async (credentials: LoginCredentials): Promise<User> => {
+      const validation = validateLogin(credentials);
+      if (!validation.valid) {
+        const message = validation.error ?? "Login validation failed";
+        updateState({ error: message });
+        throw new Error(message);
       }
 
-      const user = await authProvider.login(credentials);
-      updateState({
-        isAuthenticated: true,
-        user,
-        isLoading: false,
-        error: null,
+      return executeAuthAction(updateState, "Login failed", async () => {
+        const provider = requireProvider();
+        const user = await provider.login(credentials);
+        updateState({ isAuthenticated: true, user, isLoading: false, error: null });
+        return user;
       });
+    },
+    [requireProvider, updateState],
+  );
 
-      return user;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Login failed";
-      updateState({
-        isAuthenticated: false,
-        user: null,
-        isLoading: false,
-        error: errorMessage,
-      });
-      throw error;
-    }
-  }, [authProvider, updateState]);
-
-  // Register action
-  const register = useCallback(async (data: RegisterData) => {
-    // Validate registration data
-    const validation = validateRegister(data, false);
-    if (!validation.valid) {
-      updateState({ error: validation.error });
-      throw new Error(validation.error);
-    }
-
-    updateState({ isLoading: true, error: null });
-
-    try {
-      if (!authProvider) {
-        throw new Error("Auth provider not configured");
+  const register = useCallback(
+    async (data: RegisterData): Promise<User> => {
+      const validation = validateRegister(data, false);
+      if (!validation.valid) {
+        const message = validation.error ?? "Registration validation failed";
+        updateState({ error: message });
+        throw new Error(message);
       }
 
-      const user = await authProvider.register(data);
-      updateState({
-        isAuthenticated: true,
-        user,
-        isLoading: false,
-        error: null,
+      return executeAuthAction(updateState, "Registration failed", async () => {
+        const provider = requireProvider();
+        const user = await provider.register(data);
+        updateState({ isAuthenticated: true, user, isLoading: false, error: null });
+        return user;
       });
+    },
+    [requireProvider, updateState],
+  );
 
-      return user;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Registration failed";
-      updateState({
-        isAuthenticated: false,
-        user: null,
-        isLoading: false,
-        error: errorMessage,
-      });
-      throw error;
-    }
-  }, [authProvider, updateState]);
+  const logout = useCallback(async (): Promise<void> => {
+    await executeAuthAction(updateState, "Logout failed", async () => {
+      const provider = requireProvider();
+      await provider.logout();
+      updateState({ isAuthenticated: false, user: null, isLoading: false, error: null });
+    });
+  }, [requireProvider, updateState]);
 
-  // Logout action
-  const logout = useCallback(async () => {
-    updateState({ isLoading: true, error: null });
-
-    try {
-      if (!authProvider) {
-        throw new Error("Auth provider not configured");
+  const forgotPassword = useCallback(
+    async (data: ForgotPasswordData): Promise<void> => {
+      const validation = validateForgotPassword(data);
+      if (!validation.valid) {
+        const message = validation.error ?? "Forgot password validation failed";
+        updateState({ error: message });
+        throw new Error(message);
       }
 
-      await authProvider.logout();
-
-      updateState({
-        isAuthenticated: false,
-        user: null,
-        isLoading: false,
-        error: null,
+      await executeAuthAction(updateState, "Failed to send reset email", async () => {
+        const provider = requireProvider();
+        await provider.forgotPassword(data);
+        updateState({ isLoading: false });
       });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Logout failed";
-      updateState({
-        isLoading: false,
-        error: errorMessage,
-      });
-      throw error;
-    }
-  }, [authProvider, updateState]);
+    },
+    [requireProvider, updateState],
+  );
 
-  // Forgot password action
-  const forgotPassword = useCallback(async (data: ForgotPasswordData) => {
-    // Validate email
-    const validation = validateForgotPassword(data);
-    if (!validation.valid) {
-      updateState({ error: validation.error });
-      throw new Error(validation.error);
-    }
-
-    updateState({ isLoading: true, error: null });
-
-    try {
-      if (!authProvider) {
-        throw new Error("Auth provider not configured");
+  const resetPassword = useCallback(
+    async (data: ResetPasswordData): Promise<void> => {
+      const validation = validateResetPassword(data);
+      if (!validation.valid) {
+        const message = validation.error ?? "Reset password validation failed";
+        updateState({ error: message });
+        throw new Error(message);
       }
 
-      await authProvider.forgotPassword(data);
-      updateState({ isLoading: false });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to send reset email";
-      updateState({
-        isLoading: false,
-        error: errorMessage,
+      await executeAuthAction(updateState, "Failed to reset password", async () => {
+        const provider = requireProvider();
+        await provider.resetPassword(data);
+        updateState({ isLoading: false });
       });
-      throw error;
-    }
-  }, [authProvider, updateState]);
+    },
+    [requireProvider, updateState],
+  );
 
-  // Reset password action
-  const resetPassword = useCallback(async (data: ResetPasswordData) => {
-    // Validate reset data
-    const validation = validateResetPassword(data);
-    if (!validation.valid) {
-      updateState({ error: validation.error });
-      throw new Error(validation.error);
-    }
-
-    updateState({ isLoading: true, error: null });
-
-    try {
-      if (!authProvider) {
-        throw new Error("Auth provider not configured");
+  const updateProfile = useCallback(
+    async (data: Partial<User>): Promise<User> => {
+      const currentUser = authState.user;
+      if (!currentUser) {
+        const message = "No user to update";
+        updateState({ error: message });
+        throw new Error(message);
       }
 
-      await authProvider.resetPassword(data);
-      updateState({ isLoading: false });
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to reset password";
-      updateState({
-        isLoading: false,
-        error: errorMessage,
-      });
-      throw error;
-    }
-  }, [authProvider, updateState]);
-
-  // Update profile action
-  const updateProfile = useCallback(async (data: Partial<User>) => {
-    updateState({ isLoading: true, error: null });
-
-    try {
-      // Update local user state
-      let updatedUser: User | null = null;
-      setAuthState((prev) => {
-        updatedUser = prev.user ? { ...prev.user, ...data } : null;
-        return {
-          ...prev,
-          user: updatedUser,
-          isLoading: false,
-          error: null,
+      return executeAuthAction(updateState, "Failed to update profile", async () => {
+        // Pure derivation of the new user, no side effects in setState callback.
+        // Required fields come from the existing user; data overrides only the rest.
+        const { id: _ignoredId, ...rest } = data;
+        const updatedUser: User = {
+          ...currentUser,
+          ...rest,
+          id: currentUser.id,
+          email: data.email ?? currentUser.email,
         };
+        updateState({ user: updatedUser, isLoading: false, error: null });
+        return updatedUser;
       });
+    },
+    [authState.user, updateState],
+  );
 
-      // In production, call your API here
-      // await authProvider?.updateProfile(data);
-
-      if (!updatedUser) {
-        throw new Error("No user to update");
-      }
-
-      return updatedUser;
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to update profile";
-      updateState({
-        isLoading: false,
-        error: errorMessage,
-      });
-      throw error;
-    }
-  }, [updateState]);
-
-  // Refresh auth action
-  const refresh = useCallback(async () => {
-    updateState({ isLoading: true, error: null });
-
-    try {
-      if (!authProvider) {
-        throw new Error("Auth provider not configured");
-      }
-
-      const user = await authProvider.refreshAuth();
-
-      updateState({
-        isAuthenticated: !!user,
-        user,
-        isLoading: false,
-        error: null,
-      });
-
+  const refresh = useCallback(async (): Promise<User | null> => {
+    return executeAuthAction(updateState, "Failed to refresh authentication", async () => {
+      const provider = requireProvider();
+      const user = await provider.refreshAuth();
+      updateState({ isAuthenticated: Boolean(user), user, isLoading: false, error: null });
       return user;
-    } catch (error) {
-      updateState({
-        isAuthenticated: false,
-        user: null,
-        isLoading: false,
-        error: null,
-      });
-      throw error;
-    }
-  }, [authProvider, updateState]);
+    });
+  }, [requireProvider, updateState]);
 
-  // Clear error action
   const clearError = useCallback(() => {
     updateState({ error: null });
   }, [updateState]);
 
-  // Auth actions object
   const authActions: AuthActions = {
     login,
     register,

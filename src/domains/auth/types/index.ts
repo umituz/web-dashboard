@@ -21,4 +21,5 @@ export type {
   RegisterFormProps,
   ForgotPasswordFormProps,
   ResetPasswordFormProps,
+  Translate,
 } from "./auth";

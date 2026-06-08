@@ -4,6 +4,8 @@
  * Helper functions for analytics operations
  */
 
+import type { TimeSeriesData } from "../types/analytics";
+
 import type { Metric, KPIData, DateRangePreset } from "../types/analytics";
 
 /**
@@ -183,6 +185,7 @@ export function calculateDropOffRate(current: number, previous: number): number 
  * @returns Date range preset
  */
 export function createDateRangePreset(label: string, days: number): DateRangePreset {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const to = new Date();
   const from = new Date();
   from.setDate(from.getDate() - days);
@@ -244,13 +247,14 @@ export function aggregateByPeriod(
   });
 
   return Array.from(grouped.entries()).map(([date, items]) => {
-    const aggregated: any = { date };
+    const aggregated: TimeSeriesData = { date };
 
-    // Sum all numeric fields
     items.forEach((item) => {
       Object.entries(item).forEach(([key, value]) => {
-        if (key !== "date" && typeof value === "number") {
-          aggregated[key] = (aggregated[key] || 0) + value;
+        if (key === "date") return;
+        if (typeof value === "number") {
+          const current = (aggregated[key] as number | undefined) ?? 0;
+          aggregated[key] = current + value;
         }
       });
     });

@@ -1,16 +1,27 @@
 /**
  * Auth Utilities
  *
- * Utility functions for authentication operations
+ * Validation and helper functions for authentication.
+ * Validation messages are i18n keys, not hardcoded strings —
+ * the consumer renders the localized text in its UI layer.
  */
 
 import type { LoginCredentials, RegisterData, User } from "../types/auth";
+import { AUTH_VALIDATION_KEYS } from './validationKeys';
+
+export { generateResetToken } from './secureToken';
+export { AUTH_VALIDATION_KEYS } from './validationKeys';
+export type { AuthValidationKey } from './validationKeys';
+
+/**
+ * Validation result type — error is now an i18n key.
+ */
+export type ValidationResult =
+  | { valid: true }
+  | { valid: false; error: string };
 
 /**
  * Validate email format
- *
- * @param email - Email address
- * @returns Whether email is valid
  */
 export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -18,11 +29,7 @@ export function isValidEmail(email: string): boolean {
 }
 
 /**
- * Validate password strength
- *
- * @param password - Password
- * @param minLength - Minimum length (default: 8)
- * @returns Whether password meets requirements
+ * Validate password length
  */
 export function isValidPassword(password: string, minLength: number = 8): boolean {
   return password.length >= minLength;
@@ -30,148 +37,108 @@ export function isValidPassword(password: string, minLength: number = 8): boolea
 
 /**
  * Validate login credentials
- *
- * @param credentials - Login credentials
- * @returns Validation result with error message
  */
-export function validateLogin(credentials: LoginCredentials): {
-  valid: boolean;
-  error?: string;
-} {
+export function validateLogin(credentials: LoginCredentials): ValidationResult {
   if (!credentials.email) {
-    return { valid: false, error: "Email is required" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.emailRequired };
   }
-
   if (!isValidEmail(credentials.email)) {
-    return { valid: false, error: "Invalid email format" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.emailInvalid };
   }
-
   if (!credentials.password) {
-    return { valid: false, error: "Password is required" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.passwordRequired };
   }
-
   return { valid: true };
 }
 
 /**
  * Validate registration data
- *
- * @param data - Registration data
- * @param requireName - Whether name is required (default: false)
- * @param requirePasswordConfirm - Whether password confirmation is required
- * @returns Validation result with error message
  */
 export function validateRegister(
   data: RegisterData & { confirmPassword?: string },
   requireName: boolean = false,
-  requirePasswordConfirm?: boolean
-): {
-  valid: boolean;
-  error?: string;
-} {
+  requirePasswordConfirm?: boolean,
+): ValidationResult {
   if (!data.email) {
-    return { valid: false, error: "Email is required" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.emailRequired };
   }
-
   if (!isValidEmail(data.email)) {
-    return { valid: false, error: "Invalid email format" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.emailInvalid };
   }
-
   if (requireName && !data.name) {
-    return { valid: false, error: "Name is required" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.nameRequired };
   }
-
   if (!data.password) {
-    return { valid: false, error: "Password is required" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.passwordRequired };
   }
-
   if (!isValidPassword(data.password)) {
-    return { valid: false, error: "Password must be at least 8 characters" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.passwordTooShort };
   }
-
   if (requirePasswordConfirm && data.password !== data.confirmPassword) {
-    return { valid: false, error: "Passwords do not match" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.passwordsDoNotMatch };
   }
-
   return { valid: true };
 }
 
 /**
- * Validate password reset request
- *
- * @param data - Forgot password data
- * @returns Validation result with error message
+ * Validate forgot-password request
  */
-export function validateForgotPassword(data: { email: string }): {
-  valid: boolean;
-  error?: string;
-} {
+export function validateForgotPassword(data: { email: string }): ValidationResult {
   if (!data.email) {
-    return { valid: false, error: "Email is required" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.emailRequired };
   }
-
   if (!isValidEmail(data.email)) {
-    return { valid: false, error: "Invalid email format" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.emailInvalid };
   }
-
   return { valid: true };
 }
 
 /**
  * Validate password reset confirmation
- *
- * @param data - Reset password data
- * @returns Validation result with error message
  */
 export function validateResetPassword(data: {
   token: string;
   password: string;
   confirmPassword: string;
-}): {
-  valid: boolean;
-  error?: string;
-} {
+}): ValidationResult {
   if (!data.token) {
-    return { valid: false, error: "Invalid reset token" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.invalidResetToken };
   }
-
   if (!data.password) {
-    return { valid: false, error: "Password is required" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.passwordRequired };
   }
-
   if (!isValidPassword(data.password)) {
-    return { valid: false, error: "Password must be at least 8 characters" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.passwordTooShort };
   }
-
   if (data.password !== data.confirmPassword) {
-    return { valid: false, error: "Passwords do not match" };
+    return { valid: false, error: AUTH_VALIDATION_KEYS.passwordsDoNotMatch };
   }
-
   return { valid: true };
 }
 
 /**
  * Get user display name
  *
- * @param user - User object
- * @returns Display name or email fallback
+ * Returns null when no usable identifier exists, letting the caller
+ * decide on a localized fallback. Avoids hardcoded "Guest"/"User" strings.
  */
-export function getUserDisplayName(user: User | null): string {
-  if (!user) return "Guest";
-  return user.name || user.email || "User";
+export function getUserDisplayName(user: User | null): string | null {
+  if (!user) return null;
+  return user.name || user.email || null;
 }
 
 /**
  * Get user initials
  *
- * @param user - User object
- * @returns User initials (up to 2 characters)
+ * Returns null when no name is available, so the caller can decide
+ * whether to render a placeholder or hide the avatar.
  */
-export function getUserInitials(user: User | null): string {
-  if (!user) return "G";
+export function getUserInitials(user: User | null): string | null {
+  if (!user) return null;
   const name = user.name || user.email || "";
+  if (!name) return null;
   const parts = name.trim().split(" ");
-  if (parts.length >= 2) {
+  if (parts.length >= 2 && parts[0] && parts[parts.length - 1]) {
     return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
   }
   return name.slice(0, 2).toUpperCase();
@@ -179,9 +146,6 @@ export function getUserInitials(user: User | null): string {
 
 /**
  * Check if user has verified email
- *
- * @param user - User object
- * @returns Whether email is verified
  */
 export function isEmailVerified(user: User | null): boolean {
   return user?.emailVerified === true;
@@ -190,12 +154,14 @@ export function isEmailVerified(user: User | null): boolean {
 /**
  * Format user creation date
  *
- * @param user - User object
- * @param locale - Locale for formatting (default: en-US)
- * @returns Formatted date string or empty string
+ * Returns null when the user has no createdAt; the caller decides
+ * whether to display "—" or hide the field.
  */
-export function formatUserCreatedAt(user: User | null, locale: string = "en-US"): string {
-  if (!user || !user.createdAt) return "";
+export function formatUserCreatedAt(
+  user: User | null,
+  locale: string = "en-US",
+): string | null {
+  if (!user?.createdAt) return null;
   return new Date(user.createdAt).toLocaleDateString(locale, {
     year: "numeric",
     month: "long",
@@ -206,47 +172,25 @@ export function formatUserCreatedAt(user: User | null, locale: string = "en-US")
 /**
  * Mask email for privacy (e.g., u***@example.com)
  *
- * @param email - Email address
- * @returns Masked email
+ * Returns null when the email is invalid so the caller can show
+ * a "—" placeholder rather than the raw input.
  */
-export function maskEmail(email: string): string {
+export function maskEmail(email: string): string | null {
   const [local, domain] = email.split("@");
-  if (!local || !domain) return email;
-
+  if (!local || !domain) return null;
   const maskedLocal = local[0] + "***";
   return `${maskedLocal}@${domain}`;
 }
 
 /**
- * Generate secure random token (for demo purposes)
- * In production, use a proper crypto library
- *
- * @param length - Token length in bytes (default: 32)
- * @returns Random hex token
- */
-export function generateResetToken(length: number = 32): string {
-  const chars = "0123456789abcdef";
-  let token = "";
-  for (let i = 0; i < length * 2; i++) {
-    token += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return token;
-}
-
-/**
- * Calculate password strength score (0-100)
- *
- * @param password - Password to evaluate
- * @returns Strength score
+ * Password strength score (0-100)
  */
 export function calculatePasswordStrength(password: string): number {
   let score = 0;
 
-  // Length
   if (password.length >= 8) score += 25;
   if (password.length >= 12) score += 25;
 
-  // Variety
   if (/[a-z]/.test(password)) score += 12.5;
   if (/[A-Z]/.test(password)) score += 12.5;
   if (/[0-9]/.test(password)) score += 12.5;
@@ -256,25 +200,22 @@ export function calculatePasswordStrength(password: string): number {
 }
 
 /**
- * Get password strength label
- *
- * @param password - Password to evaluate
- * @returns Strength label
+ * Password strength band. Numeric so the UI can map it to a label
+ * via its own translation catalog.
  */
-export function getPasswordStrengthLabel(password: string): string {
+export type PasswordStrengthBand = 'weak' | 'fair' | 'good' | 'strong';
+
+export function getPasswordStrengthBand(password: string): PasswordStrengthBand {
   const score = calculatePasswordStrength(password);
-  if (score < 25) return "Weak";
-  if (score < 50) return "Fair";
-  if (score < 75) return "Good";
-  return "Strong";
+  if (score < 25) return 'weak';
+  if (score < 50) return 'fair';
+  if (score < 75) return 'good';
+  return 'strong';
 }
 
 /**
  * Sanitize user input for display
- *
- * @param input - User input string
- * @returns Sanitized string
  */
-export function sanitizeInput(input: string): string {
-  return input.trim().slice(0, 1000);
+export function sanitizeInput(input: string, maxLength: number = 1000): string {
+  return input.trim().slice(0, maxLength);
 }

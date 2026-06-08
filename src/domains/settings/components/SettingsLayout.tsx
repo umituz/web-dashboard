@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Skeleton } from "@umituz/web-design-system/atoms";
+import { Button } from "@umituz/web-design-system/atoms";
+import { ChevronLeft, Menu } from "lucide-react";
 import { SettingsSection } from "./SettingsSection";
 import type { SettingsConfig } from "../types/settings";
-import { Skeleton } from "@umituz/web-design-system/atoms";
-import { ChevronLeft, Menu } from "lucide-react";
-import { Button } from "@umituz/web-design-system/atoms";
 
 interface SettingsLayoutProps {
   /** Settings configuration */
@@ -12,12 +12,16 @@ interface SettingsLayoutProps {
 }
 
 /**
+ * Skeleton display duration while route transition simulates load.
+ * Single source of truth so it can be tuned in one place.
+ */
+const ROUTE_LOADING_DELAY_MS = 200;
+
+/**
  * Settings Layout Component
  *
  * Main layout wrapper for settings pages.
  * Provides sidebar navigation and content area.
- *
- * @param props - Settings layout props
  */
 export const SettingsLayout = ({
   config,
@@ -28,17 +32,43 @@ export const SettingsLayout = ({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Simulate loading on route change
-  useState(() => {
+  // Route change triggers a brief loading skeleton to mask content swap.
+  // Cleanup is essential: setTimeout must be cancelled on unmount/route change.
+  useEffect(() => {
     setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 200);
+    const timer = setTimeout(() => setLoading(false), ROUTE_LOADING_DELAY_MS);
     return () => clearTimeout(timer);
-  });
+  }, [location.pathname]);
 
   const handleNavigate = (path: string) => {
     navigate(path);
     setMobileOpen(false);
   };
+
+  const renderSidebarHeader = (onMenuClick: () => void, showMenuButton: boolean) => (
+    <div className="flex h-14 items-center justify-between border-b border-border px-4">
+      {!collapsed && (
+        <h2 className="text-lg font-semibold text-foreground">
+          {config.brandName}
+        </h2>
+      )}
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={onMenuClick}
+        className="ml-auto"
+        aria-label={showMenuButton ? "Open sidebar" : "Toggle sidebar"}
+      >
+        {showMenuButton ? (
+          <Menu className="h-4 w-4" />
+        ) : collapsed ? (
+          <Menu className="h-4 w-4" />
+        ) : (
+          <ChevronLeft className="h-4 w-4" />
+        )}
+      </Button>
+    </div>
+  );
 
   return (
     <div className="flex h-screen w-full bg-background font-sans">
@@ -48,22 +78,7 @@ export const SettingsLayout = ({
           collapsed ? "w-16" : "w-64"
         }`}
       >
-        <div className="flex h-14 items-center justify-between border-b border-border px-4">
-          {!collapsed && (
-            <h2 className="text-lg font-semibold text-foreground">
-              {config.brandName || "Settings"}
-            </h2>
-          )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setCollapsed(!collapsed)}
-            className="ml-auto"
-          >
-            {collapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </Button>
-        </div>
-
+        {renderSidebarHeader(() => setCollapsed((prev) => !prev), false)}
         <nav className="flex-1 overflow-y-auto p-2">
           {config.sections.map((section) => (
             <SettingsSection
@@ -83,17 +98,10 @@ export const SettingsLayout = ({
           <div
             className="absolute inset-0 bg-background/80 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
+            role="presentation"
           />
           <aside className="absolute left-0 top-0 h-full w-64 border-r border-border bg-card shadow-xl">
-            <div className="flex h-14 items-center justify-between border-b border-border px-4">
-              <h2 className="text-lg font-semibold text-foreground">
-                {config.brandName || "Settings"}
-              </h2>
-              <Button variant="ghost" size="icon" onClick={() => setMobileOpen(false)}>
-                <Menu className="h-4 w-4" />
-              </Button>
-            </div>
-
+            {renderSidebarHeader(() => setMobileOpen(false), true)}
             <nav className="flex-1 overflow-y-auto p-2">
               {config.sections.map((section) => (
                 <SettingsSection
@@ -113,11 +121,16 @@ export const SettingsLayout = ({
         {/* Mobile Header */}
         <header className="flex h-14 items-center justify-between border-b border-border bg-card/50 backdrop-blur-md px-4 shrink-0 md:hidden">
           <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => setMobileOpen(true)}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setMobileOpen(true)}
+              aria-label="Open mobile menu"
+            >
               <Menu className="h-5 w-5" />
             </Button>
             <h2 className="text-sm font-semibold text-foreground">
-              {config.brandName || "Settings"}
+              {config.brandName}
             </h2>
           </div>
         </header>

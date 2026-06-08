@@ -68,7 +68,7 @@ export class PerformanceService {
         });
         observer.observe({ entryTypes: ['layout-shift'] });
         this.observers.push(observer);
-      } catch (e) {
+      } catch {
         // Layout Shift API not supported
       }
 
@@ -83,7 +83,7 @@ export class PerformanceService {
         });
         observer.observe({ entryTypes: ['largest-contentful-paint'] });
         this.observers.push(observer);
-      } catch (e) {
+      } catch {
         // LCP API not supported
       }
 
@@ -98,7 +98,7 @@ export class PerformanceService {
         });
         observer.observe({ entryTypes: ['first-input'] });
         this.observers.push(observer);
-      } catch (e) {
+      } catch {
         // FID API not supported
       }
     }
@@ -187,6 +187,7 @@ export class PerformanceService {
    */
   public getDashboardMetrics(): DashboardMetrics {
     const timing = typeof window !== 'undefined' ? window.performance?.timing : null;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const navigation = typeof window !== 'undefined' ? window.performance?.navigation : null;
 
     const loadTime = timing

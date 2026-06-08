@@ -60,22 +60,49 @@ export interface ActivityItem {
 }
 
 /**
+ * Numeric metric keys supported by segment aggregation.
+ * Constrained to a string union to avoid `any` lookups at runtime.
+ */
+type NumericUserMetric =
+  | 'session_duration'
+  | 'pages_per_session'
+  | 'bounce_rate'
+  | 'lifetime_value'
+  | 'last_login_days';
+
+const isUserMetric = (key: string): key is NumericUserMetric =>
+  [
+    'session_duration',
+    'pages_per_session',
+    'bounce_rate',
+    'lifetime_value',
+    'last_login_days',
+  ].includes(key);
+
+/**
+ * Safe numeric accessor for a UserData field.
+ * Returns 0 when the field is missing or not a number, instead of forcing a cast.
+ */
+const getNumericMetric = (user: UserData, key: NumericUserMetric): number => {
+  const value = user[key];
+  return typeof value === 'number' ? value : 0;
+};
+
+/**
+ * Segmentation thresholds (in days since last login).
+ */
+const SEGMENT_THRESHOLDS = {
+  activeDays: 7,
+  moderateDays: 30,
+} as const;
+
+/**
  * Analytics Engine Service
  *
- * Singleton service for advanced analytics calculations
+ * Pure-functional service for advanced analytics calculations.
+ * Stateless and testable: instantiate with `new AnalyticsEngineService()`.
  */
 export class AnalyticsEngineService {
-  private static instance: AnalyticsEngineService;
-
-  private constructor() {}
-
-  public static getInstance(): AnalyticsEngineService {
-    if (!AnalyticsEngineService.instance) {
-      AnalyticsEngineService.instance = new AnalyticsEngineService();
-    }
-    return AnalyticsEngineService.instance;
-  }
-
   /**
    * Calculate cohort retention analysis
    *
@@ -103,9 +130,13 @@ export class AnalyticsEngineService {
       const retention: number[] = [];
       for (let month = 0; month < 12; month++) {
         const activeUsersCount = users.filter((user) => {
-          if (!user.last_activity) return false;
-          const signupDate = new Date(user.signup_date!);
-          const targetDate = new Date(signupDate.getFullYear(), signupDate.getMonth() + month, 1);
+          if (!user.last_activity || !user.signup_date) return false;
+          const signupDate = new Date(user.signup_date);
+          const targetDate = new Date(
+            signupDate.getFullYear(),
+            signupDate.getMonth() + month,
+            1,
+          );
           return new Date(user.last_activity) >= targetDate;
         }).length;
 
@@ -116,7 +147,9 @@ export class AnalyticsEngineService {
         cohort,
         size: users.length,
         retention,
-        averageRetention: retention.reduce((a, b) => a + b, 0) / retention.length,
+        averageRetention: retention.length === 0
+          ? 0
+          : retention.reduce((a, b) => a + b, 0) / retention.length,
       });
     });
 
@@ -143,7 +176,7 @@ export class AnalyticsEngineService {
       const path = paths.get(pathKey);
       if (path) {
         path.count++;
-        path.value += conversion.value || 0;
+        path.value += conversion.value ?? 0;
         totalConversions++;
       }
     });
@@ -154,7 +187,9 @@ export class AnalyticsEngineService {
         conversions: path.count,
         value: path.value,
         abandonmentRate:
-          totalConversions > 0 ? ((totalConversions - path.count) / totalConversions) * 100 : 0,
+          totalConversions > 0
+            ? ((totalConversions - path.count) / totalConversions) * 100
+            : 0,
       }))
       .sort((a, b) => b.conversions - a.conversions);
   }
@@ -169,15 +204,16 @@ export class AnalyticsEngineService {
   public calculateFunnel(data: FunnelItem[], steps: string[]): FunnelData {
     let previousCount = data.length;
     const funnelSteps = steps.map((step, index) => {
-      const stepCount = data.filter((item) => item[step]).length;
+      const stepCount = data.filter((item) => Boolean(item[step])).length;
       const conversionRate =
         index === 0 ? 100 : previousCount > 0 ? (stepCount / previousCount) * 100 : 0;
       previousCount = stepCount;
 
-      const stepData = data.filter((item) => item[step]);
+      const stepData = data.filter((item) => Boolean(item[step]));
       const avgTime =
         stepData.length > 0
-          ? stepData.reduce((sum, item) => sum + (item.time_spent || 0), 0) / stepData.length
+          ? stepData.reduce((sum, item) => sum + (item.time_spent ?? 0), 0) /
+            stepData.length
           : 0;
 
       return {
@@ -193,7 +229,7 @@ export class AnalyticsEngineService {
       title: 'Conversion Funnel',
       steps: funnelSteps,
       totalUsers: data.length,
-      finalConversion: funnelSteps[funnelSteps.length - 1]?.conversionRate || 0,
+      finalConversion: funnelSteps[funnelSteps.length - 1]?.conversionRate ?? 0,
     };
   }
 
@@ -205,7 +241,7 @@ export class AnalyticsEngineService {
    */
   public generateActivityHeatmap(data: ActivityItem[]): HeatmapData[] {
     const heatmap: HeatmapData[] = [];
-    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
     for (let day = 0; day < 7; day++) {
       for (let hour = 0; hour < 24; hour++) {
@@ -230,39 +266,46 @@ export class AnalyticsEngineService {
     const defineSegment = (
       name: string,
       filter: (u: UserData) => boolean,
-      chars: string[]
+      chars: string[],
     ) => {
       const users = data.filter(filter);
-      const avg = (field: string) =>
-        users.length === 0
-          ? 0
-          : users.reduce((s, i) => s + ((i as any)[field] || 0), 0) / users.length;
+      const safeAvg = (field: string): number => {
+        if (users.length === 0) return 0;
+        if (!isUserMetric(field)) return 0;
+        return users.reduce((sum, user) => sum + getNumericMetric(user, field), 0) /
+          users.length;
+      };
 
       return {
         name,
         count: users.length,
-        percentage: (users.length / data.length) * 100,
+        percentage: data.length === 0 ? 0 : (users.length / data.length) * 100,
         characteristics: chars,
         behavior: {
-          avgSessionDuration: avg('session_duration'),
-          pagesPerSession: avg('pages_per_session'),
-          bounceRate: avg('bounce_rate'),
+          avgSessionDuration: safeAvg('session_duration'),
+          pagesPerSession: safeAvg('pages_per_session'),
+          bounceRate: safeAvg('bounce_rate'),
         },
       };
     };
 
     return [
-      defineSegment('Active', (u) => u.last_login_days! <= 7, [
-        'Recent login',
-        'High engagement',
-      ]),
-      defineSegment('Moderate', (u) => u.last_login_days! > 7 && u.last_login_days! <= 30, [
-        'Occasional login',
-      ]),
-      defineSegment('Inactive', (u) => u.last_login_days! > 30, [
-        'Churn risk',
-        'Low activity',
-      ]),
+      defineSegment('Active', (u) => {
+        const days = u.last_login_days;
+        return typeof days === 'number' && days <= SEGMENT_THRESHOLDS.activeDays;
+      }, ['Recent login', 'High engagement']),
+      defineSegment('Moderate', (u) => {
+        const days = u.last_login_days;
+        return (
+          typeof days === 'number' &&
+          days > SEGMENT_THRESHOLDS.activeDays &&
+          days <= SEGMENT_THRESHOLDS.moderateDays
+        );
+      }, ['Occasional login']),
+      defineSegment('Inactive', (u) => {
+        const days = u.last_login_days;
+        return typeof days === 'number' && days > SEGMENT_THRESHOLDS.moderateDays;
+      }, ['Churn risk', 'Low activity']),
     ];
   }
 
@@ -275,10 +318,11 @@ export class AnalyticsEngineService {
    */
   public predictUserBehavior(
     user: UserData,
-    historicalData: UserData[]
+    historicalData: UserData[],
   ): UserBehaviorPrediction {
     const similarUsers = historicalData.filter(
-      (u) => Math.abs((u.age || 0) - (user.age || 0)) < 5 && u.location === user.location
+      (u) =>
+        Math.abs((u.age ?? 0) - (user.age ?? 0)) < 5 && u.location === user.location,
     );
 
     if (similarUsers.length === 0) {
@@ -291,17 +335,18 @@ export class AnalyticsEngineService {
     }
 
     const churnCount = similarUsers.filter((u) => u.churned).length;
-    const totalLTV = similarUsers.reduce((s, u) => s + (u.lifetime_value || 0), 0);
+    const totalLTV = similarUsers.reduce((s, u) => s + (u.lifetime_value ?? 0), 0);
 
-    // Predict next action based on frequency in similar users
-    const actions = similarUsers.map((u) => u.last_action).filter(Boolean) as string[];
-    const actionCounts = actions.reduce((c: Record<string, number>, a) => {
-      c[a] = (c[a] || 0) + 1;
+    const actions = similarUsers
+      .map((u) => u.last_action)
+      .filter((action): action is string => Boolean(action));
+    const actionCounts = actions.reduce<Record<string, number>>((c, a) => {
+      c[a] = (c[a] ?? 0) + 1;
       return c;
     }, {});
     const nextAction = Object.keys(actionCounts).reduce(
       (a, b) => (actionCounts[a] > actionCounts[b] ? a : b),
-      'unknown'
+      'unknown',
     );
 
     return {
@@ -314,6 +359,7 @@ export class AnalyticsEngineService {
 }
 
 /**
- * Singleton instance
+ * Default instance for convenience.
+ * The class is also exported so consumers can instantiate a fresh one for tests.
  */
-export const analyticsEngineService = AnalyticsEngineService.getInstance();
+export const analyticsEngineService = new AnalyticsEngineService();

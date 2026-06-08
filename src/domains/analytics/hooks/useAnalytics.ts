@@ -1,178 +1,173 @@
 /**
- * useAnalytics Hook
+ * useAnalytics
  *
- * Core analytics hook for fetching and managing analytics data
+ * Pure state + side-effect container. Mock data, commented-out
+ * fetch calls, and Math.random()-driven time series are gone.
+ * All persistence is delegated to the injected `apiClient`.
  */
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import type {
   KPIs,
   TimeSeriesData,
-  ChartConfig,
   DateRangeValue,
   AnalyticsExportOptions,
 } from "../types/analytics";
-import { createKPI } from "../utils/analytics";
+
+/**
+ * API client contract. Replace `loadAnalytics` with a real fetch wrapper
+ * and `exportAnalytics` with a server-side exporter.
+ */
+export interface AnalyticsApiClient {
+  loadAnalytics: (range: DateRangeValue) => Promise<AnalyticsDataPayload>;
+  exportAnalytics: (payload: AnalyticsDataPayload, options: AnalyticsExportOptions) => Promise<Blob>;
+}
+
+export interface AnalyticsDataPayload {
+  kpis: KPIs;
+  timeSeries: TimeSeriesData[];
+}
 
 interface UseAnalyticsOptions {
-  /** Analytics API base URL */
-  apiUrl?: string;
-  /** Initial date range */
   initialDateRange?: DateRangeValue;
   /** Auto-refresh interval in ms (0 to disable) */
   refreshInterval?: number;
+  apiClient: AnalyticsApiClient;
 }
 
-interface AnalyticsData {
-  /** KPI metrics */
+export interface UseAnalyticsReturn {
   kpis: KPIs;
-  /** Time series data */
   timeSeries: TimeSeriesData[];
-  /** Loading state */
   isLoading: boolean;
-  /** Error state */
   error: string | null;
+  dateRange: DateRangeValue;
+  updateDateRange: (range: DateRangeValue) => void;
+  refresh: () => Promise<void>;
+  exportData: (options: AnalyticsExportOptions) => Promise<void>;
 }
 
-/**
- * useAnalytics hook
- *
- * Manages analytics data fetching and state
- *
- * @param options - Hook options
- * @returns Analytics data and actions
- */
-export function useAnalytics(options: UseAnalyticsOptions = {}) {
-  const { apiUrl = "/api/analytics", initialDateRange, refreshInterval = 0 } = options;
+const DEFAULT_RANGE_DAYS = 30;
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-  // State
+const buildDefaultRange = (): DateRangeValue => {
+  const today = new Date();
+  const start = new Date(Date.now() - DEFAULT_RANGE_DAYS * MS_PER_DAY);
+  return {
+    from: start.toISOString().split("T")[0] as string,
+    to: today.toISOString().split("T")[0] as string,
+  };
+};
+
+const EMPTY_KPIS: KPIs = {
+  downloads: { current: 0, previous: 0, growth: 0 },
+  engagement: { current: 0, previous: 0, growth: 0 },
+  users: { current: 0, previous: 0, growth: 0 },
+  revenue: { current: 0, previous: 0, growth: 0 },
+  retention: { current: 0, previous: 0, growth: 0 },
+};
+
+const toErrorMessage = (err: unknown, fallback: string): string =>
+  err instanceof Error && err.message ? err.message : fallback;
+
+export function useAnalytics(options: UseAnalyticsOptions): UseAnalyticsReturn {
+  const { initialDateRange, refreshInterval = 0, apiClient } = options;
+
   const [dateRange, setDateRange] = useState<DateRangeValue>(
-    initialDateRange || {
-      from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
-      to: new Date().toISOString().split("T")[0],
-      preset: "Last 30 Days",
-    }
+    initialDateRange ?? buildDefaultRange(),
   );
-  const [data, setData] = useState<AnalyticsData>({
-    kpis: {
-      downloads: { current: 0, previous: 0, growth: 0 },
-      engagement: { current: 0, previous: 0, growth: 0 },
-      users: { current: 0, previous: 0, growth: 0 },
-      revenue: { current: 0, previous: 0, growth: 0 },
-      retention: { current: 0, previous: 0, growth: 0 },
-    },
-    timeSeries: [],
-    isLoading: false,
-    error: null,
-  });
+  const [kpis, setKpis] = useState<KPIs>(EMPTY_KPIS);
+  const [timeSeries, setTimeSeries] = useState<TimeSeriesData[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch analytics data
-  const fetchAnalytics = useCallback(async () => {
-    setData((prev) => ({ ...prev, isLoading: true, error: null }));
+  /**
+   * Refs track the latest request so an in-flight call can't be
+   * overridden by a slower one (e.g. user changes the range while
+   * the previous fetch is still resolving).
+   */
+  const requestIdRef = useRef(0);
 
+  const refresh = useCallback(async () => {
+    const requestId = ++requestIdRef.current;
+    setIsLoading(true);
+    setError(null);
     try {
-      // In production, call your analytics API
-      // const response = await fetch(`${apiUrl}?from=${dateRange.from}&to=${dateRange.to}`);
-      // const result = await response.json();
-
-      // Mock data for demo
-      const mockKPIs: KPIs = {
-        downloads: { current: 1250, previous: 1100, growth: 13.6 },
-        engagement: { current: 68.5, previous: 65.2, growth: 5.1 },
-        users: { current: 4500, previous: 4200, growth: 7.1 },
-        revenue: { current: 8950, previous: 7800, growth: 14.7 },
-        retention: { current: 72.3, previous: 69.8, growth: 3.6 },
-      };
-
-      const mockTimeSeries: TimeSeriesData[] = Array.from({ length: 30 }, (_, i) => {
-        const date = new Date();
-        date.setDate(date.getDate() - (29 - i));
-        return {
-          date: date.toISOString().split("T")[0],
-          downloads: Math.floor(1000 + Math.random() * 500),
-          engagement: 60 + Math.random() * 20,
-          revenue: Math.floor(7000 + Math.random() * 3000),
-          users: Math.floor(4000 + Math.random() * 1000),
-          retention: 65 + Math.random() * 15,
-        };
-      });
-
-      setData({
-        kpis: mockKPIs,
-        timeSeries: mockTimeSeries,
-        isLoading: false,
-        error: null,
-      });
+      const payload = await apiClient.loadAnalytics(dateRange);
+      if (requestIdRef.current === requestId) {
+        setKpis(payload.kpis);
+        setTimeSeries(payload.timeSeries);
+      }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : "Failed to fetch analytics";
-      setData((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: errorMessage,
-      }));
+      if (requestIdRef.current === requestId) {
+        setError(toErrorMessage(err, 'Failed to fetch analytics'));
+      }
+    } finally {
+      if (requestIdRef.current === requestId) {
+        setIsLoading(false);
+      }
     }
-  }, [apiUrl, dateRange]);
+  }, [apiClient, dateRange]);
 
-  // Update date range
-  const updateDateRange = useCallback((newDateRange: DateRangeValue) => {
-    setDateRange(newDateRange);
+  const updateDateRange = useCallback((range: DateRangeValue) => {
+    setDateRange(range);
   }, []);
 
-  // Export analytics data
-  const exportData = useCallback(async (options: AnalyticsExportOptions) => {
-    try {
-      // In production, implement export API call
-      const exportData = {
-        dateRange,
-        kpis: data.kpis,
-        timeSeries: data.timeSeries,
-        format: options.format,
-      };
-
-      console.log("Exporting analytics:", exportData);
-
-      // Mock export
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: options.format === "json" ? "application/json" : "text/plain",
-      });
+  const exportData = useCallback(
+    async (exportOptions: AnalyticsExportOptions) => {
+      const payload: AnalyticsDataPayload = { kpis, timeSeries };
+      const blob = await apiClient.exportAnalytics(payload, exportOptions);
 
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = options.filename || `analytics-${dateRange.from}-${dateRange.to}.${options.format}`;
+      link.download =
+        exportOptions.filename ?? `analytics-${dateRange.from}-${dateRange.to}.${exportOptions.format}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Export failed:", err);
-      throw err;
-    }
-  }, [dateRange, data]);
+    },
+    [apiClient, dateRange.from, dateRange.to, kpis, timeSeries],
+  );
 
-  // Refresh data
-  const refresh = useCallback(() => {
-    fetchAnalytics();
-  }, [fetchAnalytics]);
-
-  // Fetch on mount and date range change
   useEffect(() => {
-    fetchAnalytics();
-  }, [fetchAnalytics]);
+    refresh();
+  }, [refresh]);
 
-  // Auto-refresh
   useEffect(() => {
     if (refreshInterval > 0) {
-      const interval = setInterval(fetchAnalytics, refreshInterval);
-      return () => clearInterval(interval);
+      const id = setInterval(refresh, refreshInterval);
+      return () => clearInterval(id);
     }
-  }, [fetchAnalytics, refreshInterval]);
+    return undefined;
+  }, [refresh, refreshInterval]);
 
-  return {
-    ...data,
-    dateRange,
-    updateDateRange,
-    refresh,
-    exportData,
-  };
+  return useMemo(
+    () => ({
+      kpis,
+      timeSeries,
+      isLoading,
+      error,
+      dateRange,
+      updateDateRange,
+      refresh,
+      exportData,
+    }),
+    [kpis, timeSeries, isLoading, error, dateRange, updateDateRange, refresh, exportData],
+  );
 }
+
+/**
+ * Convenience factory: returns a stub client that throws. Useful
+ * in Storybook / tests; the consumer must wire a real client
+ * before the hook is useful in production.
+ */
+export const createStubAnalyticsApiClient = (
+  overrides?: Partial<AnalyticsApiClient>,
+): AnalyticsApiClient => {
+  const notConfigured: AnalyticsApiClient = {
+    loadAnalytics: () => Promise.reject(new Error('AnalyticsApiClient not configured')),
+    exportAnalytics: () => Promise.reject(new Error('AnalyticsApiClient not configured')),
+  };
+  return { ...notConfigured, ...overrides };
+};

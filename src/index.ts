@@ -7,12 +7,7 @@
  * @version 3.0.0
  */
 
-// Export all domains
-export * from './domains/layouts';
-export * from './domains/settings';
-export * from './domains/billing';
-
-// Domains - using selective exports to avoid conflicts
+// Core domains with complete public API
 export * from './domains/layouts';
 export * from './domains/settings';
 export * from './domains/billing';

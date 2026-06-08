@@ -7,6 +7,12 @@
 import type { ComponentType, ReactElement } from "react";
 
 /**
+ * Translation function contract. Auth components stay i18n-agnostic;
+ * the consumer plugs in their i18n library of choice.
+ */
+export type Translate = (key: string) => string;
+
+/**
  * User credentials for login
  */
 export interface LoginCredentials {

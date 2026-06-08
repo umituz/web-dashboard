@@ -1,7 +1,8 @@
 /**
- * Analytics Chart Component
+ * AnalyticsChart
  *
- * Configurable chart component using Recharts
+ * Recharts wrapper for the analytics domain.
+ * No `any`, no magic numbers — chart geometry is centralized.
  */
 
 import { useMemo } from "react";
@@ -22,57 +23,85 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import { useTranslation } from "react-i18next";
 import { cn } from "@umituz/web-design-system/utils";
-import type { ChartConfig } from "../types/analytics";
+import type { ChartConfig, ChartData, TimeSeriesData } from "../types/analytics";
 import { generateChartColors } from "../utils/analytics";
+import { ANALYTICS_KEYS } from "../utils/i18nKeys";
+
+const CHART_MARGIN = { top: 10, right: 10, left: 10, bottom: 10 } as const;
+const PIE_OUTER_RADIUS = 80;
+const PIE_INNER_RADIUS = 40;
+const DEFAULT_CHART_HEIGHT_PX = 300;
+const DEFAULT_SERIES_COUNT = 5;
+const LINE_STROKE_WIDTH = 2;
+const LINE_DOT_RADIUS = 4;
+const AREA_FILL_OPACITY = 0.3;
 
 interface AnalyticsChartProps {
-  /** Chart configuration */
   config: ChartConfig;
-  /** Custom class name */
   className?: string;
-  /** Custom height */
   height?: number | string;
 }
 
+const renderAxis = (dataKey: string | undefined) => (
+  <>
+    <XAxis
+      dataKey={dataKey}
+      className="text-xs text-muted-foreground"
+      axisLine={false}
+      tickLine={false}
+    />
+    <YAxis
+      className="text-xs text-muted-foreground"
+      axisLine={false}
+      tickLine={false}
+    />
+  </>
+);
+
+const renderGrid = (showGrid: boolean | undefined) =>
+  showGrid ? (
+    <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
+  ) : null;
+
+const renderOverlay = (config: ChartConfig) => (
+  <>
+    {config.showTooltip && <Tooltip />}
+    {config.showLegend && <Legend />}
+  </>
+);
+
 export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProps) => {
+  const { t } = useTranslation();
   const colors = useMemo(
-    () => config.colors || generateChartColors(config.yAxisKeys?.length || 5),
-    [config.colors, config.yAxisKeys]
+    () => config.colors ?? generateChartColors(config.yAxisKeys?.length ?? DEFAULT_SERIES_COUNT),
+    [config.colors, config.yAxisKeys],
   );
+
+  const chartHeight = height ?? config.height ?? DEFAULT_CHART_HEIGHT_PX;
 
   const renderChart = () => {
     const commonProps = {
-      data: config.data,
-      margin: { top: 10, right: 10, left: 10, bottom: 10 },
+      data: config.data as TimeSeriesData[] | ChartData[],
+      margin: CHART_MARGIN,
     };
 
     switch (config.type) {
       case "line":
         return (
           <LineChart {...commonProps}>
-            {config.showGrid && <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />}
-            <XAxis
-              dataKey={config.xAxisKey}
-              className="text-xs text-muted-foreground"
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              className="text-xs text-muted-foreground"
-              axisLine={false}
-              tickLine={false}
-            />
-            {config.showTooltip && <Tooltip />}
-            {config.showLegend && <Legend />}
+            {renderGrid(config.showGrid)}
+            {renderAxis(config.xAxisKey)}
+            {renderOverlay(config)}
             {config.yAxisKeys?.map((key, index) => (
               <Line
                 key={key}
                 type="monotone"
                 dataKey={key}
                 stroke={colors[index]}
-                strokeWidth={2}
-                dot={{ r: 4 }}
+                strokeWidth={LINE_STROKE_WIDTH}
+                dot={{ r: LINE_DOT_RADIUS }}
               />
             ))}
           </LineChart>
@@ -81,20 +110,9 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
       case "bar":
         return (
           <BarChart {...commonProps}>
-            {config.showGrid && <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />}
-            <XAxis
-              dataKey={config.xAxisKey}
-              className="text-xs text-muted-foreground"
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              className="text-xs text-muted-foreground"
-              axisLine={false}
-              tickLine={false}
-            />
-            {config.showTooltip && <Tooltip />}
-            {config.showLegend && <Legend />}
+            {renderGrid(config.showGrid)}
+            {renderAxis(config.xAxisKey)}
+            {renderOverlay(config)}
             {config.yAxisKeys?.map((key, index) => (
               <Bar key={key} dataKey={key} fill={colors[index]} radius={[4, 4, 0, 0]} />
             ))}
@@ -104,20 +122,9 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
       case "area":
         return (
           <AreaChart {...commonProps}>
-            {config.showGrid && <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />}
-            <XAxis
-              dataKey={config.xAxisKey}
-              className="text-xs text-muted-foreground"
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              className="text-xs text-muted-foreground"
-              axisLine={false}
-              tickLine={false}
-            />
-            {config.showTooltip && <Tooltip />}
-            {config.showLegend && <Legend />}
+            {renderGrid(config.showGrid)}
+            {renderAxis(config.xAxisKey)}
+            {renderOverlay(config)}
             {config.yAxisKeys?.map((key, index) => (
               <Area
                 key={key}
@@ -125,7 +132,7 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
                 dataKey={key}
                 stroke={colors[index]}
                 fill={colors[index]}
-                fillOpacity={0.3}
+                fillOpacity={AREA_FILL_OPACITY}
               />
             ))}
           </AreaChart>
@@ -134,45 +141,45 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
       case "pie":
       case "donut":
         return (
-          <PieChart {...commonProps}>
+          <PieChart>
             <Pie
-              data={config.data}
+              data={config.data as ChartData[]}
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-              outerRadius={80}
-              innerRadius={config.type === "donut" ? 40 : 0}
+              label={({ name, percent }) =>
+                `${name}: ${(Number(percent) * 100).toFixed(0)}%`
+              }
+              outerRadius={PIE_OUTER_RADIUS}
+              innerRadius={config.type === "donut" ? PIE_INNER_RADIUS : 0}
               dataKey="value"
             >
-              {config.data.map((entry: any, index: number) => (
-                <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
+              {(config.data as ChartData[]).map((entry, index) => (
+                <Cell key={`cell-${entry.label ?? index}`} fill={colors[index % colors.length]} />
               ))}
             </Pie>
-            {config.showTooltip && <Tooltip />}
-            {config.showLegend && <Legend />}
+            {renderOverlay(config)}
           </PieChart>
         );
 
       default:
         return (
-          <div className="flex items-center justify-center h-full text-muted-foreground">
-            Unsupported chart type: {config.type}
+          <div
+            className="flex items-center justify-center h-full text-muted-foreground"
+            role="alert"
+          >
+            {t(ANALYTICS_KEYS.chart.noData)}: {config.type}
           </div>
         );
     }
   };
 
-  const chartHeight = height || config.height || 300;
-
   return (
     <div
-      className={cn(
-        "w-full",
-        config.aspectRatio || "aspect-video",
-        className
-      )}
-      style={{ height: typeof chartHeight === "number" ? `${chartHeight}px` : chartHeight }}
+      className={cn("w-full", config.aspectRatio ?? "aspect-video", className)}
+      style={{
+        height: typeof chartHeight === "number" ? `${chartHeight}px` : chartHeight,
+      }}
     >
       <ResponsiveContainer width="100%" height="100%">
         {renderChart()}

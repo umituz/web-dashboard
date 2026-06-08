@@ -4,7 +4,6 @@
  * Type definitions for billing and subscription system
  */
 
-import type { ComponentType, ReactElement } from "react";
 import { SUBSCRIPTION_STATUS, INVOICE_STATUS, BILLING_CYCLE, CURRENCY } from "../constants/billing";
 
 /**
@@ -224,6 +223,26 @@ export interface BillingSummary {
 }
 
 /**
+ * Input shape for adding a new payment method.
+ * Providers can extend this via a discriminated union on `type`.
+ */
+export type PaymentMethodInput =
+  | {
+      type: "card";
+      last4: string;
+      brand: string;
+      expiryMonth: number;
+      expiryYear: number;
+      name?: string;
+    }
+  | {
+      type: "bank_account";
+      last4: string;
+      bankName: string;
+      accountType?: "checking" | "savings";
+    };
+
+/**
  * Plan comparison props
  */
 export interface PlanComparisonProps {
@@ -253,6 +272,8 @@ export interface PaymentMethodsListProps {
   paymentMethods: PaymentMethod[];
   /** Loading state */
   loading?: boolean;
+  /** ID of the method currently being mutated (set default / remove) */
+  busyId?: string | null;
   /** On set default */
   onSetDefault?: (methodId: string) => void;
   /** On remove */
@@ -271,6 +292,10 @@ export interface InvoiceCardProps {
   compact?: boolean;
   /** On click */
   onClick?: (invoice: Invoice) => void;
+  /** On download (overrides default window.open) */
+  onDownload?: (invoice: Invoice) => void;
+  /** Locale for date formatting (default: en-US) */
+  locale?: string;
 }
 
 /**
@@ -286,6 +311,11 @@ export interface UsageCardProps {
 }
 
 /**
+ * Billing portal tab identifiers — typed union to keep tabs exhaustive.
+ */
+export type BillingTabId = "overview" | "payment-methods" | "invoices" | "plan";
+
+/**
  * Billing portal props
  */
 export interface BillingPortalProps {
@@ -298,9 +328,21 @@ export interface BillingPortalProps {
   /** Show tabs */
   showTabs?: boolean;
   /** Active tab */
-  activeTab?: string;
+  activeTab?: BillingTabId;
   /** On tab change */
-  onTabChange?: (tab: string) => void;
+  onTabChange?: (tab: BillingTabId) => void;
+  /** On add payment method */
+  onAddPaymentMethod?: () => void;
+  /** On set default payment method */
+  onSetDefaultPaymentMethod?: (methodId: string) => void;
+  /** On remove payment method */
+  onRemovePaymentMethod?: (methodId: string) => void;
+  /** On view invoice */
+  onViewInvoice?: (invoice: Invoice) => void;
+  /** On change plan */
+  onChangePlan?: () => void;
+  /** On cancel subscription */
+  onCancelSubscription?: () => void | Promise<void>;
 }
 
 /**

@@ -20,6 +20,8 @@ export interface SettingsItem {
   icon?: LucideIcon;
   /** Route path for this setting */
   path?: string;
+  /** Click handler when no route is available */
+  onClick?: () => void;
   /** Whether this item is enabled */
   enabled?: boolean;
   /** Required permission to access */
