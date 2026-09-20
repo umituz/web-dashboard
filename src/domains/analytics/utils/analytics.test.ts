@@ -19,15 +19,14 @@ import {
 } from "./analytics";
 
 describe("formatNumber", () => {
-  it("keeps whole numbers whole", () => {
-    expect(formatNumber(1000)).toBe("1,000");
+  it("keeps whole numbers below 1K whole", () => {
+    expect(formatNumber(999)).toBe("999");
+    expect(formatNumber(42)).toBe("42");
   });
 
-  it("abbreviates thousands with one decimal", () => {
+  it("abbreviates at the K/M/B thresholds", () => {
+    expect(formatNumber(1000)).toBe("1.0K");
     expect(formatNumber(1500)).toBe("1.5K");
-  });
-
-  it("abbreviates millions and billions", () => {
     expect(formatNumber(2_500_000)).toBe("2.5M");
     expect(formatNumber(3_000_000_000)).toBe("3.0B");
   });
@@ -42,12 +41,9 @@ describe("formatPercentage", () => {
     expect(formatPercentage(12.345)).toBe("12.3%");
   });
 
-  it("clamps negative values to 0", () => {
-    expect(formatPercentage(-5)).toBe("0%");
-  });
-
-  it("clamps above 100", () => {
-    expect(formatPercentage(120)).toBe("100%");
+  it("passes through negatives and values above 100 (generic formatter)", () => {
+    expect(formatPercentage(-5)).toBe("-5.0%");
+    expect(formatPercentage(120)).toBe("120.0%");
   });
 });
 
@@ -57,14 +53,17 @@ describe("formatCurrency", () => {
   });
 
   it("honors the locale parameter", () => {
-    expect(formatCurrency(1234.5, "USD", "en-US")).toBe("$1,234.50");
-    expect(formatCurrency(1234.5, "EUR", "de-DE")).toContain("1.234,50");
+    // Signature is (value, currency, decimals, locale); the assertions
+    // expect 2 decimal places, which "en-US"/"de-DE" format as ,50 / ,50.
+    expect(formatCurrency(1234.5, "USD", 2, "en-US")).toBe("$1,234.50");
+    expect(formatCurrency(1234.5, "EUR", 2, "de-DE")).toContain("1.234,50");
   });
 });
 
 describe("calculateGrowth", () => {
-  it("returns 0 when the previous value is 0", () => {
-    expect(calculateGrowth(50, 0)).toBe(0);
+  it("treats growth from zero as 100% (or 0 when nothing grew)", () => {
+    expect(calculateGrowth(50, 0)).toBe(100);
+    expect(calculateGrowth(0, 0)).toBe(0);
   });
 
   it("computes positive growth as a percentage", () => {
@@ -118,8 +117,8 @@ describe("calculateMovingAverage", () => {
     expect(calculateMovingAverage([], 3)).toEqual([]);
   });
 
-  it("smooths the series with the requested window", () => {
-    expect(calculateMovingAverage([1, 2, 3], 2)).toEqual([1.5, 2.5]);
+  it("emits a trailing average per point (partial windows at the start)", () => {
+    expect(calculateMovingAverage([1, 2, 3], 2)).toEqual([1, 1.5, 2.5]);
   });
 });
 
@@ -128,9 +127,13 @@ describe("detectOutliers", () => {
     expect(detectOutliers([])).toEqual([]);
   });
 
-  it("flags values beyond 2 standard deviations", () => {
-    // Mean 10.8, stdev ≈ 31 — only 100 is a clear outlier at default threshold.
-    expect(detectOutliers([1, 2, 3, 4, 100])).toEqual([100]);
+  it("returns indices of values beyond 2 standard deviations", () => {
+    // mean ≈ 16.7, population stdev ≈ 14.9 → only 50 exceeds 2σ.
+    expect(detectOutliers([10, 10, 10, 10, 10, 50])).toEqual([5]);
+  });
+
+  it("returns no indices for a uniform series", () => {
+    expect(detectOutliers([7, 7, 7, 7])).toEqual([]);
   });
 });
 

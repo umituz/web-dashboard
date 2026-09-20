@@ -20,6 +20,7 @@ export {
   generateOnboardingEvent,
   isValidEmail,
   isValidPassword,
+  ONBOARDING_KEYS,
 } from './utils';
 export type {
   UserTypeOption,
