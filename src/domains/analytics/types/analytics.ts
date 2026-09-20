@@ -275,6 +275,10 @@ export interface DateRangePreset {
   value: string;
   /** Number of days */
   days: number;
+  /** Range start (ISO yyyy-mm-dd), resolved at creation time */
+  from?: string;
+  /** Range end (ISO yyyy-mm-dd), resolved at creation time */
+  to?: string;
 }
 
 /**

@@ -36,10 +36,12 @@ export interface FirestoreDocument<T = Record<string, unknown>> {
 }
 
 /**
- * Convert Firebase timestamp value to ISO string
+ * Convert Firebase timestamp value to ISO string.
+ * A missing value maps to the epoch rather than "now" — missing data
+ * must not masquerade as freshly-scheduled content in date-sorted views.
  */
 const toIsoString = (value: string | { toDate: () => Date } | undefined): string => {
-  if (!value) return new Date().toISOString();
+  if (!value) return new Date(0).toISOString();
   if (typeof value === 'string') return value;
   return value.toDate().toISOString();
 };
@@ -78,17 +80,19 @@ export const mapCalendarDocument = (doc: FirestoreDocument<CalendarItemDocument>
 };
 
 /**
- * Map posts document to ContentItem
+ * Map posts document to ContentItem.
+ * Missing display fields fall back to empty strings so the consuming
+ * UI can render its own (localized) placeholder — no package-side copy.
  */
 export const mapPostDocument = (doc: FirestoreDocument<CalendarItemDocument>): ContentItem => {
   const data = doc.data();
   return {
     id: doc.id,
-    title: data.title ?? 'Untitled Post',
+    title: data.title ?? '',
     description: data.content ?? '',
     scheduled_at: toIsoString(data.scheduledAt),
     platforms: data.platform ? [data.platform] : [],
-    app_name: data.appName ?? 'My App',
+    app_name: data.appName ?? '',
     status: normalizeStatus(data.status),
     type: 'post',
   };

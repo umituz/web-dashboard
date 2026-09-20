@@ -16,6 +16,10 @@ export interface DashboardHeaderProps {
   setMobileOpen: (open: boolean) => void;
   /** Current page title */
   title: string;
+  /** Current resolved theme; defaults to "light" rendering when omitted */
+  theme?: "light" | "dark";
+  /** Theme toggle handler — the toggle button is hidden when omitted */
+  onToggleTheme?: () => void;
 }
 
 /**
@@ -34,8 +38,10 @@ export interface DashboardSidebarProps {
 export interface DashboardLayoutConfig {
   /** Sidebar groups */
   sidebarGroups: import('./sidebar').SidebarGroup[];
-  /** Extra title mappings for routes */
+  /** Extra title mappings for routes — values may be i18n keys or literal strings */
   extraTitleMap?: Record<string, string>;
+  /** Title used when no sidebar item or extra mapping matches the route (default: "Dashboard") */
+  defaultTitle?: string;
   /** Brand name */
   brandName?: string;
   /** Brand tagline */

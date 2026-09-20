@@ -237,7 +237,7 @@ export class AnalyticsEngineService {
    * Generate activity heatmap
    *
    * @param data - Activity data with timestamps
-   * @returns Heatmap data by day and hour
+   * @returns Heatmap data by day and hour (Monday-first)
    */
   public generateActivityHeatmap(data: ActivityItem[]): HeatmapData[] {
     const heatmap: HeatmapData[] = [];
@@ -247,7 +247,9 @@ export class AnalyticsEngineService {
       for (let hour = 0; hour < 24; hour++) {
         const count = data.filter((item) => {
           const d = new Date(item.timestamp);
-          return d.getDay() === day && d.getHours() === hour;
+          // getDay() is Sunday-based (0=Sun..6=Sat); convert to Monday-first index
+          const mondayFirst = (d.getDay() + 6) % 7;
+          return mondayFirst === day && d.getHours() === hour;
         }).length;
 
         heatmap.push({ day: days[day], hour, value: count });

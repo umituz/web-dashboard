@@ -1,21 +1,38 @@
 /**
  * Auth Layout Component
  *
- * Configurable layout wrapper for authentication pages
+ * Configurable layout wrapper for authentication pages.
+ * Strings stay localizable via the optional `translate` prop; when it
+ * is not provided the embedded English fallbacks are rendered.
  */
 
 import { BrandLogo } from "../../layouts/components";
 import { cn } from "@umituz/web-design-system/utils";
-import type { AuthLayoutProps } from "../types/auth";
+import { AUTH_KEYS } from "../utils/i18nKeys";
+import type { AuthLayoutProps, Translate } from "../types/auth";
+
+/**
+ * Embedded fallbacks used when no `translate` prop is supplied.
+ * Keys mirror the AUTH_KEYS catalog so consumers can override
+ * every string via their own i18n setup.
+ */
+const DEFAULT_STRINGS: Record<string, string> = {
+  [AUTH_KEYS.layout.backToHome]: "Back to home",
+  [AUTH_KEYS.layout.orContinueWith]: "Or continue with",
+  [AUTH_KEYS.layout.allRightsReserved]: "All rights reserved.",
+};
 
 export const AuthLayout = ({
   config,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  authState,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  authActions,
+  translate,
+  onSocialLogin,
   children,
 }: AuthLayoutProps) => {
+  const t: Translate = translate ?? ((key) => DEFAULT_STRINGS[key] ?? key);
+  // Prefer an explicit home route; fall back to afterLoginRoute for backwards compatibility.
+  const homeRoute = config.homeRoute ?? config.afterLoginRoute;
+  const footerLinks = config.footerLinks ?? [];
+
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
@@ -26,12 +43,12 @@ export const AuthLayout = ({
         </div>
 
         {/* Additional Header Content */}
-        {config.afterLoginRoute && (
+        {homeRoute && (
           <a
-            href={config.afterLoginRoute}
+            href={homeRoute}
             className="text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
-            Back to home
+            {t(AUTH_KEYS.layout.backToHome)}
           </a>
         )}
       </header>
@@ -62,7 +79,7 @@ export const AuthLayout = ({
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-2 bg-secondary/30 text-muted-foreground">
-                    Or continue with
+                    {t(AUTH_KEYS.layout.orContinueWith)}
                   </span>
                 </div>
               </div>
@@ -78,10 +95,7 @@ export const AuthLayout = ({
                       "bg-background hover:bg-muted transition-colors",
                       "text-sm font-medium text-foreground"
                     )}
-                    onClick={() => {
-                      // Handle social login
-                      console.log(`Social login with ${provider.id}`);
-                    }}
+                    onClick={() => onSocialLogin?.(provider.id)}
                   >
                     <span className="text-lg">{provider.icon}</span>
                     <span>{provider.name}</span>
@@ -96,18 +110,22 @@ export const AuthLayout = ({
       {/* Footer */}
       <footer className="border-t border-border px-6 py-4">
         <div className="max-w-4xl mx-auto flex items-center justify-between text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} {config.brandName}. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <a href="/terms" className="hover:text-foreground transition-colors">
-              Terms
-            </a>
-            <a href="/privacy" className="hover:text-foreground transition-colors">
-              Privacy
-            </a>
-            <a href="/contact" className="hover:text-foreground transition-colors">
-              Contact
-            </a>
-          </div>
+          <p>
+            © {new Date().getFullYear()} {config.brandName}. {t(AUTH_KEYS.layout.allRightsReserved)}
+          </p>
+          {footerLinks.length > 0 && (
+            <div className="flex items-center gap-4">
+              {footerLinks.map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="hover:text-foreground transition-colors"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          )}
         </div>
       </footer>
     </div>

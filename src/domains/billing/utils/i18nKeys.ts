@@ -45,6 +45,7 @@ export const BILLING_KEYS = {
       confirmCancel: 'billing.portal.plan.confirmCancel',
       cancelling: 'billing.portal.plan.cancelling',
       cancelConfirmMessage: 'billing.portal.plan.cancelConfirmMessage',
+      cancelFailed: 'billing.portal.plan.cancelFailed',
     },
     paymentMethods: {
       addNew: 'billing.portal.paymentMethods.addNew',
@@ -109,6 +110,7 @@ export const BILLING_KEYS = {
     incompleteExpired: 'billing.status.incompleteExpired',
     unpaid: 'billing.status.unpaid',
     paused: 'billing.status.paused',
+    revoked: 'billing.status.revoked',
   },
 
   invoiceStatus: {
@@ -117,6 +119,7 @@ export const BILLING_KEYS = {
     paid: 'billing.invoiceStatus.paid',
     uncollectible: 'billing.invoiceStatus.uncollectible',
     void: 'billing.invoiceStatus.void',
+    refunded: 'billing.invoiceStatus.refunded',
   },
 
   // Trial

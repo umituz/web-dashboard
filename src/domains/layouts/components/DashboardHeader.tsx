@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Bell, X, Sun, Moon, Menu, User, Settings, LogOut,
   ChevronDown, CreditCard
@@ -43,6 +43,8 @@ export const DashboardHeader = ({
   setCollapsed,
   setMobileOpen,
   title,
+  theme = "light",
+  onToggleTheme,
   user,
   notifications = [],
   onLogout,
@@ -72,23 +74,6 @@ export const DashboardHeader = ({
     }
   };
 
-  // Placeholder components - these should be provided by the consuming app
-  const ThemeToggle = () => {
-    const [resolvedTheme, setResolvedTheme] = React.useState<"light" | "dark">("light");
-
-    return (
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => setResolvedTheme(resolvedTheme === "light" ? "dark" : "light")}
-        className="text-muted-foreground h-9 w-9"
-        title={resolvedTheme === "dark" ? t('common.tooltips.switchLight') : t('common.tooltips.switchDark')}
-      >
-        {resolvedTheme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-      </Button>
-    );
-  };
-
   return (
     <header className="flex h-14 items-center justify-between border-b border-border bg-card/50 backdrop-blur-md px-4 shrink-0 z-30">
       <div className="flex items-center gap-3">
@@ -106,8 +91,19 @@ export const DashboardHeader = ({
       </div>
 
       <div className="flex items-center gap-2">
-        {/* Theme Toggle */}
-        <ThemeToggle />
+        {/* Theme Toggle — rendered only when the host app wires it up */}
+        {onToggleTheme && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggleTheme}
+            className="text-muted-foreground h-9 w-9"
+            title={theme === "dark" ? t('common.tooltips.switchLight') : t('common.tooltips.switchDark')}
+            aria-label={theme === "dark" ? t('common.tooltips.switchLight') : t('common.tooltips.switchDark')}
+          >
+            {theme === "dark" ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
+          </Button>
+        )}
 
         {/* Notifications */}
         <div className="relative">
@@ -185,7 +181,7 @@ export const DashboardHeader = ({
             <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary overflow-hidden border border-primary/20 ring-primary/20 group-hover:ring-4 transition-all">
               {user?.avatar && <img src={user.avatar} alt="User" className="w-full h-full object-cover" />}
             </div>
-            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${profileOpen && "rotate-180"}`} />
+            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${profileOpen ? "rotate-180" : ""}`} />
           </button>
 
           {profileOpen && (

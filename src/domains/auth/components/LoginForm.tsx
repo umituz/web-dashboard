@@ -41,6 +41,7 @@ const KEYS = {
   orContinueWith: 'auth.login.orContinueWith',
   invalidCredentials: 'auth.errors.invalidCredentials',
   loginFailed: 'auth.errors.loginFailed',
+  noAuthProvider: 'auth.errors.noAuthProvider',
 } as const;
 
 export const LoginForm = ({
@@ -50,6 +51,7 @@ export const LoginForm = ({
   showForgotPassword = true,
   showRegisterLink = true,
   showSocialLogin = true,
+  enableMockAuth = false,
   onLoginAttempt,
   onLoginSuccess,
   onLoginError,
@@ -67,13 +69,17 @@ export const LoginForm = ({
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * Default mock auth — replaced by the real provider via onLoginAttempt
-   * in production. Kept here only for local-first dev flows.
+   * Auth execution. A real provider is supplied via onLoginAttempt.
+   * The mock path accepts ANY credentials and is therefore opt-in
+   * (`enableMockAuth`) — never a silent default in production builds.
    */
   const performLogin = useCallback(
     async (credentials: LoginCredentials): Promise<User> => {
       if (onLoginAttempt) {
         return onLoginAttempt(credentials);
+      }
+      if (!enableMockAuth) {
+        throw new Error(KEYS.noAuthProvider);
       }
       await new Promise((resolve) => setTimeout(resolve, 1000));
       return {
@@ -82,7 +88,7 @@ export const LoginForm = ({
         name: credentials.email.split("@")[0],
       };
     },
-    [onLoginAttempt],
+    [onLoginAttempt, enableMockAuth],
   );
 
   const handleSubmit = useCallback(
@@ -129,7 +135,7 @@ export const LoginForm = ({
           {translate(KEYS.welcomeBack)}
         </h1>
         <p className="text-sm text-muted-foreground">
-          {translate(KEYS.signInTo).replace('{brand}', config.brandName)}
+          {translate(KEYS.signInTo, { brand: config.brandName })}
         </p>
       </div>
 

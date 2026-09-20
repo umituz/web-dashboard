@@ -36,7 +36,6 @@ export const OnboardingWizard = ({
     state,
     currentStep,
     totalSteps,
-    isFirstStep,
     isLastStep,
     goToNext,
     goToPrev,
@@ -138,7 +137,7 @@ export const OnboardingWizard = ({
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-4xl w-full">
+        <div className="w-full max-w-4xl">
           {error && (
             <div
               role="alert"
@@ -181,9 +180,6 @@ export const OnboardingWizard = ({
         onSkip={handleSkip}
         translate={t}
       />
-
-      {/* Suppress unused warning while keeping the binding available */}
-      <span className="hidden">{String(isFirstStep)}</span>
     </div>
   );
 };

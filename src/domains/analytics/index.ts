@@ -15,6 +15,13 @@ export {
 // Hooks
 export {
   useAnalytics,
+  createStubAnalyticsApiClient,
+} from "./hooks";
+export type {
+  AnalyticsApiClient,
+  AnalyticsDataPayload,
+  UseAnalyticsOptions,
+  UseAnalyticsReturn,
 } from "./hooks";
 
 // Utils
@@ -55,6 +62,9 @@ export type {
   MetricCardProps,
   AnalyticsCardProps,
   AnalyticsLayoutProps,
+  AnalyticsPeriod,
+  AnalyticsConfig,
+  MetricConfig,
   DateRangePreset,
   DateRangeValue,
   ExportFormat,

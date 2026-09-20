@@ -25,7 +25,8 @@ export function formatNumber(num: number, decimals: number = 1): string {
   if (num >= 1_000) {
     return (num / 1_000).toFixed(decimals) + "K";
   }
-  return num.toFixed(decimals);
+  // Whole numbers stay whole ("999", not "999.0")
+  return Number.isInteger(num) ? num.toString() : num.toFixed(decimals);
 }
 
 /**
@@ -45,14 +46,16 @@ export function formatPercentage(value: number, decimals: number = 1): string {
  * @param value - Value to format
  * @param currency - Currency code (default: USD)
  * @param decimals - Number of decimal places (default: 0)
+ * @param locale - BCP 47 locale (default: en-US)
  * @returns Formatted currency string
  */
 export function formatCurrency(
   value: number,
   currency: string = "USD",
-  decimals: number = 0
+  decimals: number = 0,
+  locale: string = "en-US"
 ): string {
-  return new Intl.NumberFormat("en-US", {
+  return new Intl.NumberFormat(locale, {
     style: "currency",
     currency,
     minimumFractionDigits: decimals,
@@ -182,10 +185,9 @@ export function calculateDropOffRate(current: number, previous: number): number 
  *
  * @param label - Preset label
  * @param days - Number of days
- * @returns Date range preset
+ * @returns Date range preset with resolved `from`/`to` ISO dates
  */
 export function createDateRangePreset(label: string, days: number): DateRangePreset {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const to = new Date();
   const from = new Date();
   from.setDate(from.getDate() - days);
@@ -194,6 +196,8 @@ export function createDateRangePreset(label: string, days: number): DateRangePre
     label,
     value: label.toLowerCase().replace(/\s+/g, "-"),
     days,
+    from: from.toISOString().split("T")[0],
+    to: to.toISOString().split("T")[0],
   };
 }
 
@@ -243,7 +247,10 @@ export function aggregateByPeriod(
     if (!grouped.has(key)) {
       grouped.set(key, []);
     }
-    grouped.get(key)!.push(item);
+    const bucket = grouped.get(key);
+    if (bucket) {
+      bucket.push(item);
+    }
   });
 
   return Array.from(grouped.entries()).map(([date, items]) => {
@@ -271,6 +278,10 @@ export function aggregateByPeriod(
  * @returns Array of moving averages
  */
 export function calculateMovingAverage(data: number[], window: number): number[] {
+  if (window < 1) {
+    throw new RangeError(`calculateMovingAverage: window must be >= 1, received ${window}`);
+  }
+
   const result: number[] = [];
 
   for (let i = 0; i < data.length; i++) {
@@ -291,6 +302,8 @@ export function calculateMovingAverage(data: number[], window: number): number[]
  * @returns Array of outlier indices
  */
 export function detectOutliers(data: number[], threshold: number = 2): number[] {
+  if (data.length === 0) return [];
+
   const mean = data.reduce((sum, val) => sum + val, 0) / data.length;
   const variance = data.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / data.length;
   const stdDev = Math.sqrt(variance);

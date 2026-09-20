@@ -31,7 +31,7 @@ export interface BillingApiClient {
   getInvoiceUrl: (invoiceId: string) => Promise<string>;
 }
 
-interface UseBillingOptions {
+export interface UseBillingOptions {
   /** Initial billing data (avoids loading flash on mount) */
   initialData?: BillingSummary;
   /** API client — required to actually persist mutations */

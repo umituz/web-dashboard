@@ -13,6 +13,7 @@ export type {
   Subscription,
   PaymentMethodType,
   PaymentMethod,
+  PaymentMethodInput,
   InvoiceStatus,
   InvoiceItem,
   Invoice,
@@ -23,6 +24,7 @@ export type {
   InvoiceCardProps,
   UsageCardProps,
   BillingPortalProps,
+  BillingTabId,
   BillingLayoutProps,
   BillingConfig,
 } from "./billing";

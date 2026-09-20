@@ -28,7 +28,7 @@ export interface AnalyticsDataPayload {
   timeSeries: TimeSeriesData[];
 }
 
-interface UseAnalyticsOptions {
+export interface UseAnalyticsOptions {
   initialDateRange?: DateRangeValue;
   /** Auto-refresh interval in ms (0 to disable) */
   refreshInterval?: number;
@@ -68,6 +68,9 @@ const EMPTY_KPIS: KPIs = {
 
 const toErrorMessage = (err: unknown, fallback: string): string =>
   err instanceof Error && err.message ? err.message : fallback;
+
+const toError = (err: unknown, fallback: string): Error =>
+  err instanceof Error ? err : new Error(fallback);
 
 export function useAnalytics(options: UseAnalyticsOptions): UseAnalyticsReturn {
   const { initialDateRange, refreshInterval = 0, apiClient } = options;
@@ -115,17 +118,24 @@ export function useAnalytics(options: UseAnalyticsOptions): UseAnalyticsReturn {
   const exportData = useCallback(
     async (exportOptions: AnalyticsExportOptions) => {
       const payload: AnalyticsDataPayload = { kpis, timeSeries };
-      const blob = await apiClient.exportAnalytics(payload, exportOptions);
+      try {
+        const blob = await apiClient.exportAnalytics(payload, exportOptions);
 
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download =
-        exportOptions.filename ?? `analytics-${dateRange.from}-${dateRange.to}.${exportOptions.format}`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download =
+          exportOptions.filename ?? `analytics-${dateRange.from}-${dateRange.to}.${exportOptions.format}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } catch (err) {
+        // Surface through the same error state as fetch failures and re-throw
+        // so callers that trigger the export programmatically can react.
+        setError(toErrorMessage(err, 'Failed to export analytics'));
+        throw toError(err, 'Failed to export analytics');
+      }
     },
     [apiClient, dateRange.from, dateRange.to, kpis, timeSeries],
   );

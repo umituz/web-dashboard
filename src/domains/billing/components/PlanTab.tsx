@@ -12,7 +12,12 @@ import { Calendar, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 import { Button } from "@umituz/web-design-system/atoms";
 import type { Subscription } from "../types/billing";
 import { BILLING_KEYS } from "../utils/i18nKeys";
-import { formatPrice, getPlanPrice, getStatusColor, getStatusLabel } from "../utils/billing";
+import {
+  formatPrice,
+  getPlanPrice,
+  getStatusColor,
+  getStatusLabelKey,
+} from "../utils/billing";
 
 export interface PlanTabProps {
   subscription: Subscription;
@@ -21,16 +26,16 @@ export interface PlanTabProps {
   locale?: string;
 }
 
-const LOCALE = 'en-US';
-
 export const PlanTab = ({
   subscription,
   onChangePlan,
   onCancelSubscription,
+  locale = 'en-US',
 }: PlanTabProps) => {
   const { t } = useTranslation();
   const [confirmingCancel, setConfirmingCancel] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
 
   const handleCancel = async () => {
     if (!onCancelSubscription) return;
@@ -39,8 +44,12 @@ export const PlanTab = ({
       return;
     }
     setCancelling(true);
+    setCancelError(null);
     try {
       await onCancelSubscription();
+    } catch {
+      // Surface the failure — never leave it as an unhandled rejection.
+      setCancelError(t(BILLING_KEYS.portal.plan.cancelFailed));
     } finally {
       setCancelling(false);
       setConfirmingCancel(false);
@@ -63,7 +72,7 @@ export const PlanTab = ({
           <div>
             <p className="text-3xl font-bold text-foreground">{subscription.plan.name}</p>
             <p className={getStatusColor(subscription.status) + " text-sm font-medium mt-1"}>
-              {getStatusLabel(subscription.status)}
+              {t(getStatusLabelKey(subscription.status))}
             </p>
             <p className="text-2xl font-bold text-foreground mt-3">
               {formatPrice(
@@ -77,10 +86,10 @@ export const PlanTab = ({
             <p className="text-xs text-muted-foreground mt-2 flex items-center gap-1.5">
               <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
               {subscription.currentPeriodStart &&
-                new Date(subscription.currentPeriodStart).toLocaleDateString(LOCALE)}
+                new Date(subscription.currentPeriodStart).toLocaleDateString(locale)}
               {' → '}
               {subscription.currentPeriodEnd &&
-                new Date(subscription.currentPeriodEnd).toLocaleDateString(LOCALE)}
+                new Date(subscription.currentPeriodEnd).toLocaleDateString(locale)}
             </p>
           </div>
 
@@ -120,13 +129,23 @@ export const PlanTab = ({
           )}
         </div>
 
-        {confirmingCancel && (
+        {confirmingCancel && !cancelError && (
           <div
             role="alert"
             className="mt-4 flex items-start gap-2 p-3 rounded-lg border border-destructive/30 bg-destructive/5 text-sm text-destructive"
           >
             <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
             <span>{t(BILLING_KEYS.portal.plan.cancelConfirmMessage)}</span>
+          </div>
+        )}
+
+        {cancelError && (
+          <div
+            role="alert"
+            className="mt-4 flex items-start gap-2 p-3 rounded-lg border border-destructive/30 bg-destructive/5 text-sm text-destructive"
+          >
+            <AlertTriangle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
+            <span>{cancelError}</span>
           </div>
         )}
       </section>

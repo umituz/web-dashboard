@@ -4,6 +4,8 @@
  * Type definitions for user profile
  */
 
+import type { ComponentType } from "react";
+
 /**
  * User profile info for header
  */
@@ -29,7 +31,7 @@ export interface UserNavMenuItem {
   /** Display label */
   label: string;
   /** Icon component */
-  icon: React.ComponentType<{ className?: string }>;
+  icon: ComponentType<{ className?: string }>;
   /** Route path */
   path: string;
 }

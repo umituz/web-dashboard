@@ -148,7 +148,7 @@ export const RegisterForm = ({
           {translate(KEYS.title)}
         </h1>
         <p className="text-muted-foreground">
-          {translate(KEYS.join).replace('{brand}', config.brandName)}
+          {translate(KEYS.join, { brand: config.brandName })}
         </p>
       </div>
 

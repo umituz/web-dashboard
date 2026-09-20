@@ -9,8 +9,8 @@ build/
 out/
 .next/
 
-# Package locks
-package-lock.json
+# Package locks (package-lock.json is committed for reproducible CI installs;
+# npm never includes it in the published tarball)
 yarn.lock
 pnpm-lock.yaml
 

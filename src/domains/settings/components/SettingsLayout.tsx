@@ -9,13 +9,13 @@ import type { SettingsConfig } from "../types/settings";
 interface SettingsLayoutProps {
   /** Settings configuration */
   config: SettingsConfig;
+  /**
+   * Artificial route-transition skeleton duration in ms (default: 0 = off).
+   * Content renders immediately by default; set > 0 only if you want
+   * a skeleton to mask route swaps.
+   */
+  routeTransitionMs?: number;
 }
-
-/**
- * Skeleton display duration while route transition simulates load.
- * Single source of truth so it can be tuned in one place.
- */
-const ROUTE_LOADING_DELAY_MS = 200;
 
 /**
  * Settings Layout Component
@@ -25,20 +25,26 @@ const ROUTE_LOADING_DELAY_MS = 200;
  */
 export const SettingsLayout = ({
   config,
+  routeTransitionMs = 0,
 }: SettingsLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(routeTransitionMs > 0);
 
-  // Route change triggers a brief loading skeleton to mask content swap.
-  // Cleanup is essential: setTimeout must be cancelled on unmount/route change.
+  // Optional route-change skeleton. Cleanup is essential: setTimeout must be
+  // cancelled on unmount/route change. With routeTransitionMs = 0 (default)
+  // no artificial delay is applied at all.
   useEffect(() => {
+    if (routeTransitionMs <= 0) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    const timer = setTimeout(() => setLoading(false), ROUTE_LOADING_DELAY_MS);
+    const timer = setTimeout(() => setLoading(false), routeTransitionMs);
     return () => clearTimeout(timer);
-  }, [location.pathname]);
+  }, [location.pathname, routeTransitionMs]);
 
   const handleNavigate = (path: string) => {
     navigate(path);

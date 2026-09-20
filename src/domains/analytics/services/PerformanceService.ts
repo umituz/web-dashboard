@@ -38,69 +38,92 @@ export interface RealtimeMetrics {
 }
 
 /**
+ * Chrome-specific `performance.memory` shape (not in standard lib types).
+ */
+interface PerformanceMemoryLike {
+  usedJSHeapSize: number;
+}
+
+/**
+ * Layout-shift and first-input entry shapes (not in standard lib types
+ * for all TS versions). Structurally typed — no `any`.
+ */
+interface LayoutShiftEntry extends PerformanceEntry {
+  value: number;
+}
+
+interface FirstInputEntry extends PerformanceEntry {
+  processingStart: number;
+}
+
+const isLayoutShiftEntry = (entry: PerformanceEntry): entry is LayoutShiftEntry =>
+  typeof (entry as LayoutShiftEntry).value === 'number';
+
+const isFirstInputEntry = (entry: PerformanceEntry): entry is FirstInputEntry =>
+  typeof (entry as FirstInputEntry).processingStart === 'number';
+
+/**
  * Performance Service
  *
- * Monitors dashboard performance and provides real-time metrics
+ * Monitors dashboard performance and provides real-time metrics.
+ * Web-vitals observation is opt-in via `startMonitoring()` so that
+ * importing the module never registers browser observers as a side effect.
  */
 export class PerformanceService {
   private metrics: Map<string, PerformanceMetric[]> = new Map();
   private observers: PerformanceObserver[] = [];
 
-  constructor() {
-    if (typeof window !== 'undefined') {
-      this.initializeObservers();
-    }
-  }
-
   /**
-   * Initialize performance observers
+   * Register web-vitals observers (CLS / LCP / FID).
+   * Idempotent — calling it twice will not duplicate observers.
    */
-  private initializeObservers(): void {
-    if ('PerformanceObserver' in window) {
-      // Observe layout shifts
-      try {
-        const observer = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            if (entry.entryType === 'layout-shift') {
-              this.recordMetric('CLS', (entry as any).value, 'score', 0.1);
-            }
-          }
-        });
-        observer.observe({ entryTypes: ['layout-shift'] });
-        this.observers.push(observer);
-      } catch {
-        // Layout Shift API not supported
-      }
+  public startMonitoring(): void {
+    if (typeof window === 'undefined' || !('PerformanceObserver' in window)) return;
+    if (this.observers.length > 0) return;
 
-      // Observe largest contentful paint
-      try {
-        const observer = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            if (entry.entryType === 'largest-contentful-paint') {
-              this.recordMetric('LCP', entry.startTime, 'ms', 2500);
-            }
+    // Observe layout shifts
+    try {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (entry.entryType === 'layout-shift' && isLayoutShiftEntry(entry)) {
+            this.recordMetric('CLS', entry.value, 'score', 0.1);
           }
-        });
-        observer.observe({ entryTypes: ['largest-contentful-paint'] });
-        this.observers.push(observer);
-      } catch {
-        // LCP API not supported
-      }
+        }
+      });
+      observer.observe({ entryTypes: ['layout-shift'] });
+      this.observers.push(observer);
+    } catch {
+      // Layout Shift API not supported
+    }
 
-      // Observe first input delay
-      try {
-        const observer = new PerformanceObserver((list) => {
-          for (const entry of list.getEntries()) {
-            if (entry.entryType === 'first-input') {
-              this.recordMetric('FID', (entry as any).processingStart - entry.startTime, 'ms', 100);
-            }
+    // Observe largest contentful paint
+    try {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (entry.entryType === 'largest-contentful-paint') {
+            this.recordMetric('LCP', entry.startTime, 'ms', 2500);
           }
-        });
-        observer.observe({ entryTypes: ['first-input'] });
-        this.observers.push(observer);
-      } catch {
-        // FID API not supported
-      }
+        }
+      });
+      observer.observe({ entryTypes: ['largest-contentful-paint'] });
+      this.observers.push(observer);
+    } catch {
+      // LCP API not supported
+    }
+
+    // Observe first input delay
+    try {
+      const observer = new PerformanceObserver((list) => {
+        for (const entry of list.getEntries()) {
+          if (entry.entryType === 'first-input' && isFirstInputEntry(entry)) {
+            this.recordMetric('FID', entry.processingStart - entry.startTime, 'ms', 100);
+          }
+        }
+      });
+      observer.observe({ entryTypes: ['first-input'] });
+      this.observers.push(observer);
+    } catch {
+      // FID API not supported
     }
   }
 
@@ -186,20 +209,12 @@ export class PerformanceService {
    * @returns Dashboard performance data
    */
   public getDashboardMetrics(): DashboardMetrics {
-    const timing = typeof window !== 'undefined' ? window.performance?.timing : null;
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const navigation = typeof window !== 'undefined' ? window.performance?.navigation : null;
-
-    const loadTime = timing
-      ? timing.loadEventEnd - timing.navigationStart
-      : this.getLatestMetric('loadTime')?.value || 0;
+    const loadTime =
+      this.getNavigationLoadTime() ?? this.getLatestMetric('loadTime')?.value ?? 0;
 
     const renderTime = this.getLatestMetric('renderTime')?.value || 0;
     const apiResponseTime = this.getLatestMetric('apiResponseTime')?.value || 0;
-    const memoryUsage =
-      typeof (performance as any).memory !== 'undefined'
-        ? (performance as any).memory.usedJSHeapSize / 1048576
-        : 0;
+    const memoryUsage = this.getMemoryUsageMb();
 
     const errorRate = this.calculateErrorRate();
 
@@ -211,6 +226,31 @@ export class PerformanceService {
       errorRate,
       activeUsers: 0, // To be implemented with real data
     };
+  }
+
+  /**
+   * Page load time from the modern Navigation Timing API.
+   * Returns null when the API or the entry is unavailable.
+   */
+  private getNavigationLoadTime(): number | null {
+    if (typeof performance === 'undefined' || typeof performance.getEntriesByType !== 'function') {
+      return null;
+    }
+
+    // getEntriesByType is typed as PerformanceEntry[]; navigation entries
+    // are the only ones with loadEventEnd, hence the narrowing cast.
+    const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+    if (!navigation || navigation.loadEventEnd <= 0) return null;
+    return navigation.loadEventEnd - navigation.startTime;
+  }
+
+  /**
+   * JS heap usage in MB via the Chrome-only `performance.memory`.
+   * Returns 0 where unavailable (all other browsers, Node).
+   */
+  private getMemoryUsageMb(): number {
+    const memory = (performance as Performance & { memory?: PerformanceMemoryLike }).memory;
+    return typeof memory !== 'undefined' ? memory.usedJSHeapSize / 1048576 : 0;
   }
 
   /**
@@ -281,20 +321,27 @@ export class PerformanceService {
   }
 
   /**
-   * Measure page load time
+   * Measure page load time.
+   * Records immediately if the page already loaded; otherwise listens once.
    */
   public measurePageLoad(): void {
-    if (typeof window === 'undefined' || !window.performance) return;
+    if (typeof window === 'undefined' || typeof window.performance === 'undefined') return;
+
+    const record = () => {
+      const loadTime = this.getNavigationLoadTime();
+      if (loadTime !== null) {
+        this.recordMetric('loadTime', loadTime, 'ms', 3000);
+      }
+    };
+
+    if (document.readyState === 'complete') {
+      record();
+      return;
+    }
 
     window.addEventListener('load', () => {
-      setTimeout(() => {
-        const timing = window.performance?.timing;
-        if (timing) {
-          const loadTime = timing.loadEventEnd - timing.navigationStart;
-          this.recordMetric('loadTime', loadTime, 'ms', 3000);
-        }
-      }, 0);
-    });
+      setTimeout(record, 0);
+    }, { once: true });
   }
 
   /**

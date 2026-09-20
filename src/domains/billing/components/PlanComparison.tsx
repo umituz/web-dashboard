@@ -57,7 +57,7 @@ export const PlanComparison = ({
         role="radiogroup"
         aria-label={t(BILLING_KEYS.planComparison.radiogroupLabel)}
       >
-        {plans.map((plan) => (
+        {plans.map((plan, index) => (
           <PlanCard
             key={plan.id}
             plan={plan}
@@ -67,6 +67,7 @@ export const PlanComparison = ({
             showFeatures={showFeatures}
             loading={loading}
             onSelect={onPlanSelect}
+            tabbable={selectedPlan === plan.id || (!selectedPlan && index === 0)}
           />
         ))}
       </div>
@@ -86,8 +87,7 @@ const CycleToggle = ({ cycle, onChange, discountPercent }: CycleToggleProps) => 
     <div className="inline-flex items-center bg-muted rounded-full p-1">
       <button
         type="button"
-        role="radio"
-        aria-checked={cycle === 'monthly'}
+        aria-pressed={cycle === 'monthly'}
         onClick={() => onChange?.('monthly')}
         className={cn(
           "px-6 py-2 rounded-full text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
@@ -100,8 +100,7 @@ const CycleToggle = ({ cycle, onChange, discountPercent }: CycleToggleProps) => 
       </button>
       <button
         type="button"
-        role="radio"
-        aria-checked={cycle === 'yearly'}
+        aria-pressed={cycle === 'yearly'}
         onClick={() => onChange?.('yearly')}
         className={cn(
           "px-6 py-2 rounded-full text-sm font-medium transition-all relative focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
@@ -113,7 +112,7 @@ const CycleToggle = ({ cycle, onChange, discountPercent }: CycleToggleProps) => 
         {t(BILLING_KEYS.planComparison.yearly)}
         {discountPercent > 0 && (
           <span className="ml-1 text-xs bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
-            {t(BILLING_KEYS.planComparison.save).replace('{percent}', String(discountPercent))}
+            {t(BILLING_KEYS.planComparison.save, { percent: discountPercent })}
           </span>
         )}
       </button>
@@ -129,6 +128,8 @@ interface PlanCardProps {
   showFeatures: boolean;
   loading: boolean;
   onSelect?: (planId: string) => void;
+  /** Roving-tabindex flag: exactly one card per group stays in tab order. */
+  tabbable: boolean;
 }
 
 const PlanCard = ({
@@ -139,6 +140,7 @@ const PlanCard = ({
   showFeatures,
   loading,
   onSelect,
+  tabbable,
 }: PlanCardProps) => {
   const { t } = useTranslation();
   const price = getPlanPrice(plan, cycle);
@@ -148,7 +150,7 @@ const PlanCard = ({
     <div
       role="radio"
       aria-checked={isSelected}
-      tabIndex={0}
+      tabIndex={tabbable ? 0 : -1}
       onClick={() => !loading && onSelect?.(plan.id)}
       onKeyDown={(e) => {
         if (e.key === 'Enter' || e.key === ' ') {
@@ -204,7 +206,7 @@ const PlanCard = ({
 
         {cycle === 'yearly' && discount > 0 && (
           <p className="text-sm text-success mt-1">
-            {t(BILLING_KEYS.planComparison.saveWithYearly).replace('{percent}', String(discount))}
+            {t(BILLING_KEYS.planComparison.saveWithYearly, { percent: discount })}
           </p>
         )}
       </div>
