@@ -4,4 +4,10 @@
  * Export all analytics hooks
  */
 
-export { useAnalytics } from "./useAnalytics";
+export { useAnalytics, createStubAnalyticsApiClient } from "./useAnalytics";
+export type {
+  AnalyticsApiClient,
+  AnalyticsDataPayload,
+  UseAnalyticsOptions,
+  UseAnalyticsReturn,
+} from "./useAnalytics";

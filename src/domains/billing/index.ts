@@ -18,6 +18,12 @@ export {
 // Hooks
 export {
   useBilling,
+  createStubBillingApiClient,
+} from "./hooks";
+export type {
+  BillingApiClient,
+  UseBillingOptions,
+  UseBillingReturn,
 } from "./hooks";
 
 // Utils
@@ -57,6 +63,7 @@ export type {
   Subscription,
   PaymentMethodType,
   PaymentMethod,
+  PaymentMethodInput,
   InvoiceStatus,
   InvoiceItem,
   Invoice,
@@ -67,7 +74,11 @@ export type {
   InvoiceCardProps,
   UsageCardProps,
   BillingPortalProps,
+  BillingTabId,
   BillingLayoutProps,
   BillingConfig,
   BillingPageProps,
 } from "./types";
+
+// Constants
+export { DEFAULT_BILLING_CONFIG, CURRENCY } from "./constants/billing";

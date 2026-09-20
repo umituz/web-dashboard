@@ -13,6 +13,7 @@ import type {
   InvoiceStatus,
   UsageMetric,
 } from "../types/billing";
+import { BILLING_KEYS } from "./i18nKeys";
 
 /**
  * Format number with thousand separators
@@ -52,12 +53,13 @@ export function formatPrice(amount: number, currency: Currency = "USD"): string 
  *
  * @param monthlyPrice - Monthly price
  * @param yearlyPrice - Yearly price
- * @returns Discount percentage
+ * @returns Discount percentage (0 when monthlyPrice is 0 or the yearly price is not cheaper)
  */
 export function calculateDiscount(monthlyPrice: number, yearlyPrice: number): number {
+  if (monthlyPrice <= 0) return 0;
   const yearlyMonthly = yearlyPrice / 12;
   const discount = ((monthlyPrice - yearlyMonthly) / monthlyPrice) * 100;
-  return Math.round(discount);
+  return Math.round(Math.max(discount, 0));
 }
 
 /**
@@ -133,6 +135,9 @@ export function getStatusColor(status: SubscriptionStatus): string {
 /**
  * Get subscription status label
  *
+ * English-only convenience for non-UI contexts (logs, exports).
+ * UI components should prefer `getStatusLabelKey` + their i18n runtime.
+ *
  * @param status - Subscription status
  * @returns Human readable label
  */
@@ -148,6 +153,24 @@ export function getStatusLabel(status: SubscriptionStatus): string {
   };
 
   return labelMap[status] || status;
+}
+
+/**
+ * i18n key for a subscription status — pass through the consumer's
+ * translation function to get a localized label.
+ */
+const STATUS_LABEL_KEYS: Record<SubscriptionStatus, string> = {
+  active: BILLING_KEYS.status.active,
+  trialing: BILLING_KEYS.status.trialing,
+  past_due: BILLING_KEYS.status.pastDue,
+  canceled: BILLING_KEYS.status.canceled,
+  unpaid: BILLING_KEYS.status.unpaid,
+  incomplete: BILLING_KEYS.status.incomplete,
+  revoked: BILLING_KEYS.status.revoked,
+};
+
+export function getStatusLabelKey(status: SubscriptionStatus): string {
+  return STATUS_LABEL_KEYS[status] ?? status;
 }
 
 /**
@@ -172,6 +195,9 @@ export function getInvoiceStatusColor(status: InvoiceStatus): string {
 /**
  * Get invoice status label
  *
+ * English-only convenience for non-UI contexts (logs, exports).
+ * UI components should prefer `getInvoiceStatusLabelKey` + their i18n runtime.
+ *
  * @param status - Invoice status
  * @returns Human readable label
  */
@@ -186,6 +212,23 @@ export function getInvoiceStatusLabel(status: InvoiceStatus): string {
   };
 
   return labelMap[status] || status;
+}
+
+/**
+ * i18n key for an invoice status — pass through the consumer's
+ * translation function to get a localized label.
+ */
+const INVOICE_STATUS_LABEL_KEYS: Record<InvoiceStatus, string> = {
+  draft: BILLING_KEYS.invoiceStatus.draft,
+  open: BILLING_KEYS.invoiceStatus.open,
+  paid: BILLING_KEYS.invoiceStatus.paid,
+  void: BILLING_KEYS.invoiceStatus.void,
+  uncollectible: BILLING_KEYS.invoiceStatus.uncollectible,
+  refunded: BILLING_KEYS.invoiceStatus.refunded,
+};
+
+export function getInvoiceStatusLabelKey(status: InvoiceStatus): string {
+  return INVOICE_STATUS_LABEL_KEYS[status] ?? status;
 }
 
 /**
@@ -261,26 +304,25 @@ export function getNextBillingDate(
  * Group invoices by status
  *
  * @param invoices - Array of invoices
- * @returns Grouped invoices map
+ * @returns Grouped invoices map — every InvoiceStatus key is always present
  */
 export function groupInvoicesByStatus(
   invoices: Invoice[]
 ): Record<InvoiceStatus, Invoice[]> {
-  const grouped: Record<string, Invoice[]> = {
+  const grouped: Record<InvoiceStatus, Invoice[]> = {
     draft: [],
     open: [],
     paid: [],
     void: [],
     uncollectible: [],
+    refunded: [],
   };
 
   invoices.forEach((invoice) => {
-    if (grouped[invoice.status]) {
-      grouped[invoice.status].push(invoice);
-    }
+    grouped[invoice.status].push(invoice);
   });
 
-  return grouped as Record<InvoiceStatus, Invoice[]>;
+  return grouped;
 }
 
 /**

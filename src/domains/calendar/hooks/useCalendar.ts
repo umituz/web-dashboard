@@ -2,8 +2,9 @@
  * useCalendar
  *
  * React hook for the calendar domain. Delegates persistence
- * to the injected `CalendarService`, exposes an AbortController-aware
- * refresh, and returns a clean discriminated CRUD contract.
+ * to the injected `CalendarService`, guards refreshes with a
+ * request id so a stale response can never overwrite a newer one,
+ * and returns a clean discriminated CRUD contract.
  */
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
@@ -12,7 +13,7 @@ import type {
   ContentItem,
   CalendarFilter,
 } from '../types/calendar.types';
-import { calendarService } from '../services';
+import { calendarService, applyCalendarFilter } from '../services';
 import { DEFAULT_CALENDAR_CONFIG } from '../utils';
 import type { ICalendarService } from '../types/calendar.types';
 
@@ -55,9 +56,6 @@ export interface UseCalendarReturn {
   itemsForDate: (date: Date) => ContentItem[];
 }
 
-const toErrorMessage = (err: unknown, fallback: string): string =>
-  err instanceof Error && err.message ? err.message : fallback;
-
 const toError = (err: unknown, fallback: string): Error =>
   err instanceof Error ? err : new Error(fallback);
 
@@ -86,23 +84,35 @@ export function useCalendar(options: UseCalendarOptions): UseCalendarReturn {
     onErrorRef.current = onError;
   }, [onError]);
 
+  // Guards against out-of-order responses: only the most recent
+  // refresh may commit state (e.g. user changes the filter while a
+  // previous fetch is still resolving).
+  const requestIdRef = useRef(0);
+
   const refresh = useCallback(async () => {
     if (!userId) {
       setError('User ID is required to load calendar items');
       return;
     }
 
+    const requestId = ++requestIdRef.current;
     setLoading(true);
     setError(null);
     try {
       const data = await service.getContentItems(userId, filter);
-      setItems(data);
+      if (requestIdRef.current === requestId) {
+        setItems(data);
+      }
     } catch (err) {
-      const wrapped = toError(err, 'Failed to fetch calendar items');
-      setError(wrapped.message);
-      onErrorRef.current?.(wrapped);
+      if (requestIdRef.current === requestId) {
+        const wrapped = toError(err, 'Failed to fetch calendar items');
+        setError(wrapped.message);
+        onErrorRef.current?.(wrapped);
+      }
     } finally {
-      setLoading(false);
+      if (requestIdRef.current === requestId) {
+        setLoading(false);
+      }
     }
   }, [userId, filter, service]);
 
@@ -168,32 +178,12 @@ export function useCalendar(options: UseCalendarOptions): UseCalendarReturn {
     setFilterState((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  const filteredItems = useMemo(() => {
-    const search = filter.search?.toLowerCase();
-    const platforms = filter.platforms;
-    const types = filter.types;
-    const status = filter.status;
-    const dateRange = filter.dateRange;
-
-    return items.filter((item) => {
-      if (search) {
-        const title = item.title?.toLowerCase() ?? '';
-        if (!title.includes(search)) return false;
-      }
-      if (platforms && platforms.length > 0) {
-        if (!item.platforms?.some((p) => platforms.includes(p))) return false;
-      }
-      if (types && types.length > 0) {
-        if (!item.type || !types.includes(item.type)) return false;
-      }
-      if (status && item.status !== status) return false;
-      if (dateRange) {
-        const itemDate = new Date(item.scheduled_at);
-        if (itemDate < dateRange.start || itemDate > dateRange.end) return false;
-      }
-      return true;
-    });
-  }, [items, filter]);
+  // Single source of truth for filtering (shared with the service layer)
+  // so client-side refiltering can never drift from server-side semantics.
+  const filteredItems = useMemo(
+    () => applyCalendarFilter(items, filter),
+    [items, filter],
+  );
 
   const itemsForDate = useCallback(
     (date: Date): ContentItem[] => {
@@ -212,9 +202,6 @@ export function useCalendar(options: UseCalendarOptions): UseCalendarReturn {
   useEffect(() => {
     refresh();
   }, [refresh]);
-
-  // Suppress unused warning for the legacy helper; reserved for future hooks.
-  void toErrorMessage;
 
   return {
     items,

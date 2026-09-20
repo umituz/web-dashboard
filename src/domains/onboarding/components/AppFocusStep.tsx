@@ -22,15 +22,19 @@ export interface AppFocusStepProps {
 }
 
 /**
- * Each option maps a `stateField` to the OnboardingState key it toggles.
- * This keeps the wizard data-driven — adding a new platform doesn't
- * require a code change in this file.
+ * Each option toggles a `stateField` of OnboardingState. This keeps the
+ * wizard data-driven — adding a new platform doesn't require a code
+ * change in this file. Consumer-supplied options may omit `stateField`;
+ * it is then derived from the well-known ids below.
  */
-interface AppTypeOptionWithStateField extends AppTypeOption {
-  stateField: keyof Pick<OnboardingState, "hasMobileApp" | "hasWebApp">;
-}
+type AppFocusStateField = NonNullable<AppTypeOption["stateField"]>;
 
-const DEFAULT_OPTIONS: AppTypeOptionWithStateField[] = [
+const DEFAULT_STATE_FIELD_BY_ID: Record<string, AppFocusStateField> = {
+  mobile: "hasMobileApp",
+  web: "hasWebApp",
+};
+
+const DEFAULT_OPTIONS: AppTypeOption[] = [
   {
     id: "mobile",
     name: "Mobile App",
@@ -53,16 +57,23 @@ export const AppFocusStep = ({
   appTypes,
 }: AppFocusStepProps) => {
   const { t } = useTranslation();
-  const types: AppTypeOptionWithStateField[] = appTypes
-    ? (appTypes as AppTypeOptionWithStateField[])
-    : DEFAULT_OPTIONS;
 
-  const toggle = (option: AppTypeOptionWithStateField) => {
-    const current = Boolean(state[option.stateField]);
-    updateState({ [option.stateField]: !current } as Partial<OnboardingState>);
+  const resolveStateField = (option: AppTypeOption): AppFocusStateField | undefined =>
+    option.stateField ?? DEFAULT_STATE_FIELD_BY_ID[option.id];
+
+  const types = (appTypes ?? DEFAULT_OPTIONS).map((option) => ({
+    ...option,
+    resolvedField: resolveStateField(option),
+  }));
+
+  const toggle = (option: AppTypeOption, field: AppFocusStateField) => {
+    const current = Boolean(state[field]);
+    updateState({ [field]: !current } as Partial<OnboardingState>);
   };
 
-  const anySelected = types.some((opt) => Boolean(state[opt.stateField]));
+  const anySelected = types.some((type) =>
+    type.resolvedField ? Boolean(state[type.resolvedField]) : false,
+  );
 
   return (
     <div className="w-full max-w-xl">
@@ -77,14 +88,16 @@ export const AppFocusStep = ({
 
       <div className="grid grid-cols-1 gap-4" role="group" aria-label={t(ONBOARDING_KEYS.appFocus.title)}>
         {types.map((type) => {
-          const isSelected = Boolean(state[type.stateField]);
+          const isSelected = type.resolvedField
+            ? Boolean(state[type.resolvedField])
+            : false;
           const Icon = type.icon;
           return (
             <button
               key={type.id}
               type="button"
               aria-pressed={isSelected}
-              onClick={() => toggle(type)}
+              onClick={() => type.resolvedField && toggle(type, type.resolvedField)}
               className={cn(
                 "w-full flex items-center gap-4 p-6 rounded-2xl border bg-background text-left transition-all",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",

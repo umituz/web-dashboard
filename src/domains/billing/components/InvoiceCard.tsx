@@ -14,11 +14,9 @@ import type { InvoiceCardProps, Invoice } from "../types/billing";
 import {
   formatPrice,
   getInvoiceStatusColor,
-  getInvoiceStatusLabel,
+  getInvoiceStatusLabelKey,
 } from "../utils/billing";
 import { BILLING_KEYS } from "../utils/i18nKeys";
-
-const LOCALE = 'en-US';
 
 const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   year: "numeric",
@@ -36,6 +34,7 @@ const openExternal = (url: string) => {
 export const InvoiceCard = ({
   invoice,
   compact = false,
+  locale = 'en-US',
   onClick,
   onDownload,
 }: InvoiceCardProps) => {
@@ -64,7 +63,7 @@ export const InvoiceCard = ({
           <div>
             <p className="font-medium text-foreground text-sm">{invoice.number}</p>
             <p className="text-xs text-muted-foreground">
-              {new Date(invoice.date).toLocaleDateString(LOCALE)}
+              {new Date(invoice.date).toLocaleDateString(locale)}
             </p>
           </div>
         </div>
@@ -74,7 +73,7 @@ export const InvoiceCard = ({
             {formatPrice(invoice.amount, invoice.currency)}
           </p>
           <p className={cn("text-xs font-medium", getInvoiceStatusColor(invoice.status))}>
-            {getInvoiceStatusLabel(invoice.status)}
+            {t(getInvoiceStatusLabelKey(invoice.status))}
           </p>
         </div>
       </div>
@@ -98,7 +97,7 @@ export const InvoiceCard = ({
           <div>
             <p className="font-bold text-foreground">{invoice.number}</p>
             <p className="text-sm text-muted-foreground">
-              {new Date(invoice.date).toLocaleDateString(LOCALE, DATE_FORMAT_OPTIONS)}
+              {new Date(invoice.date).toLocaleDateString(locale, DATE_FORMAT_OPTIONS)}
             </p>
           </div>
         </div>
@@ -108,7 +107,7 @@ export const InvoiceCard = ({
             {formatPrice(invoice.amount, invoice.currency)}
           </p>
           <p className={cn("text-sm font-medium", getInvoiceStatusColor(invoice.status))}>
-            {getInvoiceStatusLabel(invoice.status)}
+            {t(getInvoiceStatusLabelKey(invoice.status))}
           </p>
         </div>
       </div>
@@ -134,7 +133,7 @@ export const InvoiceCard = ({
       <div className="flex items-center justify-between pt-4 border-t border-border">
         <p className="text-xs text-muted-foreground">
           {t(BILLING_KEYS.invoice.due)}{' '}
-          {new Date(invoice.dueDate).toLocaleDateString(LOCALE)}
+          {new Date(invoice.dueDate).toLocaleDateString(locale)}
         </p>
 
         <div className="flex items-center gap-2">

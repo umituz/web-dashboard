@@ -304,6 +304,8 @@ export interface InvoiceCardProps {
 export interface UsageCardProps {
   /** Usage metric */
   metric: UsageMetric;
+  /** Locale for date/number formatting (default: en-US) */
+  locale?: string;
   /** Show progress bar */
   showProgress?: boolean;
   /** Show limit */
@@ -329,6 +331,8 @@ export interface BillingPortalProps {
   showTabs?: boolean;
   /** Active tab */
   activeTab?: BillingTabId;
+  /** Locale for date/number formatting (default: en-US) */
+  locale?: string;
   /** On tab change */
   onTabChange?: (tab: BillingTabId) => void;
   /** On add payment method */

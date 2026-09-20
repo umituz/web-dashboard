@@ -72,7 +72,7 @@ export const PaymentMethodsList = ({
           {t(BILLING_KEYS.paymentMethods.none)}
         </p>
         {onAddNew && (
-          <Button onClick={onAddNew} variant="outline">
+          <Button type="button" onClick={onAddNew} variant="outline">
             <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
             {t(BILLING_KEYS.paymentMethods.add)}
           </Button>
@@ -106,7 +106,7 @@ export const PaymentMethodsList = ({
       ))}
 
       {onAddNew && (
-        <Button onClick={onAddNew} variant="outline" className="w-full">
+        <Button type="button" onClick={onAddNew} variant="outline" className="w-full">
           <Plus className="h-4 w-4 mr-2" aria-hidden="true" />
           {t(BILLING_KEYS.paymentMethods.add)}
         </Button>
@@ -189,6 +189,7 @@ const PaymentMethodItem = ({
         <div className="flex items-center gap-2 shrink-0">
           {!method.isDefault && onSetDefault && (
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => onSetDefault(method.id)}
@@ -200,6 +201,7 @@ const PaymentMethodItem = ({
           )}
           {onRemove && paymentMethodsAllowsRemove(method, allMethods) && (
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => onRequestRemove(method.id)}
@@ -227,10 +229,11 @@ const PaymentMethodItem = ({
             {t(BILLING_KEYS.paymentMethods.removeConfirm)}
           </span>
           <div className="flex gap-2">
-            <Button variant="ghost" size="sm" onClick={onCancelRemove}>
+            <Button type="button" variant="ghost" size="sm" onClick={onCancelRemove}>
               {t(BILLING_KEYS.paymentMethods.cancelRemove)}
             </Button>
             <Button
+              type="button"
               variant="destructive"
               size="sm"
               onClick={() => onConfirmRemove(method.id)}

@@ -40,6 +40,8 @@ export const ONBOARDING_KEYS = {
     description: 'onboarding.plan.description',
     monthly: 'onboarding.plan.monthly',
     yearly: 'onboarding.plan.yearly',
+    monthlyShort: 'onboarding.plan.monthlyShort',
+    yearlyShort: 'onboarding.plan.yearlyShort',
     save: 'onboarding.plan.save',
     recommended: 'onboarding.plan.recommended',
     selectedPlan: 'onboarding.plan.selectedPlan',

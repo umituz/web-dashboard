@@ -66,7 +66,9 @@ export const ForgotPasswordForm = ({
     try {
       // Hand off to the consumer's auth provider. The form has
       // no network knowledge of its own — it's pure orchestration.
-      await onSuccess?.();
+      // The submitted email is passed through so the consumer can
+      // actually trigger the reset email.
+      await onSuccess?.({ email });
       setSuccess(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : KEYS.sendResetFailed;

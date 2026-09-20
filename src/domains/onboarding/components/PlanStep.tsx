@@ -115,12 +115,15 @@ export const PlanStep = ({
         </p>
       </div>
 
-      <div className="flex items-center justify-center gap-2 mb-12" role="radiogroup" aria-label={t(ONBOARDING_KEYS.plan.title)}>
-        <div className="flex bg-muted rounded-full p-1.5 border border-border">
+      <div className="flex items-center justify-center gap-2 mb-12">
+        <div
+          className="flex bg-muted rounded-full p-1.5 border border-border"
+          role="group"
+          aria-label={t(ONBOARDING_KEYS.plan.title)}
+        >
           <button
             type="button"
-            role="radio"
-            aria-checked={state.billingCycle === "monthly"}
+            aria-pressed={state.billingCycle === "monthly"}
             onClick={() => updateState({ billingCycle: "monthly" })}
             className={cn(
               "px-6 py-2 rounded-full text-sm font-bold transition-all",
@@ -134,8 +137,7 @@ export const PlanStep = ({
           </button>
           <button
             type="button"
-            role="radio"
-            aria-checked={state.billingCycle === "yearly"}
+            aria-pressed={state.billingCycle === "yearly"}
             onClick={() => updateState({ billingCycle: "yearly" })}
             className={cn(
               "px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2",
@@ -160,7 +162,11 @@ export const PlanStep = ({
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-8">
+      <div
+        className="grid md:grid-cols-3 gap-8"
+        role="radiogroup"
+        aria-label={t(ONBOARDING_KEYS.plan.title)}
+      >
         {planOptions.map((plan) => {
           const isSelected = state.selectedPlan === plan.id;
           const planPrice = getPlanPrice(plan);
@@ -208,7 +214,11 @@ export const PlanStep = ({
                 <span className="text-5xl font-black text-foreground">
                   ${Math.round(planPrice)}
                 </span>
-                <span className="text-lg font-bold text-muted-foreground">/mo</span>
+                <span className="text-lg font-bold text-muted-foreground">
+                  /{state.billingCycle === "yearly"
+                    ? t(ONBOARDING_KEYS.plan.yearlyShort)
+                    : t(ONBOARDING_KEYS.plan.monthlyShort)}
+                </span>
               </div>
 
               <ul className="space-y-4">

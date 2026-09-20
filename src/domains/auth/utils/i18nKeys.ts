@@ -85,6 +85,7 @@ export const AUTH_KEYS = {
   errors: {
     invalidCredentials: 'auth.errors.invalidCredentials',
     loginFailed: 'auth.errors.loginFailed',
+    noAuthProvider: 'auth.errors.noAuthProvider',
     registrationFailed: 'auth.errors.registrationFailed',
     emailRequired: 'auth.errors.emailRequired',
     emailInvalid: 'auth.errors.emailInvalid',
@@ -107,6 +108,13 @@ export const AUTH_KEYS = {
   social: {
     continueWithGoogle: 'auth.social.continueWithGoogle',
     continueWithApple: 'auth.social.continueWithApple',
+  },
+
+  // Layout shell
+  layout: {
+    backToHome: 'auth.layout.backToHome',
+    orContinueWith: 'auth.layout.orContinueWith',
+    allRightsReserved: 'auth.layout.allRightsReserved',
   },
 
   // Accessibility

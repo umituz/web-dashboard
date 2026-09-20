@@ -9,8 +9,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Loader2, CheckCircle2 } from "lucide-react";
-import { Button } from "@umituz/web-design-system/atoms";
-import { Input } from "@umituz/web-design-system/atoms";
+import { Button, Input } from "@umituz/web-design-system/atoms";
 import { cn } from "@umituz/web-design-system/utils";
 import type { ResetPasswordFormProps, Translate } from "../types/auth";
 import { validateResetPassword } from "../utils/auth";
@@ -33,7 +32,7 @@ const KEYS = {
   successTitle: 'auth.resetPassword.successTitle',
   successMessage: 'auth.resetPassword.successMessage',
   goToSignIn: 'auth.resetPassword.goToSignIn',
-  invalidResetData: AUTH_VALIDATION_KEYS.invalidResetToken,
+  invalidResetData: AUTH_VALIDATION_KEYS.passwordTooShort,
   resetFailed: 'auth.errors.resetFailed',
 } as const;
 
@@ -70,8 +69,12 @@ export const ResetPasswordForm = ({
     setIsLoading(true);
     try {
       // Hand off the actual reset to the consumer. The form is
-      // pure orchestration; no network knowledge here.
-      await onSuccess?.();
+      // pure orchestration; no network knowledge here. Token and the
+      // new password are passed through so the consumer can persist it.
+      await onSuccess?.({ token, password });
+      // Don't keep the new password in component state after completion.
+      setPassword("");
+      setConfirmPassword("");
       setSuccess(true);
     } catch (err) {
       const message = err instanceof Error ? err.message : KEYS.resetFailed;

@@ -15,7 +15,7 @@ import {
   getDaysRemaining,
   getPlanPrice,
   getStatusColor,
-  getStatusLabel,
+  getStatusLabelKey,
 } from "../utils/billing";
 
 export interface OverviewTabProps {
@@ -42,7 +42,7 @@ export const OverviewTab = ({ billing, locale }: OverviewTabProps) => {
               {subscription.plan.name}
             </p>
             <p className={cn("text-sm font-medium", getStatusColor(subscription.status))}>
-              {getStatusLabel(subscription.status)}
+              {t(getStatusLabelKey(subscription.status))}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
               {formatPrice(
@@ -75,7 +75,7 @@ export const OverviewTab = ({ billing, locale }: OverviewTabProps) => {
           aria-label={t(BILLING_KEYS.common.usage)}
         >
           {usage.map((metric) => (
-            <UsageCard key={metric.id} metric={metric} />
+            <UsageCard key={metric.id} metric={metric} locale={locale} />
           ))}
         </section>
       )}

@@ -59,7 +59,10 @@ export const AnalyticsLayout = ({
         <div>
           {(title || config?.brandName) && (
             <h1 className="text-3xl font-bold text-foreground">
-              {title ?? `${config?.brandName ?? ''} ${t(ANALYTICS_KEYS.layout.title)}`}
+              {title ??
+                (config?.brandName
+                  ? `${config.brandName} ${t(ANALYTICS_KEYS.layout.title)}`
+                  : t(ANALYTICS_KEYS.layout.title))}
             </h1>
           )}
           {description && (
@@ -71,16 +74,16 @@ export const AnalyticsLayout = ({
           {showDateRange && onPeriodChange && period && (
             <label className="flex items-center gap-2 bg-background border border-border rounded-lg px-3 py-2">
               <Calendar className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-              <span className="sr-only">{t(ANALYTICS_KEYS.common.export)}</span>
+              <span className="sr-only">{t(ANALYTICS_KEYS.common.periodSelector)}</span>
               <select
                 className="bg-transparent text-sm text-foreground outline-none"
                 value={period}
                 onChange={(e) => onPeriodChange(e.target.value as AnalyticsPeriod)}
-                aria-label={t(ANALYTICS_KEYS.common.export)}
+                aria-label={t(ANALYTICS_KEYS.common.periodSelector)}
               >
                 {(config?.availablePeriods ?? Object.keys(PERIOD_LABEL) as AnalyticsPeriod[]).map((p) => (
                   <option key={p} value={p}>
-                    {PERIOD_LABEL[p] ?? p}
+                    {t(PERIOD_LABEL[p] ?? p)}
                   </option>
                 ))}
               </select>
@@ -93,7 +96,7 @@ export const AnalyticsLayout = ({
               size="sm"
               onClick={onRefresh}
               disabled={loading}
-              aria-label="Refresh"
+              aria-label={t(ANALYTICS_KEYS.common.refresh)}
             >
               <RefreshCw
                 className={cn("h-4 w-4", loading && "animate-spin")}

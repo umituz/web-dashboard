@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, Outlet, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { Skeleton } from "@umituz/web-design-system/atoms";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
@@ -26,6 +27,16 @@ interface DashboardLayoutProps {
   onDismissNotification?: (id: string) => void;
   /** Login route for redirect */
   loginRoute?: string;
+  /** Current theme, forwarded to the header toggle (default: "light") */
+  theme?: "light" | "dark";
+  /** Theme toggle handler — header toggle is hidden when omitted */
+  onToggleTheme?: () => void;
+  /**
+   * Artificial route-transition skeleton duration in ms (default: 0 = off).
+   * Content renders immediately by default; set > 0 only if you want
+   * a skeleton to mask route swaps.
+   */
+  routeTransitionMs?: number;
 }
 
 /**
@@ -38,7 +49,7 @@ interface DashboardLayoutProps {
  * - Collapsible sidebar
  * - Mobile menu overlay
  * - Breadcrumb page titles
- * - Loading skeletons
+ * - Loading skeletons (opt-in via routeTransitionMs)
  * - Auth protection
  *
  * @param props - Dashboard layout props
@@ -53,17 +64,25 @@ export const DashboardLayout = ({
   onMarkAllRead,
   onDismissNotification,
   loginRoute = "/login",
+  theme,
+  onToggleTheme,
+  routeTransitionMs = 0,
 }: DashboardLayoutProps) => {
   const location = useLocation();
+  const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(routeTransitionMs > 0);
 
   useEffect(() => {
+    if (routeTransitionMs <= 0) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
-    const timer = setTimeout(() => setLoading(false), 300);
+    const timer = setTimeout(() => setLoading(false), routeTransitionMs);
     return () => clearTimeout(timer);
-  }, [location.pathname]);
+  }, [location.pathname, routeTransitionMs]);
 
   useEffect(() => {
     setMobileOpen(false);
@@ -77,8 +96,10 @@ export const DashboardLayout = ({
     .find((i) => i.path === location.pathname);
 
   const getTitle = () => {
-    if (!activeItem) return config.extraTitleMap?.[location.pathname] || "Dashboard";
-    return activeItem.label; // Note: In real app, this would be translated
+    if (activeItem) return t(activeItem.label);
+    const extraTitle = config.extraTitleMap?.[location.pathname];
+    if (extraTitle) return t(extraTitle);
+    return config.defaultTitle ?? "Dashboard";
   };
 
   const currentTitle = getTitle();
@@ -125,6 +146,8 @@ export const DashboardLayout = ({
           setCollapsed={setCollapsed}
           setMobileOpen={setMobileOpen}
           title={currentTitle}
+          theme={theme}
+          onToggleTheme={onToggleTheme}
           user={user}
           notifications={notifications}
           onLogout={onLogout}

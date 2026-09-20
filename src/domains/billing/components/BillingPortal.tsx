@@ -7,6 +7,7 @@
  */
 
 import { CreditCard, FileText, BarChart3, Settings, Loader2, AlertCircle } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@umituz/web-design-system/utils";
 import type { BillingPortalProps, BillingTabId } from "../types/billing";
@@ -16,14 +17,12 @@ import { InvoiceCard } from "./InvoiceCard";
 import { PlanTab } from "./PlanTab";
 import { OverviewTab } from "./OverviewTab";
 
-const TABS: ReadonlyArray<{ id: BillingTabId; labelKey: string; icon: typeof BarChart3 }> = [
+const TABS: ReadonlyArray<{ id: BillingTabId; labelKey: string; icon: LucideIcon }> = [
   { id: "overview", labelKey: BILLING_KEYS.portal.tabs.overview, icon: BarChart3 },
   { id: "payment-methods", labelKey: BILLING_KEYS.portal.tabs.paymentMethods, icon: CreditCard },
   { id: "invoices", labelKey: BILLING_KEYS.portal.tabs.invoices, icon: FileText },
   { id: "plan", labelKey: BILLING_KEYS.portal.tabs.plan, icon: Settings },
 ];
-
-const LOCALE = 'en-US';
 
 export const BillingPortal = ({
   billing,
@@ -31,6 +30,7 @@ export const BillingPortal = ({
   error,
   showTabs = true,
   activeTab = "overview",
+  locale = 'en-US',
   onTabChange,
   onAddPaymentMethod,
   onSetDefaultPaymentMethod,
@@ -71,7 +71,7 @@ export const BillingPortal = ({
   const renderContent = () => {
     switch (activeTab) {
       case "overview":
-        return <OverviewTab billing={billing} locale={LOCALE} />;
+        return <OverviewTab billing={billing} locale={locale} />;
       case "payment-methods":
         return (
           <PaymentMethodsList
@@ -82,13 +82,14 @@ export const BillingPortal = ({
           />
         );
       case "invoices":
-        return <InvoiceList invoices={billing.recentInvoices} onView={onViewInvoice} locale={LOCALE} />;
+        return <InvoiceList invoices={billing.recentInvoices} onView={onViewInvoice} locale={locale} />;
       case "plan":
         return (
           <PlanTab
             subscription={billing.subscription}
             onChangePlan={onChangePlan}
             onCancelSubscription={onCancelSubscription}
+            locale={locale}
           />
         );
       default:

@@ -19,6 +19,8 @@ interface DashboardSidebarPropsExtended extends DashboardSidebarProps {
   brandTagline?: string;
   /** Create post route */
   createPostRoute?: string;
+  /** Whether to show the primary create button (default: true) */
+  showCreatePost?: boolean;
   /** Auth user */
   user?: DashboardUser;
 }
@@ -38,6 +40,7 @@ export const DashboardSidebar = ({
   brandName = "App",
   brandTagline = "grow smarter",
   createPostRoute = "/dashboard/create",
+  showCreatePost = true,
   user,
 }: DashboardSidebarPropsExtended) => {
   const location = useLocation();
@@ -57,7 +60,7 @@ export const DashboardSidebar = ({
       <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-4 transition-all duration-300">
         <BrandLogo size={32} />
         {!collapsed && (
-          <div className="flex flex-col -gap-1">
+          <div className="flex flex-col">
             <span className="text-2xl font-black text-sidebar-foreground tracking-tighter leading-none">{brandName}</span>
             <span className="text-[11px] font-bold text-primary/70 lowercase tracking-tight mt-2 ml-1 select-none underline decoration-primary/40 underline-offset-[6px] decoration-2">
               {brandTagline}
@@ -67,20 +70,22 @@ export const DashboardSidebar = ({
       </div>
 
       {/* Create Button */}
-      <div className="px-3 py-4 border-b border-sidebar-border/50">
-        <Link to={createPostRoute}>
-          <Button
-            variant="default"
-            className={`w-full gap-3 shadow-glow transition-all active:scale-95 group overflow-hidden rounded-xl ${
-              collapsed ? "px-0 justify-center h-10 w-10 mx-auto" : "justify-start px-4 h-11"
-            }`}
-            title={collapsed ? t('sidebar.createPost') : undefined}
-          >
-            <PenTool className={`shrink-0 transition-transform duration-300 ${collapsed ? "h-5 w-5" : "h-4 w-4 group-hover:scale-110"}`} />
-            {!collapsed && <span className="font-bold tracking-tight">{t('sidebar.createPost')}</span>}
-          </Button>
-        </Link>
-      </div>
+      {showCreatePost && createPostRoute && (
+        <div className="px-3 py-4 border-b border-sidebar-border/50">
+          <Link to={createPostRoute}>
+            <Button
+              variant="default"
+              className={`w-full gap-3 shadow-glow transition-all active:scale-95 group overflow-hidden rounded-xl ${
+                collapsed ? "px-0 justify-center h-10 w-10 mx-auto" : "justify-start px-4 h-11"
+              }`}
+              title={collapsed ? t('sidebar.createPost') : undefined}
+            >
+              <PenTool className={`shrink-0 transition-transform duration-300 ${collapsed ? "h-5 w-5" : "h-4 w-4 group-hover:scale-110"}`} />
+              {!collapsed && <span className="font-bold tracking-tight">{t('sidebar.createPost')}</span>}
+            </Button>
+          </Link>
+        </div>
+      )}
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-2 py-3 scrollbar-hide">
@@ -100,7 +105,7 @@ export const DashboardSidebar = ({
                     className="w-full flex items-center justify-between px-3 py-2 mb-1 rounded-lg hover:bg-sidebar-accent/30 transition-all duration-200 group/header"
                   >
                     <span className="text-[10px] font-bold uppercase tracking-widest text-sidebar-foreground/40 group-hover/header:text-sidebar-foreground/70 transition-colors">
-                      {group.title === "sidebar.ai" ? `${brandName} AI` : t(group.title)}
+                      {t(group.title, { brand: brandName })}
                     </span>
                     <div className="flex-shrink-0">
                       {isGroupCollapsed ? (
@@ -125,7 +130,7 @@ export const DashboardSidebar = ({
                       } ${collapsed ? "justify-center" : ""}`}
                       title={collapsed ? t(item.label) : undefined}
                     >
-                      <item.icon className={`h-4 w-4 shrink-0 transition-transform duration-200 ${active && "scale-110"}`} />
+                      <item.icon className={`h-4 w-4 shrink-0 transition-transform duration-200 ${active ? "scale-110" : ""}`} />
                       {!collapsed && <span>{t(item.label)}</span>}
                     </Link>
                   );

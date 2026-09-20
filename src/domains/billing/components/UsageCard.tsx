@@ -17,10 +17,9 @@ import {
 } from "../utils/billing";
 import { BILLING_KEYS } from "../utils/i18nKeys";
 
-const LOCALE = 'en-US';
-
 export const UsageCard = ({
   metric,
+  locale = 'en-US',
   showProgress = true,
   showLimit = true,
 }: UsageCardProps) => {
@@ -33,7 +32,7 @@ export const UsageCard = ({
         <div>
           <p className="text-sm text-muted-foreground mb-1">{metric.name}</p>
           <p className="text-3xl font-bold text-foreground">
-            {formatNumber(metric.current)}
+            {formatNumber(metric.current, locale)}
             <span className="text-base font-normal text-muted-foreground ml-1">
               {metric.unit}
             </span>
@@ -64,7 +63,7 @@ export const UsageCard = ({
           <div className="flex items-center justify-between text-xs">
             {showLimit && (
               <span className="text-muted-foreground">
-                {formatNumber(metric.limit)} {metric.unit} {t(BILLING_KEYS.usage.limit)}
+                {formatNumber(metric.limit, locale)} {metric.unit} {t(BILLING_KEYS.usage.limit)}
               </span>
             )}
             <span
@@ -84,11 +83,11 @@ export const UsageCard = ({
           <div
             className="w-full h-2 bg-muted rounded-full overflow-hidden"
             role="progressbar"
-            aria-label={`${metric.name} usage`}
+            aria-label={`${metric.name} ${t(BILLING_KEYS.common.usage)}`}
             aria-valuemin={0}
             aria-valuemax={Math.max(metric.limit, metric.current)}
             aria-valuenow={metric.current}
-            aria-valuetext={`${metric.current} of ${metric.limit} ${metric.unit}`}
+            aria-valuetext={`${formatNumber(metric.current, locale)} / ${formatNumber(metric.limit, locale)} ${metric.unit}`}
           >
             <div
               className={cn(
@@ -106,7 +105,7 @@ export const UsageCard = ({
           {metric.resetAt && (
             <p className="text-xs text-muted-foreground mt-2">
               {t(BILLING_KEYS.usage.resets)}{' '}
-              {new Date(metric.resetAt).toLocaleDateString(LOCALE)}
+              {new Date(metric.resetAt).toLocaleDateString(locale)}
             </p>
           )}
         </div>

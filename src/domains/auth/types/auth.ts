@@ -9,8 +9,9 @@ import type { ComponentType, ReactElement } from "react";
 /**
  * Translation function contract. Auth components stay i18n-agnostic;
  * the consumer plugs in their i18n library of choice.
+ * Interpolation params follow the i18next convention (`{{placeholder}}`).
  */
-export type Translate = (key: string) => string;
+export type Translate = (key: string, params?: Record<string, unknown>) => string;
 
 /**
  * User credentials for login
@@ -162,6 +163,10 @@ export interface AuthConfig {
   showSocialLogin?: boolean;
   /** Available social providers */
   socialProviders?: SocialProvider[];
+  /** Public home route (header "back" link). Falls back to `afterLoginRoute`. */
+  homeRoute?: string;
+  /** Footer links (rendered only when provided — no defaults that 404) */
+  footerLinks?: Array<{ label: string; href: string }>;
   /** Enable remember me */
   enableRememberMe?: boolean;
   /** Enable email verification */
@@ -198,6 +203,10 @@ export interface AuthLayoutProps {
   authState?: AuthState;
   /** Auth actions */
   authActions?: AuthActions;
+  /** Optional translation function for layout strings (falls back to embedded English) */
+  translate?: Translate;
+  /** Social provider login handler (receives the provider id) */
+  onSocialLogin?: (providerId: string) => void | Promise<void>;
   /** Children content */
   children?: React.ReactNode;
 }
@@ -218,7 +227,13 @@ export interface LoginFormProps {
   showRegisterLink?: boolean;
   /** Show social login buttons */
   showSocialLogin?: boolean;
-  /** Custom login handler (receives credentials, returns user) - overrides mock auth */
+  /**
+   * Allow the built-in mock login (accepts ANY credentials) for demos.
+   * Defaults to false — without `onLoginAttempt` the form reports a
+   * configuration error instead of silently "logging in".
+   */
+  enableMockAuth?: boolean;
+  /** Custom login handler (receives credentials, returns user) */
   onLoginAttempt?: (credentials: LoginCredentials) => Promise<User>;
   /** On successful login (called after onLoginAttempt or mock auth succeeds) */
   onLoginSuccess?: (user: User) => void | Promise<void>;
@@ -264,8 +279,8 @@ export interface RegisterFormProps {
 export interface ForgotPasswordFormProps {
   /** Auth configuration */
   config: AuthConfig;
-  /** On success */
-  onSuccess?: () => void | Promise<void>;
+  /** Submit handler — receives the entered email and performs the reset request */
+  onSuccess?: (data: { email: string }) => void | Promise<void>;
   /** On error */
   onError?: (error: string) => void;
   /** Show back to login link */
@@ -280,8 +295,8 @@ export interface ResetPasswordFormProps {
   config: AuthConfig;
   /** Reset token */
   token: string;
-  /** On success */
-  onSuccess?: () => void | Promise<void>;
+  /** Submit handler — receives the token and the new password */
+  onSuccess?: (data: { token: string; password: string }) => void | Promise<void>;
   /** On error */
   onError?: (error: string) => void;
 }

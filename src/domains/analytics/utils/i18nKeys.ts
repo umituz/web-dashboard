@@ -6,6 +6,8 @@ export const ANALYTICS_KEYS = {
   // Common
   common: {
     export: 'analytics.common.export',
+    refresh: 'analytics.common.refresh',
+    periodSelector: 'analytics.common.periodSelector',
     lastPeriod: 'analytics.common.lastPeriod',
     last7Days: 'analytics.common.last7Days',
     last30Days: 'analytics.common.last30Days',

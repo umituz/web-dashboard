@@ -65,6 +65,12 @@ export interface AppTypeOption {
   name: string;
   description: string;
   icon: LucideIcon;
+  /**
+   * State field toggled by this option. When omitted, the field is
+   * derived from the id ("mobile" → hasMobileApp, "web" → hasWebApp);
+   * options that resolve to neither render inert.
+   */
+  stateField?: "hasMobileApp" | "hasWebApp";
 }
 
 /**
