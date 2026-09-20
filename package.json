@@ -1,6 +1,6 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "3.2.4",
+  "version": "3.2.5",
   "description": "Dashboard Layout System - Comprehensive analytics, calendar, customizable layouts, and config-based architecture",
   "type": "module",
   "main": "./src/index.ts",
