@@ -6,7 +6,7 @@
  */
 
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { Button } from "@umituz/web-design-system/atoms";
+import { Button } from "../../../primitives";
 
 /**
  * Centralized i18n keys for navigation labels.
@@ -59,27 +59,27 @@ export const StepNavigation = ({
   const isLastStep = currentStep === totalSteps;
 
   return (
-    <footer className="bg-background border-t border-border px-8 py-6 flex items-center justify-between">
+    <footer className="udb-onboarding__footer">
       {currentStep > 1 ? (
         <Button
           variant="ghost"
           onClick={onPrev}
-          className="rounded-full px-6"
+          className="udb-onboarding__footer-btn"
           disabled={isSaving}
         >
-          <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
+          <ArrowLeft className="udb-onboarding__footer-icon" aria-hidden="true" />
           {prevLabel ?? t(STEP_NAVIGATION_KEYS.back)}
         </Button>
       ) : (
         <div />
       )}
 
-      <div className="flex items-center gap-3">
+      <div className="udb-onboarding__footer-actions">
         {allowSkip && onSkip && !isLastStep && (
           <Button
             variant="ghost"
             onClick={onSkip}
-            className="rounded-full px-6"
+            className="udb-onboarding__footer-btn"
             disabled={isSaving}
           >
             {t(STEP_NAVIGATION_KEYS.skip)}
@@ -88,12 +88,12 @@ export const StepNavigation = ({
 
         <Button
           onClick={onNext}
-          className="rounded-full px-12 h-12 text-base font-bold"
+          className="udb-onboarding__footer-next"
           disabled={!canGoNext || isSaving}
         >
           {isSaving ? (
             <>
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+              <Loader2 className="udb-onboarding__footer-icon udb-spin" aria-hidden="true" />
               {t(STEP_NAVIGATION_KEYS.finalizing)}
             </>
           ) : isLastStep ? (

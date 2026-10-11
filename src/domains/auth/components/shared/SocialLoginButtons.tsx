@@ -6,7 +6,7 @@
  * not a code change.
  */
 
-import { Button } from "@umituz/web-design-system/atoms";
+import { Button } from "../../../../primitives";
 import { GoogleIcon, AppleIcon } from "./SocialProviderIcons";
 
 export type SocialProviderId = 'google' | 'apple';
@@ -38,7 +38,7 @@ export const SocialLoginButtons = ({
   disabled = false,
 }: SocialLoginButtonsProps) => {
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="udb-social-grid">
       {SOCIAL_PROVIDERS.map(({ id, labelKey, Icon }) => (
         <Button
           key={id}
@@ -47,9 +47,9 @@ export const SocialLoginButtons = ({
           onClick={() => onProvider(id)}
           disabled={disabled}
           aria-label={translate(labelKey)}
-          className="w-full"
+          className="udb-social-grid__btn"
         >
-          <Icon className="h-4 w-4 mr-2" aria-hidden="true" />
+          <Icon className="udb-social-grid__icon" aria-hidden="true" />
           {translate(labelKey)}
         </Button>
       ))}

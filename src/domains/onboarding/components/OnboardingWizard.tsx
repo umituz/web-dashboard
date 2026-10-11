@@ -3,13 +3,14 @@
  *
  * Multi-step onboarding container. Delegates state, navigation, and
  * progress to `useOnboarding` so there's a single source of truth
- * for the wizard's lifecycle.
+ * for the wizard's lifecycle. Styling is entirely `udb-onboarding*`
+ * classes from the package stylesheet.
  */
 
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Button } from "@umituz/web-design-system/atoms";
+import { Button } from "../../../primitives";
 import { useOnboarding } from "../hooks/useOnboarding";
 import { StepProgress } from "./StepProgress";
 import { StepNavigation } from "./StepNavigation";
@@ -108,10 +109,10 @@ export const OnboardingWizard = ({
   const StepContent = currentStepConfig?.component;
 
   return (
-    <div className="min-h-screen bg-secondary flex flex-col">
-      <header className="bg-background border-b border-border px-6 py-3 flex items-center">
-        <div className="flex items-center gap-2 mr-8">
-          <span className="font-bold text-foreground">{config.brandName}</span>
+    <div className="udb-root udb-onboarding">
+      <header className="udb-onboarding__header">
+        <div className="udb-onboarding__brand">
+          <span className="udb-onboarding__brand-name">{config.brandName}</span>
         </div>
 
         {config.showProgress !== false && (
@@ -122,7 +123,7 @@ export const OnboardingWizard = ({
           />
         )}
 
-        <div className="w-24 flex justify-end">
+        <div className="udb-onboarding__header-actions">
           {config.allowCancel !== false && (
             <Button
               variant="ghost"
@@ -136,13 +137,13 @@ export const OnboardingWizard = ({
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4 py-12">
-        <div className="w-full max-w-4xl">
+      <main className="udb-onboarding__main">
+        <div className="udb-onboarding__content">
           {error && (
             <div
               role="alert"
               aria-live="polite"
-              className="mb-4 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive"
+              className="udb-onboarding__error"
             >
               {t(error.message)}
             </div>
@@ -162,7 +163,7 @@ export const OnboardingWizard = ({
               StepContent
             )
           ) : (
-            <div className="text-center text-muted-foreground">
+            <div className="udb-onboarding__empty">
               {t('onboarding.errors.stepNotConfigured')}
             </div>
           )}

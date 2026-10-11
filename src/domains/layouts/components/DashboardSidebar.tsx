@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-import { Button } from "@umituz/web-design-system/atoms";
+import { Button, cn } from "../../../primitives";
 import { BrandLogo } from "./BrandLogo";
 import { PenTool, Menu, ChevronLeft, ChevronDown, ChevronRight } from "lucide-react";
 import type { DashboardSidebarProps } from "../types/layout";
@@ -30,6 +30,7 @@ interface DashboardSidebarPropsExtended extends DashboardSidebarProps {
  *
  * Displays collapsible sidebar with navigation menu items.
  * Supports app-based filtering (mobile/web) and collapsible groups.
+ * Styling is entirely `udb-sidebar*` classes from the package stylesheet.
  *
  * @param props - Dashboard sidebar props
  */
@@ -55,41 +56,37 @@ export const DashboardSidebar = ({
   };
 
   return (
-    <div className="flex h-full flex-col">
+    <div className={cn("udb-sidebar", collapsed && "udb-sidebar--collapsed")}>
       {/* Brand Section */}
-      <div className="flex h-16 items-center gap-3 border-b border-sidebar-border px-4 transition-all duration-300">
+      <div className="udb-sidebar__brand">
         <BrandLogo size={32} />
         {!collapsed && (
-          <div className="flex flex-col">
-            <span className="text-2xl font-black text-sidebar-foreground tracking-tighter leading-none">{brandName}</span>
-            <span className="text-[11px] font-bold text-primary/70 lowercase tracking-tight mt-2 ml-1 select-none underline decoration-primary/40 underline-offset-[6px] decoration-2">
-              {brandTagline}
-            </span>
+          <div className="udb-sidebar__brand-text">
+            <span className="udb-sidebar__brand-name">{brandName}</span>
+            <span className="udb-sidebar__brand-tagline">{brandTagline}</span>
           </div>
         )}
       </div>
 
       {/* Create Button */}
       {showCreatePost && createPostRoute && (
-        <div className="px-3 py-4 border-b border-sidebar-border/50">
+        <div className="udb-sidebar__create">
           <Link to={createPostRoute}>
             <Button
               variant="default"
-              className={`w-full gap-3 shadow-glow transition-all active:scale-95 group overflow-hidden rounded-xl ${
-                collapsed ? "px-0 justify-center h-10 w-10 mx-auto" : "justify-start px-4 h-11"
-              }`}
+              className={cn("udb-sidebar__create-btn", collapsed && "udb-sidebar__create-btn--collapsed")}
               title={collapsed ? t('sidebar.createPost') : undefined}
             >
-              <PenTool className={`shrink-0 transition-transform duration-300 ${collapsed ? "h-5 w-5" : "h-4 w-4 group-hover:scale-110"}`} />
-              {!collapsed && <span className="font-bold tracking-tight">{t('sidebar.createPost')}</span>}
+              <PenTool className="udb-sidebar__create-icon" />
+              {!collapsed && <span className="udb-sidebar__create-label">{t('sidebar.createPost')}</span>}
             </Button>
           </Link>
         </div>
       )}
 
       {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2 py-3 scrollbar-hide">
-        <div className="space-y-6">
+      <nav className="udb-sidebar__nav">
+        <div className="udb-sidebar__groups">
           {sidebarGroups.map((group) => {
             const filteredItems = filterSidebarItems(group.items, user);
 
@@ -98,22 +95,23 @@ export const DashboardSidebar = ({
             const isGroupCollapsed = collapsedGroups[group.title];
 
             return (
-              <div key={group.title} className="space-y-1">
+              <div key={group.title} className="udb-sidebar__group">
                 {!collapsed && (
                   <button
+                    type="button"
                     onClick={() => toggleGroup(group.title)}
-                    className="w-full flex items-center justify-between px-3 py-2 mb-1 rounded-lg hover:bg-sidebar-accent/30 transition-all duration-200 group/header"
+                    className="udb-sidebar__group-toggle"
                   >
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-sidebar-foreground/40 group-hover/header:text-sidebar-foreground/70 transition-colors">
+                    <span className="udb-sidebar__group-title">
                       {t(group.title, { brand: brandName })}
                     </span>
-                    <div className="flex-shrink-0">
+                    <span className="udb-sidebar__group-chevron">
                       {isGroupCollapsed ? (
-                        <ChevronRight className="h-3.5 w-3.5 text-sidebar-foreground/30 transition-transform duration-200 group-hover/header:text-sidebar-foreground/50" />
+                        <ChevronRight className="udb-sidebar__chevron-icon" />
                       ) : (
-                        <ChevronDown className="h-3.5 w-3.5 text-sidebar-foreground/30 transition-transform duration-200 group-hover/header:text-sidebar-foreground/50" />
+                        <ChevronDown className="udb-sidebar__chevron-icon" />
                       )}
-                    </div>
+                    </span>
                   </button>
                 )}
 
@@ -123,14 +121,10 @@ export const DashboardSidebar = ({
                     <Link
                       key={item.path}
                       to={item.path}
-                      className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                        active
-                          ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm"
-                          : "text-sidebar-foreground/70 hover:bg-sidebar-accent/40 hover:text-sidebar-foreground"
-                      } ${collapsed ? "justify-center" : ""}`}
+                      className={cn("udb-sidebar__item", active && "udb-sidebar__item--active")}
                       title={collapsed ? t(item.label) : undefined}
                     >
-                      <item.icon className={`h-4 w-4 shrink-0 transition-transform duration-200 ${active ? "scale-110" : ""}`} />
+                      <item.icon className="udb-sidebar__item-icon" />
                       {!collapsed && <span>{t(item.label)}</span>}
                     </Link>
                   );
@@ -142,17 +136,15 @@ export const DashboardSidebar = ({
       </nav>
 
       {/* Collapse Toggle */}
-      <div className="border-t border-sidebar-border p-3">
-        <div className={`flex items-center ${collapsed ? "justify-center" : "justify-between"}`}>
-          {!collapsed && (
-            <p className="text-[10px] uppercase tracking-wider text-sidebar-foreground/40 font-bold px-2">
-              {t('sidebar.system')}
-            </p>
-          )}
-          <Button variant="ghost" size="icon" onClick={() => setCollapsed(!collapsed)} className="text-sidebar-foreground/70">
-            {collapsed ? <Menu className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-          </Button>
-        </div>
+      <div className="udb-sidebar__footer">
+        {!collapsed && (
+          <p className="udb-sidebar__footer-label">
+            {t('sidebar.system')}
+          </p>
+        )}
+        <Button variant="ghost" size="icon" onClick={() => setCollapsed(!collapsed)} className="udb-sidebar__footer-btn">
+          {collapsed ? <Menu className="udb-sidebar__footer-icon" /> : <ChevronLeft className="udb-sidebar__footer-icon" />}
+        </Button>
       </div>
     </div>
   );

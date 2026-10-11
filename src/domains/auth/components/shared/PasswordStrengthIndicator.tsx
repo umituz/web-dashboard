@@ -3,12 +3,14 @@
  *
  * Renders a 4-segment strength bar plus a localized label band.
  * The label i18n key is computed from the strength band so the
- * component stays free of hardcoded strings.
+ * component stays free of hardcoded strings. Bar/label colors come
+ * from `--u-*` tones (weak/danger, fair/warning-2, good/warning,
+ * strong/success).
  */
 
 import { useMemo } from "react";
 import { calculatePasswordStrength } from "../../utils/auth";
-import { cn } from "@umituz/web-design-system/utils";
+import { cn } from "../../../../primitives";
 
 const STRENGTH_KEYS = {
   weak: 'auth.passwordStrength.weak',
@@ -50,38 +52,22 @@ export const PasswordStrengthIndicator = ({
   if (!password) return null;
 
   return (
-    <div className="space-y-1.5" aria-live="polite">
-      <div className="flex gap-1">
+    <div className="udb-strength" aria-live="polite">
+      <div className="udb-strength__bars">
         {[0, 1, 2, 3].map((segment) => {
           const isActive = segment < filledSegments;
           return (
             <div
               key={segment}
               className={cn(
-                "h-1 flex-1 rounded-full transition-colors",
-                isActive
-                  ? band === 'weak'
-                    ? "bg-destructive"
-                    : band === 'fair'
-                    ? "bg-orange-500"
-                    : band === 'good'
-                    ? "bg-yellow-500"
-                    : "bg-green-500"
-                  : "bg-muted",
+                "udb-strength__bar",
+                isActive && `udb-strength__bar--${band}`,
               )}
             />
           );
         })}
       </div>
-      <p
-        className={cn(
-          "text-xs",
-          band === 'weak' && "text-destructive",
-          band === 'fair' && "text-orange-600 dark:text-orange-400",
-          band === 'good' && "text-yellow-600 dark:text-yellow-400",
-          band === 'strong' && "text-green-600 dark:text-green-400",
-        )}
-      >
+      <p className={cn("udb-strength__label", `udb-strength__label--${band}`)}>
         {translate(STRENGTH_KEYS[band])}
       </p>
     </div>

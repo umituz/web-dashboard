@@ -9,7 +9,7 @@
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Button, Checkbox } from "@umituz/web-design-system/atoms";
+import { Button, Checkbox } from "../../../primitives";
 import { Loader2 } from "lucide-react";
 import { validateLogin } from "../utils/auth";
 import type {
@@ -129,12 +129,12 @@ export const LoginForm = ({
   );
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-      <div className="space-y-2 text-center">
-        <h1 className="text-2xl font-bold text-foreground">
+    <form onSubmit={handleSubmit} className="udb-form" noValidate>
+      <div className="udb-form__header">
+        <h1 className="udb-form__title">
           {translate(KEYS.welcomeBack)}
         </h1>
-        <p className="text-sm text-muted-foreground">
+        <p className="udb-form__subtitle">
           {translate(KEYS.signInTo, { brand: config.brandName })}
         </p>
       </div>
@@ -165,9 +165,9 @@ export const LoginForm = ({
       />
 
       {(showRememberMe || showForgotPassword) && (
-        <div className="flex items-center justify-between">
+        <div className="udb-form__row">
           {showRememberMe && (
-            <label className="flex items-center gap-2 cursor-pointer text-sm">
+            <label className="udb-check-label">
               <Checkbox
                 checked={remember}
                 onCheckedChange={(checked) => setRemember(Boolean(checked))}
@@ -180,7 +180,7 @@ export const LoginForm = ({
             <button
               type="button"
               onClick={() => navigate(config.forgotPasswordRoute ?? '/forgot-password')}
-              className="text-sm text-primary hover:underline"
+              className="udb-link-btn"
               disabled={loading}
             >
               {translate(KEYS.forgotPassword)}
@@ -189,14 +189,10 @@ export const LoginForm = ({
         </div>
       )}
 
-      <Button
-        type="submit"
-        disabled={loading}
-        className="w-full h-12 text-base font-bold"
-      >
+      <Button type="submit" disabled={loading} className="udb-submit-btn">
         {loading ? (
           <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+            <Loader2 className="udb-btn__spinner" aria-hidden="true" />
             {translate(KEYS.submitting)}
           </>
         ) : (
@@ -205,12 +201,12 @@ export const LoginForm = ({
       </Button>
 
       {showRegisterLink && (
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="udb-form__footer-text">
           {translate(KEYS.noAccount)}{' '}
           <button
             type="button"
             onClick={() => navigate(config.registerRoute)}
-            className="text-primary font-semibold hover:underline"
+            className="udb-link-btn udb-link-btn--strong"
             disabled={loading}
           >
             {translate(KEYS.signUp)}
@@ -220,15 +216,10 @@ export const LoginForm = ({
 
       {showSocialLogin && (
         <>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                {translate(KEYS.orContinueWith)}
-              </span>
-            </div>
+          <div className="udb-divider-row">
+            <span className="udb-divider-row__label">
+              {translate(KEYS.orContinueWith)}
+            </span>
           </div>
           <SocialLoginButtons
             onProvider={handleSocial}

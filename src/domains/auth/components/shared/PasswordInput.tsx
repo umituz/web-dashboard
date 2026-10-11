@@ -8,9 +8,9 @@
 
 import { forwardRef, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { Input } from "@umituz/web-design-system/atoms";
-import { Button } from "@umituz/web-design-system/atoms";
-import { cn } from "@umituz/web-design-system/utils";
+import { Input } from "../../../../primitives";
+import { Button } from "../../../../primitives";
+import { cn } from "../../../../primitives";
 
 export interface PasswordInputProps {
   /** Input id (used to wire up the label) */
@@ -57,19 +57,16 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
     const [visible, setVisible] = useState(false);
 
     return (
-      <div className={cn("space-y-2", className)}>
-        <label
-          htmlFor={id}
-          className="text-sm font-medium leading-none text-foreground"
-        >
+      <div className={cn("udb-field", className)}>
+        <label htmlFor={id} className="udb-field__label">
           {translate(labelKey)}
           {required && (
-            <span className="text-destructive ml-1" aria-hidden="true">
+            <span className="udb-field__required" aria-hidden="true">
               *
             </span>
           )}
         </label>
-        <div className="relative">
+        <div className="udb-password-wrap">
           <Input
             ref={ref}
             id={id}
@@ -82,7 +79,7 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
             onChange={(e) => onChange(e.target.value)}
             aria-invalid={Boolean(error)}
             aria-describedby={error ? `${id}-error` : undefined}
-            className="pr-10"
+            className="udb-input--with-toggle"
           />
           <Button
             type="button"
@@ -96,19 +93,19 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
                 ? translate('auth.a11y.hidePassword')
                 : translate('auth.a11y.showPassword')
             }
-            className="absolute right-0 top-0 h-full px-3 text-muted-foreground hover:text-foreground"
+            className="udb-password-toggle"
           >
             {visible ? (
-              <EyeOff className="h-4 w-4" aria-hidden="true" />
+              <EyeOff className="udb-password-toggle__icon" aria-hidden="true" />
             ) : (
-              <Eye className="h-4 w-4" aria-hidden="true" />
+              <Eye className="udb-password-toggle__icon" aria-hidden="true" />
             )}
           </Button>
         </div>
         {error && (
           <p
             id={`${id}-error`}
-            className="text-xs text-destructive"
+            className="udb-field__error"
             role="alert"
           >
             {error}

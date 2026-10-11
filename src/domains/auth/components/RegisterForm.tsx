@@ -11,8 +11,8 @@ import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
-import { Button, Checkbox, Input } from "@umituz/web-design-system/atoms";
-import { cn } from "@umituz/web-design-system/utils";
+import { Button, Checkbox, Input } from "../../../primitives";
+import { cn } from "../../../primitives";
 import type { RegisterFormProps, RegisterData, Translate } from "../types/auth";
 import { validateRegister } from "../utils/auth";
 import { AUTH_KEYS } from "../utils/i18nKeys";
@@ -142,23 +142,20 @@ export const RegisterForm = ({
   );
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-5" noValidate>
-      <div className="text-center">
-        <h1 className="text-3xl font-extrabold text-foreground mb-2">
+    <form onSubmit={handleSubmit} className="udb-form" noValidate>
+      <div className="udb-form__header">
+        <h1 className="udb-form__title udb-form__title--lg">
           {translate(KEYS.title)}
         </h1>
-        <p className="text-muted-foreground">
+        <p className="udb-form__subtitle">
           {translate(KEYS.join, { brand: config.brandName })}
         </p>
       </div>
 
       <AuthErrorBanner message={error} translate={translate} />
 
-      <div className="space-y-2">
-        <label
-          htmlFor="register-name"
-          className="text-sm font-medium leading-none text-foreground"
-        >
+      <div className="udb-field">
+        <label htmlFor="register-name" className="udb-field__label">
           {translate(KEYS.nameLabel)}
         </label>
         <Input
@@ -183,7 +180,7 @@ export const RegisterForm = ({
         required
       />
 
-      <div className="space-y-3">
+      <div className="udb-form__group">
         <PasswordInput
           id="register-password"
           labelKey={KEYS.passwordLabel}
@@ -199,13 +196,10 @@ export const RegisterForm = ({
       </div>
 
       {requirePasswordConfirm && (
-        <div className="space-y-2">
-          <label
-            htmlFor="register-confirm"
-            className="text-sm font-medium leading-none text-foreground"
-          >
+        <div className="udb-field">
+          <label htmlFor="register-confirm" className="udb-field__label">
             {translate(KEYS.confirmPassword)}
-            <span className="text-destructive ml-1" aria-hidden="true">*</span>
+            <span className="udb-field__required" aria-hidden="true">*</span>
           </label>
           <Input
             id="register-confirm"
@@ -217,10 +211,10 @@ export const RegisterForm = ({
             placeholder={translate(KEYS.passwordPlaceholder)}
             onChange={(e) => setConfirmPassword(e.target.value)}
             aria-invalid={Boolean(confirmPassword) && !passwordsMatch}
-            className={cn(confirmPassword && !passwordsMatch && 'border-destructive')}
+            className={cn(confirmPassword && !passwordsMatch && 'udb-input--error')}
           />
           {confirmPassword && !passwordsMatch && (
-            <p className="text-xs text-destructive" role="alert">
+            <p className="udb-field__error" role="alert">
               {translate(KEYS.passwordsDoNotMatch)}
             </p>
           )}
@@ -228,21 +222,20 @@ export const RegisterForm = ({
       )}
 
       {showTerms && (
-        <label className="flex items-start gap-2 cursor-pointer">
+        <label className="udb-check-label udb-check-label--multiline">
           <Checkbox
             checked={agreeToTerms}
             onCheckedChange={(checked) => setAgreeToTerms(Boolean(checked))}
             disabled={isLoading}
-            className="mt-1"
             aria-label={translate(KEYS.acceptTerms)}
           />
-          <span className="text-sm text-muted-foreground">
+          <span className="udb-check-label__text">
             {translate(KEYS.acceptTerms)}{' '}
-            <a href="/terms" className="text-primary hover:underline">
+            <a href="/terms" className="udb-text-link">
               {translate(KEYS.termsOfService)}
             </a>{' '}
             and{' '}
-            <a href="/privacy" className="text-primary hover:underline">
+            <a href="/privacy" className="udb-text-link">
               {translate(KEYS.privacyPolicy)}
             </a>
           </span>
@@ -251,12 +244,12 @@ export const RegisterForm = ({
 
       <Button
         type="submit"
-        className="w-full h-12 text-base font-bold rounded-full"
+        className="udb-submit-btn udb-submit-btn--pill"
         disabled={isLoading || (requirePasswordConfirm && !passwordsMatch)}
       >
         {isLoading ? (
           <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+            <Loader2 className="udb-btn__spinner" aria-hidden="true" />
             {translate(KEYS.submitting)}
           </>
         ) : (
@@ -265,12 +258,12 @@ export const RegisterForm = ({
       </Button>
 
       {showLoginLink && config.loginRoute && (
-        <p className="text-center text-sm text-muted-foreground">
+        <p className="udb-form__footer-text">
           {translate(KEYS.haveAccount)}{' '}
           <button
             type="button"
             onClick={() => navigate(config.loginRoute)}
-            className="text-primary hover:underline font-medium"
+            className="udb-link-btn udb-link-btn--strong"
             disabled={isLoading}
           >
             {translate(KEYS.signIn)}
@@ -280,15 +273,10 @@ export const RegisterForm = ({
 
       {showSocialLogin && config.showSocialLogin && config.socialProviders && config.socialProviders.length > 0 && (
         <>
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                {translate(KEYS.orContinueWith)}
-              </span>
-            </div>
+          <div className="udb-divider-row">
+            <span className="udb-divider-row__label">
+              {translate(KEYS.orContinueWith)}
+            </span>
           </div>
           <SocialLoginButtons
             onProvider={handleSocial}

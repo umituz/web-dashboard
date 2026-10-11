@@ -6,7 +6,7 @@
  */
 
 import { AlertCircle } from "lucide-react";
-import { cn } from "@umituz/web-design-system/utils";
+import { cn } from "../../../../primitives";
 
 export interface AuthErrorBannerProps {
   /** i18n key for the message (already resolved by the consumer) */
@@ -26,12 +26,9 @@ export const AuthErrorBanner = ({ message, translate, className }: AuthErrorBann
     <div
       role="alert"
       aria-live="polite"
-      className={cn(
-        "flex items-start gap-2 rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive",
-        className,
-      )}
+      className={cn("udb-form-alert", className)}
     >
-      <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
+      <AlertCircle className="udb-form-alert__icon" aria-hidden="true" />
       <span>{resolved}</span>
     </div>
   );

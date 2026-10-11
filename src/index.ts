@@ -10,7 +10,6 @@
 // Core domains with complete public API
 export * from './domains/layouts';
 export * from './domains/settings';
-export * from './domains/billing';
 export * from './domains/calendar';
 export {
   OnboardingWizard,

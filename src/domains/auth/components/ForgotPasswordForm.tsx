@@ -10,7 +10,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, Loader2, CheckCircle2, Check } from "lucide-react";
-import { Button } from "@umituz/web-design-system/atoms";
+import { Button } from "../../../primitives";
 import type { ForgotPasswordFormProps, Translate } from "../types/auth";
 import { validateForgotPassword } from "../utils/auth";
 import { AUTH_KEYS } from "../utils/i18nKeys";
@@ -81,35 +81,31 @@ export const ForgotPasswordForm = ({
 
   if (success) {
     return (
-      <div className="w-full max-w-md space-y-6" role="status" aria-live="polite">
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="h-8 w-8 text-success" aria-hidden="true" />
-            </div>
+      <div className="udb-form" role="status" aria-live="polite">
+        <div className="udb-form__header">
+          <div className="udb-success-badge">
+            <CheckCircle2 className="udb-success-badge__icon" aria-hidden="true" />
           </div>
-          <div>
-            <h1 className="text-2xl font-extrabold text-foreground mb-2">
-              {translate(KEYS.successTitle)}
-            </h1>
-            <p className="text-muted-foreground">
-              {translate(KEYS.sentTo)}{' '}
-              <span className="font-medium text-foreground">{email}</span>
-            </p>
-          </div>
+          <h1 className="udb-form__title">
+            {translate(KEYS.successTitle)}
+          </h1>
+          <p className="udb-form__subtitle">
+            {translate(KEYS.sentTo)}{' '}
+            <span className="udb-form__subtitle-strong">{email}</span>
+          </p>
         </div>
 
-        <ol className="bg-muted/50 border border-border rounded-lg p-4 space-y-2 text-sm text-muted-foreground">
-          <li className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-success shrink-0" aria-hidden="true" />
+        <ol className="udb-steps-list">
+          <li className="udb-steps-list__item">
+            <Check className="udb-steps-list__icon" aria-hidden="true" />
             {translate(KEYS.step1)}
           </li>
-          <li className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-success shrink-0" aria-hidden="true" />
+          <li className="udb-steps-list__item">
+            <Check className="udb-steps-list__icon" aria-hidden="true" />
             {translate(KEYS.step2)}
           </li>
-          <li className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-success shrink-0" aria-hidden="true" />
+          <li className="udb-steps-list__item">
+            <Check className="udb-steps-list__icon" aria-hidden="true" />
             {translate(KEYS.step3)}
           </li>
         </ol>
@@ -119,9 +115,9 @@ export const ForgotPasswordForm = ({
             type="button"
             variant="ghost"
             onClick={() => navigate(config.loginRoute)}
-            className="w-full"
+            className="udb-submit-btn"
           >
-            <ArrowLeft className="h-4 w-4 mr-2" aria-hidden="true" />
+            <ArrowLeft className="udb-btn__spinner" aria-hidden="true" />
             {translate(KEYS.backToSignIn)}
           </Button>
         )}
@@ -130,12 +126,12 @@ export const ForgotPasswordForm = ({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-6" noValidate>
-      <div className="text-center">
-        <h1 className="text-3xl font-extrabold text-foreground mb-2">
+    <form onSubmit={handleSubmit} className="udb-form" noValidate>
+      <div className="udb-form__header">
+        <h1 className="udb-form__title udb-form__title--lg">
           {translate(KEYS.title)}
         </h1>
-        <p className="text-muted-foreground">{translate(KEYS.description)}</p>
+        <p className="udb-form__subtitle">{translate(KEYS.description)}</p>
       </div>
 
       <AuthErrorBanner message={error} translate={translate} />
@@ -153,12 +149,12 @@ export const ForgotPasswordForm = ({
 
       <Button
         type="submit"
-        className="w-full h-12 text-base font-bold rounded-full"
+        className="udb-submit-btn udb-submit-btn--pill"
         disabled={isLoading}
       >
         {isLoading ? (
           <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+            <Loader2 className="udb-btn__spinner" aria-hidden="true" />
             {translate(KEYS.submitting)}
           </>
         ) : (
@@ -170,9 +166,9 @@ export const ForgotPasswordForm = ({
         <button
           type="button"
           onClick={() => navigate(config.loginRoute)}
-          className="w-full flex items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-none focus-visible:underline"
+          className="udb-back-link"
         >
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          <ArrowLeft className="udb-back-link__icon" aria-hidden="true" />
           {translate(KEYS.backToSignIn)}
         </button>
       )}

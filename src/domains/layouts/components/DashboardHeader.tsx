@@ -3,7 +3,7 @@ import {
   Bell, X, Sun, Moon, Menu, User, Settings, LogOut,
   ChevronDown, CreditCard
 } from "lucide-react";
-import { Button } from "@umituz/web-design-system/atoms";
+import { Button } from "../../../primitives";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import type { DashboardHeaderProps } from "../types/layout";
@@ -34,7 +34,8 @@ interface DashboardHeaderPropsExtended extends DashboardHeaderProps {
  * Dashboard Header Component
  *
  * Displays top navigation bar with theme toggle, notifications,
- * user menu, and organisation selector.
+ * user menu, and organisation selector. Styling is entirely
+ * `udb-header*` / `udb-menu*` classes from the package stylesheet.
  *
  * @param props - Dashboard header props
  */
@@ -75,91 +76,87 @@ export const DashboardHeader = ({
   };
 
   return (
-    <header className="flex h-14 items-center justify-between border-b border-border bg-card/50 backdrop-blur-md px-4 shrink-0 z-30">
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMobileOpen(true)}>
-          <Menu className="h-5 w-5" />
+    <header className="udb-header">
+      <div className="udb-header__lead">
+        <Button variant="ghost" size="icon" className="udb-header__mobile-toggle" onClick={() => setMobileOpen(true)}>
+          <Menu className="udb-header__toggle-icon" />
         </Button>
         {collapsed && (
-          <Button variant="ghost" size="icon" className="hidden md:inline-flex" onClick={() => setCollapsed(false)}>
-            <Menu className="h-5 w-5" />
+          <Button variant="ghost" size="icon" className="udb-header__desktop-toggle" onClick={() => setCollapsed(false)}>
+            <Menu className="udb-header__toggle-icon" />
           </Button>
         )}
-        <h2 className="text-sm font-semibold text-foreground">
+        <h2 className="udb-header__title">
           {title}
         </h2>
       </div>
 
-      <div className="flex items-center gap-2">
+      <div className="udb-header__actions">
         {/* Theme Toggle — rendered only when the host app wires it up */}
         {onToggleTheme && (
           <Button
             variant="ghost"
             size="icon"
             onClick={onToggleTheme}
-            className="text-muted-foreground h-9 w-9"
+            className="udb-header__icon-btn"
             title={theme === "dark" ? t('common.tooltips.switchLight') : t('common.tooltips.switchDark')}
             aria-label={theme === "dark" ? t('common.tooltips.switchLight') : t('common.tooltips.switchDark')}
           >
-            {theme === "dark" ? <Sun className="h-4 w-4" aria-hidden="true" /> : <Moon className="h-4 w-4" aria-hidden="true" />}
+            {theme === "dark" ? <Sun className="udb-header__icon" aria-hidden="true" /> : <Moon className="udb-header__icon" aria-hidden="true" />}
           </Button>
         )}
 
         {/* Notifications */}
-        <div className="relative">
+        <div className="udb-header__anchor">
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground relative h-9 w-9"
+            className="udb-header__icon-btn"
             onClick={() => {
               setNotifOpen(!notifOpen);
               setProfileOpen(false);
             }}
           >
-            <Bell className="h-4 w-4" />
-            {unreadCount > 0 && (
-              <span className="absolute top-2 right-2 flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-destructive"></span>
-              </span>
-            )}
+            <Bell className="udb-header__icon" />
+            {unreadCount > 0 && <span className="udb-header__unread"><span className="udb-header__unread-core" /></span>}
           </Button>
 
           {notifOpen && (
             <>
-              <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
-              <div className="absolute top-12 right-0 w-80 bg-popover border border-border rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                <div className="flex items-center justify-between px-4 py-3 border-b border-border bg-muted/50">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">{t('dashboard.notifications.title')}</h3>
+              <div className="udb-overlay" onClick={() => setNotifOpen(false)} />
+              <div className="udb-menu udb-notif">
+                <div className="udb-menu__header">
+                  <h3 className="udb-menu__heading">{t('dashboard.notifications.title')}</h3>
                   {unreadCount > 0 && (
-                    <button onClick={markAllRead} className="text-[10px] font-bold text-primary hover:underline uppercase">{t('dashboard.notifications.markAllRead')}</button>
+                    <button type="button" onClick={markAllRead} className="udb-menu__action">{t('dashboard.notifications.markAllRead')}</button>
                   )}
                 </div>
 
-                <div className="max-h-[400px] overflow-y-auto">
+                <div className="udb-notif__list">
                   {notifications.map((n) => (
-                    <div key={n.id} className={`px-4 py-3 border-b border-border last:border-0 flex items-start gap-3 transition-colors hover:bg-muted/30 ${!n.read ? "bg-primary/5" : ""}`}>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm text-foreground leading-snug">{n.text}</p>
-                        <p className="text-[10px] text-muted-foreground mt-1 flex items-center gap-1">
-                          <span className="inline-block w-1 h-1 rounded-full bg-muted-foreground/30" />
+                    <div key={n.id} className={`udb-notif__item${!n.read ? " udb-notif__item--unread" : ""}`}>
+                      <div className="udb-notif__body">
+                        <p className="udb-notif__text">{n.text}</p>
+                        <p className="udb-notif__meta">
+                          <span className="udb-notif__dot" />
                           {formatNotificationTime(n.createdAt, t)}
                         </p>
                       </div>
                       <button
+                        type="button"
                         onClick={() => onDismissNotification?.(n.id)}
-                        className="text-muted-foreground/50 hover:text-foreground shrink-0 transition-colors"
+                        className="udb-notif__dismiss"
                       >
-                        <X className="h-3 w-3" />
+                        <X className="udb-notif__dismiss-icon" />
                       </button>
                     </div>
                   ))}
                   {notifications.length === 0 && (
-                    <div className="px-4 py-10 text-center">
-                      <div className="mx-auto w-10 h-10 rounded-full bg-muted flex items-center justify-center mb-3">
-                        <Bell className="h-5 w-5 text-muted-foreground/50" />
+                    <div className="udb-notif__empty">
+                      <div className="udb-notif__empty-icon">
+                        <Bell className="udb-notif__empty-bell" />
                       </div>
-                      <p className="text-sm text-muted-foreground">{t('dashboard.notifications.none')}</p>
+                      <p className="udb-notif__empty-text">{t('dashboard.notifications.none')}</p>
                     </div>
                   )}
                 </div>
@@ -168,62 +165,67 @@ export const DashboardHeader = ({
           )}
         </div>
 
-        <div className="h-6 w-px bg-border mx-1" />
+        <div className="udb-header__divider" />
 
-        <div className="relative">
+        <div className="udb-header__anchor">
           <button
+            type="button"
             onClick={() => {
               setProfileOpen(!profileOpen);
               setNotifOpen(false);
             }}
-            className="flex items-center gap-2 p-1 pl-1 rounded-full hover:bg-muted transition-colors group"
+            className="udb-profile-btn"
           >
-            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary overflow-hidden border border-primary/20 ring-primary/20 group-hover:ring-4 transition-all">
-              {user?.avatar && <img src={user.avatar} alt="User" className="w-full h-full object-cover" />}
-            </div>
-            <ChevronDown className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${profileOpen ? "rotate-180" : ""}`} />
+            <span className="udb-avatar">
+              {user?.avatar && <img src={user.avatar} alt="" className="udb-avatar__img" />}
+            </span>
+            <ChevronDown className={`udb-profile-btn__chevron${profileOpen ? " udb-profile-btn__chevron--open" : ""}`} />
           </button>
 
           {profileOpen && (
             <>
-              <div className="fixed inset-0 z-40" onClick={() => setProfileOpen(false)} />
-              <div className="absolute top-12 right-0 w-56 bg-popover border border-border rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200 p-1.5">
-                <div className="px-3 py-2 border-b border-border/50 mb-1">
-                  <p className="text-sm font-bold text-foreground">{user?.name || t("common.roles.user")}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              <div className="udb-overlay" onClick={() => setProfileOpen(false)} />
+              <div className="udb-menu udb-profile-menu">
+                <div className="udb-profile-menu__id">
+                  <p className="udb-profile-menu__name">{user?.name || t("common.roles.user")}</p>
+                  <p className="udb-profile-menu__email">{user?.email}</p>
                 </div>
 
-                <div className="space-y-0.5">
+                <div className="udb-profile-menu__items">
                   <button
+                    type="button"
                     onClick={() => { navigate(profileRoute); setProfileOpen(false); }}
-                    className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-lg transition-colors"
+                    className="udb-menu__item"
                   >
-                    <User className="h-4 w-4 text-muted-foreground" />
+                    <User className="udb-menu__item-icon" />
                     {t('common.profile')}
                   </button>
                   <button
+                    type="button"
                     onClick={() => { navigate(billingRoute); setProfileOpen(false); }}
-                    className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-lg transition-colors"
+                    className="udb-menu__item"
                   >
-                    <CreditCard className="h-4 w-4 text-muted-foreground" />
+                    <CreditCard className="udb-menu__item-icon" />
                     {t('common.billing')}
                   </button>
                   <button
+                    type="button"
                     onClick={() => { navigate(settingsRoute); setProfileOpen(false); }}
-                    className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-foreground hover:bg-muted rounded-lg transition-colors"
+                    className="udb-menu__item"
                   >
-                    <Settings className="h-4 w-4 text-muted-foreground" />
+                    <Settings className="udb-menu__item-icon" />
                     {t('common.settings')}
                   </button>
                 </div>
 
-                <div className="h-px bg-border my-1.5" />
+                <div className="udb-profile-menu__separator" />
 
                 <button
+                  type="button"
                   onClick={handleLogout}
-                  className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-destructive hover:bg-destructive/10 rounded-lg transition-colors font-medium"
+                  className="udb-menu__item udb-menu__item--danger"
                 >
-                  <LogOut className="h-4 w-4" />
+                  <LogOut className="udb-menu__item-icon" />
                   {t('common.logout')}
                 </button>
               </div>
