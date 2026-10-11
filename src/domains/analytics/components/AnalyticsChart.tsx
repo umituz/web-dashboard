@@ -24,7 +24,7 @@ import {
   Cell,
 } from "recharts";
 import { useTranslation } from "react-i18next";
-import { cn } from "@umituz/web-design-system/utils";
+import { cn } from "../../../primitives";
 import type { ChartConfig, ChartData, TimeSeriesData } from "../types/analytics";
 import { generateChartColors } from "../utils/analytics";
 import { ANALYTICS_KEYS } from "../utils/i18nKeys";
@@ -48,12 +48,12 @@ const renderAxis = (dataKey: string | undefined) => (
   <>
     <XAxis
       dataKey={dataKey}
-      className="text-xs text-muted-foreground"
+      className="udb-chart__axis"
       axisLine={false}
       tickLine={false}
     />
     <YAxis
-      className="text-xs text-muted-foreground"
+      className="udb-chart__axis"
       axisLine={false}
       tickLine={false}
     />
@@ -62,7 +62,7 @@ const renderAxis = (dataKey: string | undefined) => (
 
 const renderGrid = (showGrid: boolean | undefined) =>
   showGrid ? (
-    <CartesianGrid strokeDasharray="3 3" className="stroke-border/50" />
+    <CartesianGrid strokeDasharray="3 3" className="udb-chart__grid" />
   ) : null;
 
 const renderOverlay = (config: ChartConfig) => (
@@ -164,10 +164,7 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
 
       default:
         return (
-          <div
-            className="flex items-center justify-center h-full text-muted-foreground"
-            role="alert"
-          >
+          <div className="udb-chart__empty" role="alert">
             {t(ANALYTICS_KEYS.chart.noData)}: {config.type}
           </div>
         );
@@ -176,7 +173,7 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
 
   return (
     <div
-      className={cn("w-full", config.aspectRatio ?? "aspect-video", className)}
+      className={cn("udb-chart", config.aspectRatio, className)}
       style={{
         height: typeof chartHeight === "number" ? `${chartHeight}px` : chartHeight,
       }}

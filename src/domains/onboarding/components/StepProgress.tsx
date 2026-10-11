@@ -6,7 +6,7 @@
  */
 
 import { Check } from "lucide-react";
-import { cn } from "@umituz/web-design-system/utils";
+import { cn } from "../../../primitives";
 
 interface StepProgressProps {
   currentStep: number;
@@ -21,7 +21,7 @@ export const StepProgress = ({
 }: StepProgressProps) => {
   return (
     <div
-      className="flex items-center gap-0 flex-1 justify-center"
+      className="udb-progress"
       role="progressbar"
       aria-valuemin={1}
       aria-valuemax={totalSteps}
@@ -32,18 +32,16 @@ export const StepProgress = ({
         const isCurrent = step === currentStep;
 
         return (
-          <div key={step} className="flex items-center">
+          <div key={step} className="udb-progress__segment">
             <div
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-colors",
-                isCompleted || isCurrent
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground",
+                "udb-progress__node",
+                (isCompleted || isCurrent) && "udb-progress__node--on",
               )}
               aria-current={isCurrent ? "step" : undefined}
             >
               {isCompleted ? (
-                <Check className="h-4 w-4" aria-hidden="true" />
+                <Check className="udb-progress__check" aria-hidden="true" />
               ) : (
                 step
               )}
@@ -51,8 +49,8 @@ export const StepProgress = ({
             {step < totalSteps && (
               <div
                 className={cn(
-                  "w-12 h-0.5 mx-1",
-                  step < currentStep ? "bg-primary" : "bg-border",
+                  "udb-progress__connector",
+                  step < currentStep && "udb-progress__connector--on",
                 )}
               />
             )}

@@ -9,8 +9,8 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Loader2, CheckCircle2 } from "lucide-react";
-import { Button, Input } from "@umituz/web-design-system/atoms";
-import { cn } from "@umituz/web-design-system/utils";
+import { Button, Input } from "../../../primitives";
+import { cn } from "../../../primitives";
 import type { ResetPasswordFormProps, Translate } from "../types/auth";
 import { validateResetPassword } from "../utils/auth";
 import { AUTH_KEYS } from "../utils/i18nKeys";
@@ -87,28 +87,24 @@ export const ResetPasswordForm = ({
 
   if (success) {
     return (
-      <div className="w-full max-w-md space-y-6" role="status" aria-live="polite">
-        <div className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="h-8 w-8 text-success" aria-hidden="true" />
-            </div>
+      <div className="udb-form" role="status" aria-live="polite">
+        <div className="udb-form__header">
+          <div className="udb-success-badge">
+            <CheckCircle2 className="udb-success-badge__icon" aria-hidden="true" />
           </div>
-          <div>
-            <h1 className="text-2xl font-extrabold text-foreground mb-2">
-              {translate(KEYS.successTitle)}
-            </h1>
-            <p className="text-muted-foreground">
-              {translate(KEYS.successMessage)}
-            </p>
-          </div>
+          <h1 className="udb-form__title">
+            {translate(KEYS.successTitle)}
+          </h1>
+          <p className="udb-form__subtitle">
+            {translate(KEYS.successMessage)}
+          </p>
         </div>
 
         {config.loginRoute && (
           <Button
             type="button"
             onClick={() => navigate(config.loginRoute)}
-            className="w-full h-12 text-base font-bold rounded-full"
+            className="udb-submit-btn udb-submit-btn--pill"
           >
             {translate(KEYS.goToSignIn)}
           </Button>
@@ -118,17 +114,17 @@ export const ResetPasswordForm = ({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md space-y-5" noValidate>
-      <div className="text-center">
-        <h1 className="text-3xl font-extrabold text-foreground mb-2">
+    <form onSubmit={handleSubmit} className="udb-form" noValidate>
+      <div className="udb-form__header">
+        <h1 className="udb-form__title udb-form__title--lg">
           {translate(KEYS.title)}
         </h1>
-        <p className="text-muted-foreground">{translate(KEYS.description)}</p>
+        <p className="udb-form__subtitle">{translate(KEYS.description)}</p>
       </div>
 
       <AuthErrorBanner message={error} translate={translate} />
 
-      <div className="space-y-3">
+      <div className="udb-form__group">
         <PasswordInput
           id="reset-password"
           labelKey={KEYS.newPassword}
@@ -143,13 +139,10 @@ export const ResetPasswordForm = ({
         <PasswordStrengthIndicator password={password} translate={translate} />
       </div>
 
-      <div className="space-y-2">
-        <label
-          htmlFor="reset-confirm"
-          className="text-sm font-medium leading-none text-foreground"
-        >
+      <div className="udb-field">
+        <label htmlFor="reset-confirm" className="udb-field__label">
           {translate(KEYS.confirmNewPassword)}
-          <span className="text-destructive ml-1" aria-hidden="true">*</span>
+          <span className="udb-field__required" aria-hidden="true">*</span>
         </label>
         <Input
           id="reset-confirm"
@@ -161,10 +154,10 @@ export const ResetPasswordForm = ({
           placeholder={translate(AUTH_KEYS.placeholders.password)}
           onChange={(e) => setConfirmPassword(e.target.value)}
           aria-invalid={Boolean(confirmPassword) && !passwordsMatch}
-          className={cn(confirmPassword && !passwordsMatch && "border-destructive")}
+          className={cn(confirmPassword && !passwordsMatch && 'udb-input--error')}
         />
         {confirmPassword && !passwordsMatch && (
-          <p className="text-xs text-destructive" role="alert">
+          <p className="udb-field__error" role="alert">
             {translate(KEYS.passwordsDoNotMatch)}
           </p>
         )}
@@ -172,12 +165,12 @@ export const ResetPasswordForm = ({
 
       <Button
         type="submit"
-        className="w-full h-12 text-base font-bold rounded-full"
+        className="udb-submit-btn udb-submit-btn--pill"
         disabled={isLoading || !passwordsMatch}
       >
         {isLoading ? (
           <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" aria-hidden="true" />
+            <Loader2 className="udb-btn__spinner" aria-hidden="true" />
             {translate(KEYS.submitting)}
           </>
         ) : (

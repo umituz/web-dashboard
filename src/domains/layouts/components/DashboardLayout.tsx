@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, Outlet, Navigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Skeleton } from "@umituz/web-design-system/atoms";
+import { Skeleton } from "../../../primitives";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
 import type { DashboardLayoutConfig } from "../types/layout";
@@ -51,6 +51,9 @@ interface DashboardLayoutProps {
  * - Breadcrumb page titles
  * - Loading skeletons (opt-in via routeTransitionMs)
  * - Auth protection
+ *
+ * All styling comes from `udb-*` classes in the package stylesheet
+ * (`@umituz/web-dashboard/styles.css`) — no utility framework required.
  *
  * @param props - Dashboard layout props
  */
@@ -105,12 +108,10 @@ export const DashboardLayout = ({
   const currentTitle = getTitle();
 
   return (
-    <div className="flex h-screen w-full bg-background font-sans">
+    <div className="udb-root udb-layout">
       {/* Desktop Sidebar */}
       <aside
-        className={`hidden md:flex flex-col shrink-0 border-r border-sidebar-border bg-sidebar transition-all duration-300 ${
-          collapsed ? "w-16" : "w-60"
-        }`}
+        className={`udb-layout__sidebar ${collapsed ? "udb-layout__sidebar--collapsed" : ""}`}
       >
         <DashboardSidebar
           collapsed={collapsed}
@@ -124,9 +125,9 @@ export const DashboardLayout = ({
 
       {/* Mobile Menu Overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <aside className="absolute left-0 top-0 h-full w-60 border-r border-sidebar-border bg-sidebar shadow-xl">
+        <div className="udb-layout__mobile">
+          <div className="udb-layout__backdrop" onClick={() => setMobileOpen(false)} />
+          <aside className="udb-layout__mobile-sidebar">
             <DashboardSidebar
               collapsed={false}
               setCollapsed={() => setMobileOpen(false)}
@@ -140,7 +141,7 @@ export const DashboardLayout = ({
       )}
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+      <div className="udb-layout__main">
         <DashboardHeader
           collapsed={collapsed}
           setCollapsed={setCollapsed}
@@ -155,16 +156,16 @@ export const DashboardLayout = ({
           onDismissNotification={onDismissNotification}
         />
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="udb-layout__content">
           {loading ? (
-            <div className="mx-auto w-full max-w-7xl space-y-6">
-              <Skeleton className="h-8 w-1/3 rounded-xl" />
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="udb-page-skeleton">
+              <Skeleton className="udb-skeleton--title" />
+              <div className="udb-skeleton-grid">
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <Skeleton key={i} className="h-28 rounded-2xl" />
+                  <Skeleton key={i} className="udb-skeleton--card" />
                 ))}
               </div>
-              <Skeleton className="h-64 rounded-[32px]" />
+              <Skeleton className="udb-skeleton--section" />
             </div>
           ) : (
             <Outlet />

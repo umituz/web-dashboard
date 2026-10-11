@@ -50,7 +50,7 @@ export interface PlatformOption {
   name: string;
   /** Lucide icon component */
   icon: LucideIcon;
-  /** Tailwind color class (e.g. "from-purple-500 to-pink-500") */
+  /** Brand color as a plain CSS color string (e.g. "#c026d3") */
   color?: string;
   /** Connection status */
   connected?: boolean;
@@ -85,8 +85,8 @@ export interface PlanOption {
   badge?: string;
   /** i18n key for the badge — resolved via `translate` in the consumer */
   badgeKey?: string;
-  /** Badge color class */
-  badgeColor?: string;
+  /** Semantic badge tone rendered by the stylesheet */
+  badgeTone?: "muted" | "primary" | "accent";
   /** Description text */
   description: string;
   /** Monthly price */

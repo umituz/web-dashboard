@@ -6,8 +6,8 @@
  */
 
 import { forwardRef } from "react";
-import { Input } from "@umituz/web-design-system/atoms";
-import { cn } from "@umituz/web-design-system/utils";
+import { Input } from "../../../../primitives";
+import { cn } from "../../../../primitives";
 
 export interface EmailInputProps {
   /** Input id (used to wire up the label) */
@@ -52,14 +52,11 @@ export const EmailInput = forwardRef<HTMLInputElement, EmailInputProps>(
     ref,
   ) => {
     return (
-      <div className={cn("space-y-2", className)}>
-        <label
-          htmlFor={id}
-          className="text-sm font-medium leading-none text-foreground"
-        >
+      <div className={cn("udb-field", className)}>
+        <label htmlFor={id} className="udb-field__label">
           {translate(labelKey)}
           {required && (
-            <span className="text-destructive ml-1" aria-hidden="true">
+            <span className="udb-field__required" aria-hidden="true">
               *
             </span>
           )}
@@ -80,7 +77,7 @@ export const EmailInput = forwardRef<HTMLInputElement, EmailInputProps>(
         {error && (
           <p
             id={`${id}-error`}
-            className="text-xs text-destructive"
+            className="udb-field__error"
             role="alert"
           >
             {error}

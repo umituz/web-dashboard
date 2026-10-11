@@ -10,8 +10,8 @@
 import { useMemo } from "react";
 import { RefreshCw, Download, Calendar, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { cn } from "@umituz/web-design-system/utils";
-import { Button } from "@umituz/web-design-system/atoms";
+import { cn } from "../../../primitives";
+import { Button } from "../../../primitives";
 import type { AnalyticsLayoutProps, AnalyticsPeriod } from "../types/analytics";
 import { AnalyticsCard } from "./AnalyticsCard";
 import { MetricCard } from "./MetricCard";
@@ -54,11 +54,11 @@ export const AnalyticsLayout = ({
   const showExportAction = showExport && Boolean(onExport);
 
   return (
-    <div className="w-full space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
+    <div className="udb-analytics">
+      <div className="udb-analytics__header">
+        <div className="udb-analytics__heading">
           {(title || config?.brandName) && (
-            <h1 className="text-3xl font-bold text-foreground">
+            <h1 className="udb-analytics__title">
               {title ??
                 (config?.brandName
                   ? `${config.brandName} ${t(ANALYTICS_KEYS.layout.title)}`
@@ -66,17 +66,17 @@ export const AnalyticsLayout = ({
             </h1>
           )}
           {description && (
-            <p className="text-muted-foreground mt-1">{description}</p>
+            <p className="udb-analytics__description">{description}</p>
           )}
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="udb-analytics__actions">
           {showDateRange && onPeriodChange && period && (
-            <label className="flex items-center gap-2 bg-background border border-border rounded-lg px-3 py-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
-              <span className="sr-only">{t(ANALYTICS_KEYS.common.periodSelector)}</span>
+            <label className="udb-period-select">
+              <Calendar className="udb-period-select__icon" aria-hidden="true" />
+              <span className="udb-sr-only">{t(ANALYTICS_KEYS.common.periodSelector)}</span>
               <select
-                className="bg-transparent text-sm text-foreground outline-none"
+                className="udb-period-select__select"
                 value={period}
                 onChange={(e) => onPeriodChange(e.target.value as AnalyticsPeriod)}
                 aria-label={t(ANALYTICS_KEYS.common.periodSelector)}
@@ -99,7 +99,7 @@ export const AnalyticsLayout = ({
               aria-label={t(ANALYTICS_KEYS.common.refresh)}
             >
               <RefreshCw
-                className={cn("h-4 w-4", loading && "animate-spin")}
+                className={cn("udb-analytics__action-icon", loading && "udb-spin")}
                 aria-hidden="true"
               />
             </Button>
@@ -113,8 +113,8 @@ export const AnalyticsLayout = ({
               disabled={loading}
               aria-label={t(ANALYTICS_KEYS.common.export)}
             >
-              <Download className="h-4 w-4" aria-hidden="true" />
-              <span className="ml-1.5">{t(ANALYTICS_KEYS.common.export)}</span>
+              <Download className="udb-analytics__action-icon" aria-hidden="true" />
+              <span>{t(ANALYTICS_KEYS.common.export)}</span>
             </Button>
           )}
 
@@ -124,22 +124,20 @@ export const AnalyticsLayout = ({
 
       {loading && (
         <div
-          className="flex items-center justify-center py-24"
+          className="udb-analytics__loading"
           role="status"
           aria-live="polite"
         >
-          <Loader2 className="h-12 w-12 animate-spin text-muted-foreground" aria-hidden="true" />
-          <span className="sr-only">{t(ANALYTICS_KEYS.common.loading)}</span>
+          <Loader2 className="udb-spin udb-analytics__loading-spinner" aria-hidden="true" />
+          <span className="udb-sr-only">{t(ANALYTICS_KEYS.common.loading)}</span>
         </div>
       )}
 
       {!loading && visibleMetrics.length > 0 && (
         <div
           className={cn(
-            "grid gap-4",
-            visibleMetrics.length >= 4
-              ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-              : "grid-cols-1 sm:grid-cols-2",
+            "udb-analytics__metrics",
+            visibleMetrics.length >= 4 && "udb-analytics__metrics--wide",
           )}
         >
           {visibleMetrics.map((metric) => (
@@ -149,7 +147,7 @@ export const AnalyticsLayout = ({
       )}
 
       {!loading && charts && charts.length > 0 && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="udb-analytics__charts">
           {charts.map((chartConfig) => (
             <AnalyticsCard
               key={chartConfig.id}

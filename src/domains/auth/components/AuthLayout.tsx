@@ -4,10 +4,11 @@
  * Configurable layout wrapper for authentication pages.
  * Strings stay localizable via the optional `translate` prop; when it
  * is not provided the embedded English fallbacks are rendered.
+ * Styling is entirely `udb-auth*` classes from the package stylesheet.
  */
 
 import { BrandLogo } from "../../layouts/components";
-import { cn } from "@umituz/web-design-system/utils";
+import { cn } from "../../../primitives";
 import { AUTH_KEYS } from "../utils/i18nKeys";
 import type { AuthLayoutProps, Translate } from "../types/auth";
 
@@ -34,33 +35,30 @@ export const AuthLayout = ({
   const footerLinks = config.footerLinks ?? [];
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="udb-root udb-auth">
       {/* Header */}
-      <header className="border-b border-border px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+      <header className="udb-auth__header">
+        <div className="udb-auth__brand">
           <BrandLogo size={32} />
-          <span className="font-bold text-xl text-foreground">{config.brandName}</span>
+          <span className="udb-auth__brand-name">{config.brandName}</span>
         </div>
 
         {/* Additional Header Content */}
         {homeRoute && (
-          <a
-            href={homeRoute}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <a href={homeRoute} className="udb-auth__home-link">
             {t(AUTH_KEYS.layout.backToHome)}
           </a>
         )}
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-4 py-12 bg-secondary/30">
-        <div className="w-full max-w-md">
+      <main className="udb-auth__main">
+        <div className="udb-auth__column">
           {/* Card Container */}
-          <div className="bg-background border border-border rounded-2xl shadow-sm p-8">
+          <div className="udb-auth__card">
             {/* Tagline */}
             {config.brandTagline && (
-              <p className="text-center text-sm text-muted-foreground mb-6">
+              <p className="udb-auth__tagline">
                 {config.brandTagline}
               </p>
             )}
@@ -71,33 +69,24 @@ export const AuthLayout = ({
 
           {/* Social Login */}
           {config.showSocialLogin && config.socialProviders && config.socialProviders.length > 0 && (
-            <div className="mt-6 space-y-4">
+            <div className="udb-auth__social">
               {/* Divider */}
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border" />
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-secondary/30 text-muted-foreground">
-                    {t(AUTH_KEYS.layout.orContinueWith)}
-                  </span>
-                </div>
+              <div className="udb-divider-row">
+                <span className="udb-divider-row__label">
+                  {t(AUTH_KEYS.layout.orContinueWith)}
+                </span>
               </div>
 
               {/* Social Buttons */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="udb-social-grid">
                 {config.socialProviders.map((provider) => (
                   <button
                     key={provider.id}
                     type="button"
-                    className={cn(
-                      "flex items-center justify-center gap-2 px-4 py-3 rounded-lg border",
-                      "bg-background hover:bg-muted transition-colors",
-                      "text-sm font-medium text-foreground"
-                    )}
+                    className={cn("udb-social-btn")}
                     onClick={() => onSocialLogin?.(provider.id)}
                   >
-                    <span className="text-lg">{provider.icon}</span>
+                    <span className="udb-social-btn__icon">{provider.icon}</span>
                     <span>{provider.name}</span>
                   </button>
                 ))}
@@ -108,18 +97,18 @@ export const AuthLayout = ({
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border px-6 py-4">
-        <div className="max-w-4xl mx-auto flex items-center justify-between text-xs text-muted-foreground">
+      <footer className="udb-auth__footer">
+        <div className="udb-auth__footer-inner">
           <p>
             © {new Date().getFullYear()} {config.brandName}. {t(AUTH_KEYS.layout.allRightsReserved)}
           </p>
           {footerLinks.length > 0 && (
-            <div className="flex items-center gap-4">
+            <div className="udb-auth__footer-links">
               {footerLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className="hover:text-foreground transition-colors"
+                  className="udb-auth__footer-link"
                 >
                   {link.label}
                 </a>

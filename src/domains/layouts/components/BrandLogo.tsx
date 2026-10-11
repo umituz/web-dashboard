@@ -1,5 +1,5 @@
 import React from "react";
-import { cn } from "@umituz/web-design-system/utils";
+import { cn } from "../../../primitives";
 
 interface BrandLogoProps {
   className?: string;
@@ -10,7 +10,9 @@ interface BrandLogoProps {
  * BrandLogo Component
  *
  * Displays the application brand logo as an SVG.
- * Supports custom sizing and styling through className.
+ * Colors come from the package tokens (`--u-color-primary`,
+ * `--u-color-secondary`) so hosts restyle it by overriding CSS
+ * custom properties — no host theme variables required.
  *
  * @param className - Optional CSS classes for styling
  * @param size - Width and height in pixels (default: 32)
@@ -23,7 +25,8 @@ export const BrandLogo = ({ className, size = 32 }: BrandLogoProps) => {
       viewBox="0 0 100 100"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
-      className={cn("shrink-0", className)}
+      className={cn("udb-brand-logo", className)}
+      aria-hidden="true"
     >
       {/* Solid Foundation / Platform */}
       <rect
@@ -32,7 +35,7 @@ export const BrandLogo = ({ className, size = 32 }: BrandLogoProps) => {
         width="70"
         height="15"
         rx="4"
-        fill="hsl(var(--primary))"
+        fill="var(--u-color-primary)"
       />
 
       {/* Assembly Paths / Structure */}
@@ -42,7 +45,7 @@ export const BrandLogo = ({ className, size = 32 }: BrandLogoProps) => {
         width="12"
         height="40"
         rx="2"
-        fill="hsl(var(--primary))"
+        fill="var(--u-color-primary)"
       />
       <rect
         x="44"
@@ -50,7 +53,7 @@ export const BrandLogo = ({ className, size = 32 }: BrandLogoProps) => {
         width="12"
         height="30"
         rx="2"
-        fill="hsl(var(--primary))"
+        fill="var(--u-color-primary)"
       />
       <rect
         x="63"
@@ -58,7 +61,7 @@ export const BrandLogo = ({ className, size = 32 }: BrandLogoProps) => {
         width="12"
         height="45"
         rx="2"
-        fill="hsl(var(--primary))"
+        fill="var(--u-color-primary)"
       />
 
       {/* Modern Accent - The 'Assembly' Bridge */}
@@ -68,7 +71,7 @@ export const BrandLogo = ({ className, size = 32 }: BrandLogoProps) => {
         width="60"
         height="10"
         rx="2"
-        fill="hsl(var(--secondary))"
+        fill="var(--u-color-secondary)"
       />
 
       {/* Connection Point / Beacon */}
@@ -76,7 +79,7 @@ export const BrandLogo = ({ className, size = 32 }: BrandLogoProps) => {
         cx="50"
         cy="20"
         r="5"
-        fill="hsl(var(--secondary))"
+        fill="var(--u-color-secondary)"
       />
     </svg>
   );

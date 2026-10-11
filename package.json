@@ -5,9 +5,14 @@
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
-  "sideEffects": false,
+  "sideEffects": [
+    "*.css"
+  ],
   "exports": {
     ".": "./src/index.ts",
+    "./styles.css": "./src/styles/dashboard.css",
+    "./tokens.css": "./src/styles/tokens.css",
+    "./primitives": "./src/primitives/index.ts",
     "./layouts": "./src/domains/layouts/index.ts",
     "./layouts/components": "./src/domains/layouts/components/index.ts",
     "./layouts/hooks": "./src/domains/layouts/hooks/index.ts",
@@ -41,11 +46,6 @@
     "./calendar/hooks": "./src/domains/calendar/hooks/index.ts",
     "./calendar/utils": "./src/domains/calendar/utils/index.ts",
     "./config": "./src/domain/config/index.ts",
-    "./billing": "./src/domains/billing/index.ts",
-    "./billing/components": "./src/domains/billing/components/index.ts",
-    "./billing/hooks": "./src/domains/billing/hooks/index.ts",
-    "./billing/utils": "./src/domains/billing/utils/index.ts",
-    "./billing/types": "./src/domains/billing/types/index.ts",
     "./package.json": "./package.json"
   },
   "files": [
@@ -62,7 +62,6 @@
     "version:major": "npm version major -m 'chore: release v%s'"
   },
   "peerDependencies": {
-    "@umituz/web-design-system": "^3.1.11",
     "@umituz/web-firebase": "^3.0.0",
     "firebase": "^10.0.0 || ^11.0.0 || ^12.0.0",
     "react": "^18.0.0 || ^19.0.0",
@@ -79,18 +78,15 @@
     }
   },
   "dependencies": {
-    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.577.0",
-    "recharts": "^2.15.0",
-    "tailwind-merge": "^3.5.0"
+    "recharts": "^2.15.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.57.2",
     "@typescript-eslint/parser": "^8.57.2",
-    "@umituz/web-design-system": "^3.1.11",
     "@umituz/web-firebase": "^3.6.0",
     "eslint": "^10.0.2",
     "firebase": "^12.0.0",
@@ -127,12 +123,6 @@
     "kpi",
     "visualization",
     "recharts",
-    "billing",
-    "subscription",
-    "payment",
-    "invoices",
-    "pricing",
-    "plans",
     "react",
     "typescript",
     "components",

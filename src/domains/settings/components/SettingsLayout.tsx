@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Skeleton } from "@umituz/web-design-system/atoms";
-import { Button } from "@umituz/web-design-system/atoms";
+import { Skeleton, Button } from "../../../primitives";
 import { ChevronLeft, Menu } from "lucide-react";
 import { SettingsSection } from "./SettingsSection";
 import type { SettingsConfig } from "../types/settings";
@@ -21,7 +20,8 @@ interface SettingsLayoutProps {
  * Settings Layout Component
  *
  * Main layout wrapper for settings pages.
- * Provides sidebar navigation and content area.
+ * Provides sidebar navigation and content area. Styling is entirely
+ * `udb-settings*` classes from the package stylesheet.
  */
 export const SettingsLayout = ({
   config,
@@ -52,9 +52,9 @@ export const SettingsLayout = ({
   };
 
   const renderSidebarHeader = (onMenuClick: () => void, showMenuButton: boolean) => (
-    <div className="flex h-14 items-center justify-between border-b border-border px-4">
+    <div className="udb-settings__sidebar-header">
       {!collapsed && (
-        <h2 className="text-lg font-semibold text-foreground">
+        <h2 className="udb-settings__sidebar-title">
           {config.brandName}
         </h2>
       )}
@@ -62,30 +62,26 @@ export const SettingsLayout = ({
         variant="ghost"
         size="icon"
         onClick={onMenuClick}
-        className="ml-auto"
+        className="udb-settings__sidebar-toggle"
         aria-label={showMenuButton ? "Open sidebar" : "Toggle sidebar"}
       >
         {showMenuButton ? (
-          <Menu className="h-4 w-4" />
+          <Menu className="udb-settings__toggle-icon" />
         ) : collapsed ? (
-          <Menu className="h-4 w-4" />
+          <Menu className="udb-settings__toggle-icon" />
         ) : (
-          <ChevronLeft className="h-4 w-4" />
+          <ChevronLeft className="udb-settings__toggle-icon" />
         )}
       </Button>
     </div>
   );
 
   return (
-    <div className="flex h-screen w-full bg-background font-sans">
+    <div className="udb-root udb-settings">
       {/* Desktop Sidebar */}
-      <aside
-        className={`hidden md:flex flex-col shrink-0 border-r border-border bg-card transition-all duration-300 ${
-          collapsed ? "w-16" : "w-64"
-        }`}
-      >
+      <aside className={`udb-settings__sidebar${collapsed ? " udb-settings__sidebar--collapsed" : ""}`}>
         {renderSidebarHeader(() => setCollapsed((prev) => !prev), false)}
-        <nav className="flex-1 overflow-y-auto p-2">
+        <nav className="udb-settings__nav">
           {config.sections.map((section) => (
             <SettingsSection
               key={section.key}
@@ -100,15 +96,15 @@ export const SettingsLayout = ({
 
       {/* Mobile Menu Overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="udb-settings__mobile">
           <div
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+            className="udb-backdrop"
             onClick={() => setMobileOpen(false)}
             role="presentation"
           />
-          <aside className="absolute left-0 top-0 h-full w-64 border-r border-border bg-card shadow-xl">
+          <aside className="udb-settings__mobile-sidebar">
             {renderSidebarHeader(() => setMobileOpen(false), true)}
-            <nav className="flex-1 overflow-y-auto p-2">
+            <nav className="udb-settings__nav">
               {config.sections.map((section) => (
                 <SettingsSection
                   key={section.key}
@@ -123,31 +119,31 @@ export const SettingsLayout = ({
       )}
 
       {/* Main Content Area */}
-      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+      <div className="udb-settings__main">
         {/* Mobile Header */}
-        <header className="flex h-14 items-center justify-between border-b border-border bg-card/50 backdrop-blur-md px-4 shrink-0 md:hidden">
-          <div className="flex items-center gap-3">
+        <header className="udb-settings__mobile-header">
+          <div className="udb-settings__mobile-lead">
             <Button
               variant="ghost"
               size="icon"
               onClick={() => setMobileOpen(true)}
               aria-label="Open mobile menu"
             >
-              <Menu className="h-5 w-5" />
+              <Menu className="udb-settings__toggle-icon-lg" />
             </Button>
-            <h2 className="text-sm font-semibold text-foreground">
+            <h2 className="udb-settings__mobile-title">
               {config.brandName}
             </h2>
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-4 md:p-8">
+        <main className="udb-settings__content">
           {loading ? (
-            <div className="mx-auto w-full max-w-4xl space-y-6">
-              <Skeleton className="h-8 w-1/3 rounded-xl" />
-              <div className="grid gap-4">
+            <div className="udb-settings__skeleton">
+              <Skeleton className="udb-skeleton--title" />
+              <div className="udb-settings__skeleton-list">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-24 rounded-xl" />
+                  <Skeleton key={i} className="udb-settings__skeleton-row" />
                 ))}
               </div>
             </div>

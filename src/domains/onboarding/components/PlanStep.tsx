@@ -3,12 +3,14 @@
  *
  * Subscription plan selection step. All copy is i18n-keyed;
  * the 20% yearly discount is a named constant, not a magic 0.8.
+ * Badge tones are semantic (`muted` | `primary` | `accent`) —
+ * no data-driven utility classes.
  */
 
 import { useMemo } from "react";
 import { Check, Sparkles } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { cn } from "@umituz/web-design-system/utils";
+import { cn } from "../../../primitives";
 import type { OnboardingState, PlanOption } from "../types/onboarding";
 import { ONBOARDING_KEYS } from "../utils/i18nKeys";
 
@@ -31,7 +33,7 @@ const DEFAULT_PLANS: PlanOption[] = [
     id: "standard",
     name: "Standard",
     badgeKey: ONBOARDING_KEYS.plan.mostPopular,
-    badgeColor: "bg-muted text-muted-foreground",
+    badgeTone: "muted",
     description: "Perfect for individuals and small businesses",
     price: 12,
     features: [
@@ -45,7 +47,7 @@ const DEFAULT_PLANS: PlanOption[] = [
     id: "pro",
     name: "Pro",
     badgeKey: ONBOARDING_KEYS.plan.bestValue,
-    badgeColor: "bg-primary text-primary-foreground",
+    badgeTone: "primary",
     description: "For growing businesses and teams",
     price: 29,
     features: [
@@ -62,7 +64,7 @@ const DEFAULT_PLANS: PlanOption[] = [
     id: "enterprise",
     name: "Enterprise",
     badgeKey: ONBOARDING_KEYS.plan.custom,
-    badgeColor: "bg-accent text-accent-foreground",
+    badgeTone: "accent",
     description: "For large organizations with custom needs",
     price: 99,
     features: [
@@ -105,19 +107,19 @@ export const PlanStep = ({
   );
 
   return (
-    <div className="w-full max-w-5xl">
-      <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-extrabold text-foreground mb-3">
+    <div className="udb-step udb-step--widest">
+      <div className="udb-step__header">
+        <h1 className="udb-step__title">
           {t(ONBOARDING_KEYS.plan.title)}
         </h1>
-        <p className="text-muted-foreground text-lg">
+        <p className="udb-step__description udb-step__description--lg">
           {t(ONBOARDING_KEYS.plan.description, { days: trialDays })}
         </p>
       </div>
 
-      <div className="flex items-center justify-center gap-2 mb-12">
+      <div className="udb-cycle-toggle-row">
         <div
-          className="flex bg-muted rounded-full p-1.5 border border-border"
+          className="udb-cycle-toggle"
           role="group"
           aria-label={t(ONBOARDING_KEYS.plan.title)}
         >
@@ -126,11 +128,8 @@ export const PlanStep = ({
             aria-pressed={state.billingCycle === "monthly"}
             onClick={() => updateState({ billingCycle: "monthly" })}
             className={cn(
-              "px-6 py-2 rounded-full text-sm font-bold transition-all",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-              state.billingCycle === "monthly"
-                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                : "text-muted-foreground hover:text-foreground",
+              "udb-cycle-toggle__pill",
+              state.billingCycle === "monthly" && "udb-cycle-toggle__pill--on",
             )}
           >
             {t(ONBOARDING_KEYS.plan.monthly)}
@@ -140,20 +139,15 @@ export const PlanStep = ({
             aria-pressed={state.billingCycle === "yearly"}
             onClick={() => updateState({ billingCycle: "yearly" })}
             className={cn(
-              "px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2",
-              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-              state.billingCycle === "yearly"
-                ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
-                : "text-muted-foreground hover:text-foreground",
+              "udb-cycle-toggle__pill udb-cycle-toggle__pill--with-badge",
+              state.billingCycle === "yearly" && "udb-cycle-toggle__pill--on",
             )}
           >
             {t(ONBOARDING_KEYS.plan.yearly)}
             <span
               className={cn(
-                "text-[10px] px-1.5 py-0.5 rounded-full transition-colors",
-                state.billingCycle === "yearly"
-                  ? "bg-white/20 text-white"
-                  : "bg-success/10 text-success",
+                "udb-cycle-toggle__save",
+                state.billingCycle === "yearly" && "udb-cycle-toggle__save--on",
               )}
             >
               {t(ONBOARDING_KEYS.plan.save, { percent: yearlyDiscountPercent })}
@@ -163,7 +157,7 @@ export const PlanStep = ({
       </div>
 
       <div
-        className="grid md:grid-cols-3 gap-8"
+        className="udb-plans"
         role="radiogroup"
         aria-label={t(ONBOARDING_KEYS.plan.title)}
       >
@@ -180,57 +174,49 @@ export const PlanStep = ({
               aria-checked={isSelected}
               onClick={() => updateState({ selectedPlan: plan.id })}
               className={cn(
-                "bg-background border-2 rounded-3xl p-8 text-left transition-all relative",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
-                isSelected
-                  ? "border-primary ring-4 ring-primary/10"
-                  : "border-border hover:border-primary/40",
-                plan.highlight && "shadow-xl",
+                "udb-plan",
+                isSelected && "udb-plan--selected",
+                plan.highlight && "udb-plan--highlight",
               )}
             >
               {plan.highlight && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-primary to-accent text-primary-foreground text-[10px] font-black uppercase tracking-widest px-4 py-1 rounded-full">
+                <div className="udb-plan__recommended">
                   {t(ONBOARDING_KEYS.plan.recommended)}
                 </div>
               )}
 
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-2xl font-black text-foreground">{plan.name}</h3>
+              <div className="udb-plan__heading">
+                <h3 className="udb-plan__name">{plan.name}</h3>
                 {badge && (
-                  <div
-                    className={cn(
-                      "text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full",
-                      plan.badgeColor,
-                    )}
-                  >
+                  <div className={cn("udb-plan__badge", plan.badgeTone && `udb-plan__badge--${plan.badgeTone}`)}>
                     {badge}
                   </div>
                 )}
               </div>
 
-              <p className="text-muted-foreground mb-8 font-medium">{plan.description}</p>
+              <p className="udb-plan__description">{plan.description}</p>
 
-              <div className="flex items-baseline gap-1 mb-8">
-                <span className="text-5xl font-black text-foreground">
+              <div className="udb-plan__price-row">
+                <span className="udb-plan__price">
                   ${Math.round(planPrice)}
                 </span>
-                <span className="text-lg font-bold text-muted-foreground">
+                <span className="udb-plan__price-unit">
                   /{state.billingCycle === "yearly"
                     ? t(ONBOARDING_KEYS.plan.yearlyShort)
                     : t(ONBOARDING_KEYS.plan.monthlyShort)}
                 </span>
               </div>
 
-              <ul className="space-y-4">
+              <ul className="udb-plan__features">
                 {plan.features.map((feature, i) => {
                   const text = typeof feature === "string" ? feature : feature.text;
                   const bold = typeof feature !== "string" && feature.bold;
                   return (
-                    <li key={`${plan.id}-feature-${i}`} className="flex items-start gap-3 text-sm font-medium">
-                      <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                        <Check className="h-3 w-3 text-primary" aria-hidden="true" />
-                      </div>
-                      <span className={cn("text-foreground/90", bold && "font-black")}>
+                    <li key={`${plan.id}-feature-${i}`} className="udb-plan__feature">
+                      <span className="udb-plan__feature-check">
+                        <Check className="udb-plan__feature-check-icon" aria-hidden="true" />
+                      </span>
+                      <span className={cn("udb-plan__feature-text", bold && "udb-plan__feature-text--bold")}>
                         {text}
                       </span>
                     </li>
@@ -243,12 +229,8 @@ export const PlanStep = ({
       </div>
 
       {selectedPlan && (
-        <p
-          className="mt-8 text-center text-sm text-muted-foreground animate-in fade-in flex items-center justify-center gap-2"
-          role="status"
-          aria-live="polite"
-        >
-          <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
+        <p className="udb-step__hint" role="status" aria-live="polite">
+          <Sparkles className="udb-step__hint-icon" aria-hidden="true" />
           {t(ONBOARDING_KEYS.plan.selectedPlan, { name: selectedPlan.name })}
         </p>
       )}
