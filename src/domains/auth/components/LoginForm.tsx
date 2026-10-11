@@ -8,7 +8,7 @@
 
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { Button, Checkbox } from "../../../primitives";
 import { Loader2 } from "lucide-react";
 import { validateLogin } from "../utils/auth";
@@ -59,7 +59,7 @@ export const LoginForm = ({
   onAppleLogin,
 }: LoginFormProps) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const t = useT();
   const translate: Translate = t;
 
   const [email, setEmail] = useState<string>(defaultCredentials?.email ?? "");

@@ -7,7 +7,7 @@
  */
 
 import { ArrowUp, ArrowDown, Minus } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { cn } from "../../../primitives";
 import type { MetricCardProps } from "../types/analytics";
 import { formatMetricValue, calculateGrowth, getTrend } from "../utils/analytics";
@@ -21,7 +21,7 @@ export const MetricCard = ({
   className,
   onClick,
 }: MetricCardProps) => {
-  const { t } = useTranslation();
+  const t = useT();
 
   const hasPrevious = metric.previousValue !== undefined;
   const growth = hasPrevious ? calculateGrowth(metric.value, metric.previousValue as number) : null;

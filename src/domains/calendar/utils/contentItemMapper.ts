@@ -1,13 +1,13 @@
 /**
  * Content Item Mapper
  *
- * Type-safe transformation between Firebase documents and domain ContentItem objects
+ * Type-safe transformation between wire-format documents and domain ContentItem objects.
  */
 
 import type { ContentItem, ContentStatus, ContentType } from '../types/calendar.types';
 
 /**
- * Raw Firebase document shape for calendar_items collection
+ * Raw wire document shape for calendar_items records
  */
 interface CalendarItemDocument {
   title?: string;

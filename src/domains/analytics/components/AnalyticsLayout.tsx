@@ -9,7 +9,7 @@
 
 import { useMemo } from "react";
 import { RefreshCw, Download, Calendar, Loader2 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { cn } from "../../../primitives";
 import { Button } from "../../../primitives";
 import type { AnalyticsLayoutProps, AnalyticsPeriod } from "../types/analytics";
@@ -46,7 +46,7 @@ export const AnalyticsLayout = ({
   onExport,
   children,
 }: AnalyticsLayoutProps) => {
-  const { t } = useTranslation();
+  const t = useT();
 
   const visibleMetrics = useMemo(() => metrics ?? [], [metrics]);
 

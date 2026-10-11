@@ -7,7 +7,7 @@
  */
 
 import { Check, Smartphone, Monitor, Sparkles } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { cn } from "../../../primitives";
 import type {
   OnboardingState,
@@ -56,7 +56,7 @@ export const AppFocusStep = ({
   updateState,
   appTypes,
 }: AppFocusStepProps) => {
-  const { t } = useTranslation();
+  const t = useT();
 
   const resolveStateField = (option: AppTypeOption): AppFocusStateField | undefined =>
     option.stateField ?? DEFAULT_STATE_FIELD_BY_ID[option.id];

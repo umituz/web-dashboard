@@ -5,7 +5,7 @@ import {
 } from "lucide-react";
 import { Button } from "../../../primitives";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import type { DashboardHeaderProps } from "../types/layout";
 import type { DashboardNotification } from "../types/notification";
 import type { DashboardUser } from "../types/user";
@@ -56,7 +56,7 @@ export const DashboardHeader = ({
   billingRoute = "/dashboard/billing",
 }: DashboardHeaderPropsExtended) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const t = useT();
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
