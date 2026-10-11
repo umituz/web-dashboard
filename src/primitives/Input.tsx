@@ -1,18 +1,22 @@
 /**
- * Input — text input field (`udb-input`).
- *
- * Minimal clone of the surface this package uses: a native input with
- * token-driven styling. Everything else passes through untouched.
+ * Input — delegates to the design system.
+ * Native `size` (character width) has no DS counterpart; it maps to a
+ * `ch`-based width so the original prop API keeps working.
  */
 
-import { forwardRef, type InputHTMLAttributes } from 'react';
-import { cn } from './cn';
+import { forwardRef } from 'react';
+import { Input as DSInput } from '@umituz/web-design-system/atoms';
 
-export type InputProps = InputHTMLAttributes<HTMLInputElement>;
+export type InputProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type = 'text', ...props }, ref) => (
-    <input ref={ref} type={type} className={cn('udb-input', className)} {...props} />
+  ({ type = 'text', size: nativeSize, style, ...props }, ref) => (
+    <DSInput
+      ref={ref}
+      type={type}
+      {...props}
+      style={nativeSize != null ? { width: `${nativeSize}ch`, ...style } : style}
+    />
   ),
 );
 

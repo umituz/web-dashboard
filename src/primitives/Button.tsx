@@ -1,29 +1,23 @@
 /**
- * Button — camp-agnostic action button (`udb-btn`).
- *
- * Clones only the surface this package actually uses: variants
- * default/destructive/outline/ghost, sizes default/sm/icon. No `asChild`
- * (radix-free), no variant library — classes come from `styles.css`.
+ * Button — delegates to the design system.
+ * Dashboard surface: variants default/destructive/outline/ghost,
+ * sizes default/sm/icon. Call-site API unchanged.
  */
 
-import { forwardRef, type ButtonHTMLAttributes } from 'react';
-import { cn } from './cn';
+import { forwardRef } from 'react';
+import { Button as DSButton } from '@umituz/web-design-system/atoms';
 
 export type ButtonVariant = 'default' | 'destructive' | 'outline' | 'ghost';
 export type ButtonSize = 'default' | 'sm' | 'icon';
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant;
   size?: ButtonSize;
 }
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant = 'default', size = 'default', ...props }, ref) => (
-    <button
-      ref={ref}
-      className={cn('udb-btn', `udb-btn--${variant}`, `udb-btn--${size}`, className)}
-      {...props}
-    />
+  ({ variant = 'default', size = 'default', ...props }, ref) => (
+    <DSButton ref={ref} variant={variant} size={size} {...props} />
   ),
 );
 

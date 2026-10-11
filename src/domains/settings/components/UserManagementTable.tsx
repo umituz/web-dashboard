@@ -1,11 +1,10 @@
 /**
  * UserManagementTable — admin skeleton for the users screen.
  * Config-driven: rows and role catalog come in as props, role
- * changes delegate out. No fetching, no package-side copy beyond
- * the empty state.
+ * changes delegate out.
  */
 
-import { Users } from "lucide-react";
+import { DataTable, type Column } from "@umituz/web-design-system/organisms";
 import { useT } from "../../../i18n";
 import { SETTINGS_ADMIN_KEYS } from "../utils/i18nKeys";
 import type { RoleKey, RoleInfo } from "../../permissions/types";
@@ -32,55 +31,38 @@ export const UserManagementTable = ({
 }: UserManagementTableProps) => {
   const t = useT();
 
-  if (users.length === 0) {
-    return (
-      <div className="udb-empty">
-        <div className="udb-empty__icon">
-          <Users className="udb-empty__glyph" aria-hidden="true" />
-        </div>
-        <p className="udb-empty__text">{t(SETTINGS_ADMIN_KEYS.users.empty)}</p>
-      </div>
-    );
-  }
+  const columns: Column<ManagedUser>[] = [
+    { id: "name", header: t("settings.users.columns.name"), accessor: "name" },
+    { id: "email", header: t("settings.users.columns.email"), accessor: "email" },
+    {
+      id: "role",
+      header: t("settings.users.columns.role"),
+      accessor: (user) =>
+        onRoleChange ? (
+          <select
+            className="udb-period-select__select"
+            value={user.role}
+            aria-label={t("settings.users.columns.role")}
+            onChange={(e) => onRoleChange(user.id, e.target.value as RoleKey)}
+          >
+            {roles.map((role) => (
+              <option key={role.key} value={role.key}>
+                {role.label}
+              </option>
+            ))}
+          </select>
+        ) : (
+          roles.find((role) => role.key === user.role)?.label ?? user.role
+        ),
+    },
+  ];
 
   return (
-    <div className="udb-table__wrap">
-      <table className="udb-table">
-        <thead>
-          <tr>
-            <th className="udb-table__th">{t("settings.users.columns.name")}</th>
-            <th className="udb-table__th">{t("settings.users.columns.email")}</th>
-            <th className="udb-table__th">{t("settings.users.columns.role")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id} className="udb-table__row">
-              <td className="udb-table__td">{user.name}</td>
-              <td className="udb-table__td">{user.email}</td>
-              <td className="udb-table__td">
-                {onRoleChange ? (
-                  <select
-                    className="udb-period-select__select"
-                    value={user.role}
-                    aria-label={t("settings.users.columns.role")}
-                    onChange={(e) => onRoleChange(user.id, e.target.value)}
-                  >
-                    {roles.map((role) => (
-                      <option key={role.key} value={role.key}>
-                        {role.label}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  roles.find((role) => role.key === user.role)?.label ?? user.role
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <DataTable
+      data={users}
+      columns={columns}
+      emptyState={{ title: t(SETTINGS_ADMIN_KEYS.users.empty) }}
+    />
   );
 };
 
