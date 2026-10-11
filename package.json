@@ -1,6 +1,6 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "4.0.1",
+  "version": "4.1.0",
   "description": "Installable app skeleton for the fleet — layouts, auth, onboarding, analytics (dependency-free SVG charts), calendar, i18n injection, permissions/session/module registry; ships its own udb-* stylesheet and --u-* tokens",
   "type": "module",
   "main": "./src/index.ts",
@@ -71,10 +71,11 @@
     "react-router-dom": "^6.0.0 || ^7.0.0"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
+    "@umituz/web-design-system": "^4.0.2",
     "lucide-react": "^0.577.0"
   },
   "devDependencies": {
+    "@types/node": "^22.20.5",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.57.2",

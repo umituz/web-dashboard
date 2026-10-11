@@ -1,15 +1,10 @@
 /**
- * cn — conditional className join (clsx only).
+ * cn — conditional className join, delegated to the design system.
  *
- * Deliberately drops the old tailwind-merge layer: v4 ships its own
- * `udb-*` class vocabulary where overrides append instead of conflicting,
- * so plain conditional joining is the whole job.
+ * The design system's `cn` (clsx + tailwind-merge) understands both the
+ * `udb-*` vocabulary (unknown classes pass through untouched) and real
+ * Tailwind utilities a host may pass, resolving conflicts by last-wins.
  */
 
-import { clsx, type ClassValue } from 'clsx';
-
-export type { ClassValue };
-
-export function cn(...inputs: ClassValue[]): string {
-  return clsx(inputs);
-}
+export { cn } from '@umituz/web-design-system/utils/cn';
+export type { ClassValue } from '@umituz/web-design-system/utils/cn';

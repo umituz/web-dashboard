@@ -14,11 +14,8 @@ Your bundler compiles it alongside your app; no prebuilt bundle ships.
 
 - **Billing moved to [@umituz/web-polar-payment](https://github.com/umituz/web-polar-payment)**
   under the `./portal` entry point. The old `./billing*` entry points are gone.
-- **`@umituz/web-design-system` is no longer a dependency.** The primitives
-  (`Button`, `Input`, `Checkbox`, `Skeleton`, `cn`) live in `./primitives`.
 - **Styling is shipped, not assumed.** Import `@umituz/web-dashboard/styles.css`
-  (and optionally `tokens.css`) once; all components use `udb-*` BEM classes.
-  Tailwind, design-system tokens and utility classes are gone from the package.
+  once; all components use `udb-*` BEM classes.
 - **No i18n runtime.** `react-i18next` is out; hosts bridge their own `t` via
   `<DashboardI18nProvider t={i18n.t}>` (see below). Without a provider,
   keys humanize to readable English.
@@ -30,6 +27,31 @@ Your bundler compiles it alongside your app; no prebuilt bundle ships.
   texora/visora pattern (one module list drives routes + nav + guards) as
   reusable building blocks.
 
+## What changed in 4.1
+
+- **The design system is back — for real this time.** 4.0 dropped
+  `@umituz/web-design-system` entirely; 4.1 makes it a runtime dependency
+  again and actually renders it:
+  - `./primitives` (`Button`, `Input`, `Checkbox`, `Skeleton`, `cn`) are thin
+    adapters that **delegate to the DS components** — the dashboard prop API
+    is unchanged, call sites need zero edits.
+  - `UserManagementTable` renders the DS `DataTable`; `MetricCard` composes
+    the DS `MetricCard`; `AnalyticsCard` is built on DS `Card` primitives.
+  - `styles.css` imports `@umituz/web-design-system/styles.css` transitively
+    (Tailwind v4 precompiled) — hosts still import only the dashboard
+    stylesheet.
+- **`--u-*` tokens are now bridges.** `tokens.css` maps every color/radius/
+  shadow token to the DS `--color-*`/`--radius-*` variables (with the old
+  literal as fallback). Override either side; dark mode (`data-udb-theme="dark"`)
+  now sets DS variables and the bridge flows through.
+- **Primitive base CSS is gone from `dashboard.css`.** Only dashboard-owned
+  modifiers remain (`udb-btn__spinner`, `udb-input--error/--with-toggle`,
+  `udb-skeleton--*`, `udb-card--sm/--lg`, `udb-table` for the permission
+  matrix); bases come from the DS stylesheet.
+- **Peer footprint**: pulling the dashboard in transitively installs the DS's
+  Radix UI peers (npm 7+ handles this automatically; only imported components
+  end up in the bundle).
+
 ## Installation
 
 ```bash
@@ -38,7 +60,7 @@ import "@umituz/web-dashboard/styles.css";
 ```
 
 Peers: `react` + `react-dom` (^18 or ^19) and `react-router-dom` (^6 or ^7).
-Runtime deps: `clsx` + `lucide-react`. Nothing else.
+Runtime deps: `@umituz/web-design-system` + `lucide-react`. Nothing else.
 
 ### Tailwind hosts
 
@@ -48,8 +70,12 @@ resets: import the package stylesheet **after** your base layer.
 
 ### Theming & dark mode
 
-Override the `--u-*` custom properties (see `tokens.css` for the full list).
-Dark mode is host-driven: put `data-udb-theme="dark"` on any ancestor.
+`tokens.css` bridges every `--u-*` token to a design-system variable
+(`--u-color-primary: var(--color-primary, #2563eb)`), so you can theme two
+ways: override the `--u-*` bridge heads, or set the DS `--color-*`/`--radius-*`
+variables (e.g. from your own Tailwind `@theme`). Dark mode is host-driven:
+put `data-udb-theme="dark"` on any ancestor — the dashboard dark block sets
+the DS variables and both layers switch together.
 
 ## Entry points
 

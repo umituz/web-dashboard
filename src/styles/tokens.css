@@ -1,53 +1,51 @@
 /**
  * @umituz/web-dashboard — design tokens (`--u-*`)
  *
- * The whole visual surface of the package is driven by these custom
- * properties. Hosts restyle everything (including dark mode) by
- * overriding them — no utility framework, no host theme variables.
- *
- * Dark mode: add `data-udb-theme="dark"` on any ancestor (typically
- * <html> or the layout root). The package never switches themes on
- * its own — the host decides.
+ * Colors, radii, fonts and shadows are bridged to the design system's
+ * `--color-*` / `--radius-*` / `--font-*` / `--shadow-*` variables; each
+ * bridge keeps its previous value as fallback. Dark mode: add
+ * `data-udb-theme="dark"` on any ancestor — the dark block re-sets the
+ * design-system variables and every bridge follows automatically.
  */
 
 :root {
-  /* Palette — surfaces & text */
-  --u-color-bg: #f8fafc;
-  --u-color-surface: #ffffff;
-  --u-color-surface-muted: #f1f5f9;
-  --u-color-text: #0f172a;
-  --u-color-muted: #64748b;
-  --u-color-border: #e2e8f0;
+  /* Surfaces & text */
+  --u-color-bg: var(--color-background, #f8fafc);
+  --u-color-surface: var(--color-card, #ffffff);
+  --u-color-surface-muted: var(--color-muted, #f1f5f9);
+  --u-color-text: var(--color-foreground, #0f172a);
+  --u-color-muted: var(--color-muted-foreground, #64748b);
+  --u-color-border: var(--color-border, #e2e8f0);
   --u-color-border-strong: #cbd5e1;
 
-  /* Palette — brand */
-  --u-color-primary: #2563eb;
-  --u-color-primary-hover: #1d4ed8;
-  --u-color-primary-contrast: #ffffff;
-  --u-color-primary-soft: rgba(37, 99, 235, 0.1);
-  --u-color-secondary: #8b5cf6;
+  /* Brand (hover/soft derive from the base color) */
+  --u-color-primary: var(--color-primary, #2563eb);
+  --u-color-primary-hover: var(--color-primary-hover, color-mix(in oklab, var(--color-primary, #2563eb) 86%, #000));
+  --u-color-primary-contrast: var(--color-primary-foreground, #ffffff);
+  --u-color-primary-soft: var(--color-primary-soft, color-mix(in srgb, var(--color-primary, #2563eb) 10%, transparent));
+  --u-color-secondary: var(--color-secondary, #8b5cf6);
 
-  /* Palette — semantic */
-  --u-color-danger: #dc2626;
-  --u-color-danger-hover: #b91c1c;
-  --u-color-danger-contrast: #ffffff;
-  --u-color-danger-soft: rgba(220, 38, 38, 0.1);
-  --u-color-success: #16a34a;
-  --u-color-success-soft: rgba(22, 163, 74, 0.12);
-  --u-color-warning: #d97706;
-  --u-color-warning-soft: rgba(217, 119, 6, 0.15);
+  /* Semantic */
+  --u-color-danger: var(--color-destructive, #dc2626);
+  --u-color-danger-hover: var(--color-destructive-hover, color-mix(in oklab, var(--color-destructive, #dc2626) 85%, #000));
+  --u-color-danger-contrast: var(--color-destructive-foreground, #ffffff);
+  --u-color-danger-soft: var(--color-destructive-soft, color-mix(in srgb, var(--color-destructive, #dc2626) 10%, transparent));
+  --u-color-success: var(--color-success, #16a34a);
+  --u-color-success-soft: var(--color-success-soft, color-mix(in srgb, var(--color-success, #16a34a) 12%, transparent));
+  --u-color-warning: var(--color-warning, #d97706);
+  --u-color-warning-soft: var(--color-warning-soft, color-mix(in srgb, var(--color-warning, #d97706) 15%, transparent));
 
   /* Focus */
-  --u-color-ring: rgba(37, 99, 235, 0.45);
+  --u-color-ring: var(--color-ring, rgba(37, 99, 235, 0.45));
 
   /* Radii */
-  --u-radius-sm: 6px;
-  --u-radius-md: 8px;
-  --u-radius-lg: 12px;
-  --u-radius-xl: 16px;
+  --u-radius-sm: var(--radius-sm, 6px);
+  --u-radius-md: var(--radius-md, 8px);
+  --u-radius-lg: var(--radius-lg, 12px);
+  --u-radius-xl: var(--radius-xl, 16px);
   --u-radius-pill: 9999px;
 
-  /* Spacing scale (4px base) */
+  /* Spacing (4px base) */
   --u-space-1: 4px;
   --u-space-2: 8px;
   --u-space-3: 12px;
@@ -58,8 +56,8 @@
   --u-space-8: 40px;
 
   /* Typography */
-  --u-font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
-    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  --u-font-sans: var(--font-sans, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif);
   --u-font-size-xs: 11px;
   --u-font-size-sm: 12px;
   --u-font-size-md: 14px;
@@ -72,17 +70,17 @@
   --u-font-weight-medium: 500;
   --u-font-weight-bold: 700;
 
-  /* Layout metrics */
+  /* Layout */
   --u-sidebar-width: 240px;
   --u-sidebar-width-collapsed: 64px;
   --u-header-height: 56px;
 
   /* Elevation */
-  --u-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
-  --u-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
-  --u-shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.14);
+  --u-shadow-sm: var(--shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.06));
+  --u-shadow-md: var(--shadow-md, 0 4px 12px rgba(15, 23, 42, 0.08));
+  --u-shadow-lg: var(--shadow-lg, 0 12px 32px rgba(15, 23, 42, 0.14));
 
-  /* Sidebar palette (distinct surface so hosts can tint it) */
+  /* Sidebar palette */
   --u-sidebar-bg: var(--u-color-surface);
   --u-sidebar-text: var(--u-color-text);
   --u-sidebar-muted: var(--u-color-muted);
@@ -92,33 +90,27 @@
 }
 
 [data-udb-theme="dark"] {
-  --u-color-bg: #0b1120;
-  --u-color-surface: #111827;
-  --u-color-surface-muted: #1e293b;
-  --u-color-text: #f1f5f9;
-  --u-color-muted: #94a3b8;
-  --u-color-border: #1f2a3c;
+  --color-background: #0b1120;
+  --color-card: #111827;
+  --color-muted: #1e293b;
+  --color-foreground: #f1f5f9;
+  --color-muted-foreground: #94a3b8;
+  --color-border: #1f2a3c;
+
+  --color-primary: #3b82f6;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #a78bfa;
+
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+
+  --color-ring: rgba(96, 165, 250, 0.5);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+
   --u-color-border-strong: #334155;
-
-  --u-color-primary: #3b82f6;
-  --u-color-primary-hover: #60a5fa;
-  --u-color-primary-contrast: #ffffff;
-  --u-color-primary-soft: rgba(59, 130, 246, 0.16);
-
-  --u-color-secondary: #a78bfa;
-
-  --u-color-danger: #ef4444;
-  --u-color-danger-hover: #f87171;
-  --u-color-danger-contrast: #ffffff;
-  --u-color-danger-soft: rgba(239, 68, 68, 0.16);
-  --u-color-success: #22c55e;
-  --u-color-success-soft: rgba(34, 197, 94, 0.16);
-  --u-color-warning: #f59e0b;
-  --u-color-warning-soft: rgba(245, 158, 11, 0.16);
-
-  --u-color-ring: rgba(96, 165, 250, 0.5);
-
-  --u-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --u-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
-  --u-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
 }

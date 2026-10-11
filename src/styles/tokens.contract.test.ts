@@ -63,4 +63,29 @@ describe("dashboard stylesheet token contract", () => {
   it("provides dark-mode overrides", () => {
     expect(tokensCss).toContain('[data-udb-theme="dark"]');
   });
+
+  it("bridges core tokens to design-system variables with fallbacks", () => {
+    const BRIDGED = [
+      ["--u-color-primary", "var(--color-primary, #2563eb)"],
+      ["--u-color-bg", "var(--color-background, #f8fafc)"],
+      ["--u-color-danger", "var(--color-destructive, #dc2626)"],
+      ["--u-radius-md", "var(--radius-md, 8px)"],
+      ["--u-shadow-lg", "var(--shadow-lg,"],
+      ["--u-font-sans", "var(--font-sans,"],
+    ] as const;
+    for (const [token, bridge] of BRIDGED) {
+      expect(tokensCss).toContain(`${token}: ${bridge}`);
+    }
+  });
+
+  it("derives hover/soft shades from the bridged base color", () => {
+    expect(tokensCss).toMatch(/--u-color-primary-hover: var\(--color-primary-hover, color-mix\(/);
+    expect(tokensCss).toMatch(/--u-color-primary-soft: var\(--color-primary-soft, color-mix\(/);
+  });
+
+  it("pulls the design-system stylesheet transitively", () => {
+    const imports = [...dashboardCss.matchAll(/@import\s+"([^"]+)"/g)].map((m) => m[1]);
+    expect(imports[0]).toBe("@umituz/web-design-system/styles.css");
+    expect(imports).toContain("./tokens.css");
+  });
 });
