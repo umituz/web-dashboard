@@ -13,7 +13,7 @@
  *   1. Scope & reset       5. Sidebar            9. Onboarding
  *   2. Primitives          6. Header / menus    10. Settings
  *   3. Layout helpers      7. Auth              11. Analytics
- *   4. App shell           8. Forms (auth)
+ *   4. App shell           8. Forms (auth)      12. Shared blocks
  */
 
 /* ============================================================
@@ -2777,4 +2777,239 @@
 
 .udb-chart__grid {
   stroke: var(--u-color-border);
+}
+
+/* ============================================================
+ * 12. Shared blocks — empty state, tables, org switcher, matrix,
+ *     audit list (used by guards, session and settings skeletons)
+ * ============================================================ */
+
+/* Generic empty / forbidden state. */
+.udb-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--u-space-3);
+  padding: var(--u-space-8) var(--u-space-6);
+  text-align: center;
+  color: var(--u-color-muted);
+}
+
+.udb-empty__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--u-color-surface-muted);
+}
+
+.udb-empty__glyph {
+  width: 20px;
+  height: 20px;
+  color: var(--u-color-muted);
+  opacity: 0.7;
+}
+
+.udb-empty__text {
+  margin: 0;
+  font-size: var(--u-font-size-md);
+  font-weight: var(--u-font-weight-medium);
+  color: var(--u-color-text);
+}
+
+.udb-empty__hint {
+  margin: 0;
+  font-size: var(--u-font-size-sm);
+  color: var(--u-color-muted);
+}
+
+/* Data tables (user management, permission matrix). */
+.udb-table__wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--u-color-border);
+  border-radius: var(--u-radius-lg);
+  background: var(--u-color-surface);
+}
+
+.udb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--u-font-size-md);
+}
+
+.udb-table__th {
+  padding: var(--u-space-2) var(--u-space-3);
+  border-bottom: 1px solid var(--u-color-border-strong);
+  text-align: left;
+  font-size: var(--u-font-size-xs);
+  font-weight: var(--u-font-weight-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--u-color-muted);
+  white-space: nowrap;
+}
+
+.udb-table__th--code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.udb-table__td {
+  padding: var(--u-space-3);
+  border-bottom: 1px solid var(--u-color-border);
+  color: var(--u-color-text);
+}
+
+.udb-table__row:last-child .udb-table__td {
+  border-bottom: none;
+}
+
+.udb-table__row:hover .udb-table__td {
+  background: var(--u-color-surface-muted);
+}
+
+.udb-table__td--strong {
+  font-weight: var(--u-font-weight-medium);
+  white-space: nowrap;
+}
+
+.udb-table__td--center {
+  text-align: center;
+}
+
+/* Org switcher (reuses udb-profile-btn / udb-avatar / udb-menu). */
+.udb-org {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.2;
+}
+
+.udb-org__name {
+  font-size: var(--u-font-size-md);
+  font-weight: var(--u-font-weight-medium);
+  color: var(--u-color-text);
+}
+
+.udb-org__meta {
+  font-size: 10px;
+  text-transform: capitalize;
+  color: var(--u-color-muted);
+}
+
+.udb-org-menu {
+  padding: var(--u-space-2);
+}
+
+.udb-org-menu__label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.udb-org-menu__check {
+  width: 14px;
+  height: 14px;
+  color: var(--u-color-primary);
+}
+
+.udb-menu__item--active {
+  background: var(--u-color-primary-soft);
+  color: var(--u-color-primary);
+  font-weight: var(--u-font-weight-medium);
+}
+
+/* Permission matrix cells. */
+.udb-matrix__cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--u-color-border-strong);
+  border-radius: var(--u-radius-sm);
+  background: var(--u-color-surface);
+  cursor: pointer;
+}
+
+.udb-matrix__cell:hover {
+  border-color: var(--u-color-primary);
+}
+
+.udb-matrix__cell--on {
+  border-color: var(--u-color-primary);
+  background: var(--u-color-primary-soft);
+}
+
+.udb-matrix__check {
+  width: 14px;
+  height: 14px;
+  color: var(--u-color-success);
+}
+
+.udb-matrix__deny {
+  width: 14px;
+  height: 14px;
+  color: var(--u-color-muted);
+  opacity: 0.5;
+}
+
+/* Audit log rows. */
+.udb-audit {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border: 1px solid var(--u-color-border);
+  border-radius: var(--u-radius-lg);
+  background: var(--u-color-surface);
+  overflow: hidden;
+}
+
+.udb-audit__item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--u-space-4);
+  padding: var(--u-space-3) var(--u-space-4);
+  border-bottom: 1px solid var(--u-color-border);
+  font-size: var(--u-font-size-md);
+}
+
+.udb-audit__item:last-child {
+  border-bottom: none;
+}
+
+.udb-audit__at {
+  flex-shrink: 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--u-font-size-sm);
+  color: var(--u-color-muted);
+}
+
+.udb-audit__actor {
+  flex-shrink: 0;
+  font-weight: var(--u-font-weight-medium);
+  color: var(--u-color-text);
+}
+
+.udb-audit__action {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--u-font-size-sm);
+  color: var(--u-color-primary);
+}
+
+.udb-audit__target {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--u-color-muted);
 }
