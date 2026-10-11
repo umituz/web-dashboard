@@ -175,7 +175,7 @@ readably. The per-domain key catalogs are the string contract:
 import { AUTH_KEYS } from "@umituz/web-dashboard/auth";
 import { ANALYTICS_KEYS } from "@umituz/web-dashboard/analytics";
 import { ONBOARDING_KEYS } from "@umituz/web-dashboard/onboarding";
-import { SETTINGS_ADMIN_KEYS } from "@umituz/web-dashboard/settings/utils/i18nKeys";
+import { SETTINGS_ADMIN_KEYS } from "@umituz/web-dashboard/settings/utils";
 import { PERMISSIONS_KEYS } from "@umituz/web-dashboard/permissions";
 import { SESSION_KEYS } from "@umituz/web-dashboard/session";
 ```
