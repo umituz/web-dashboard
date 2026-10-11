@@ -2751,8 +2751,7 @@
   margin-top: var(--u-space-4);
 }
 
-/* Chart container (recharts is rewritten in B7; these classes
- * style the wrapper and the axis/grid/empty surfaces it renders). */
+/* Chart container + dependency-free SVG renderer surfaces. */
 .udb-chart {
   position: relative;
   width: 100%;
@@ -2777,6 +2776,37 @@
 
 .udb-chart__grid {
   stroke: var(--u-color-border);
+}
+
+.udb-chart__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.udb-chart__legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: var(--u-space-3);
+  margin-top: var(--u-space-3);
+}
+
+.udb-chart__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--u-space-2);
+  font-size: var(--u-font-size-sm);
+  color: var(--u-color-muted);
+}
+
+.udb-chart__chip-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
 }
 
 /* ============================================================
