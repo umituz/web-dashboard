@@ -15,7 +15,7 @@ import {
   Pin,
   Hash,
 } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { cn } from "../../../primitives";
 import type { OnboardingState, PlatformOption } from "../types/onboarding";
 import { ONBOARDING_KEYS } from "../utils/i18nKeys";
@@ -45,7 +45,7 @@ export const PlatformsStep = ({
   updateState,
   platforms,
 }: PlatformsStepProps) => {
-  const { t } = useTranslation();
+  const t = useT();
   const platformOptions = platforms ?? DEFAULT_PLATFORMS;
 
   const togglePlatform = (id: string) => {

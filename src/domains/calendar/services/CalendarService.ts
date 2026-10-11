@@ -1,8 +1,11 @@
 /**
  * Calendar Service
  *
- * Firebase-based calendar service for managing content items
- * Uses dependency-injected database interface for testability
+ * Camp-agnostic calendar service for managing content items.
+ * Persistence is injected via the `ICalendarDatabase` seam — the
+ * package ships no Firebase (or any other) backend. Use
+ * `createInMemoryCalendarDatabase()` for demos and tests, or adapt
+ * your own backend to the interface.
  */
 
 import type {
@@ -12,12 +15,6 @@ import type {
   UpdateContentItemParams,
   ICalendarService,
 } from '../types/calendar.types';
-import {
-  mapCalendarDocument,
-  mapPostDocument,
-  type FirestoreDocument,
-} from '../utils/contentItemMapper';
-import type { Firestore } from 'firebase/firestore';
 
 /**
  * Database interface for calendar operations
@@ -32,11 +29,6 @@ export interface ICalendarDatabase {
 }
 
 /**
- * Firestore document with id for both collections
- */
-type CalendarDoc = FirestoreDocument<Record<string, unknown>>;
-
-/**
  * Resolve scheduled_at to ISO string regardless of source type
  */
 const resolveScheduledAt = (value: string | Date | undefined): string => {
@@ -48,114 +40,67 @@ const resolveScheduledAt = (value: string | Date | undefined): string => {
 };
 
 /**
- * Firebase implementation of calendar database
+ * In-memory calendar database — zero-dependency default for demos
+ * and tests. Data lives per-instance for the lifetime of the page.
  */
-class FirebaseCalendarDatabase implements ICalendarDatabase {
-  async getItems(userId: string): Promise<ContentItem[]> {
-    const { collection, query, where, getDocs } = await import('firebase/firestore');
-    const { getFirebaseDB } = await import('@umituz/web-firebase');
-    const db = getFirebaseDB() as Firestore;
+export const createInMemoryCalendarDatabase = (): ICalendarDatabase => {
+  const items = new Map<string, ContentItem>();
 
-    const calendarQuery = query(
-      collection(db, 'calendar_items'),
-      where('user_id', '==', userId),
-    );
+  const findByUser = (userId: string): ContentItem[] =>
+    [...items.values()].filter((item) => item.user_id === userId);
 
-    const postsQuery = query(
-      collection(db, 'posts'),
-      where('userId', '==', userId),
-    );
+  return {
+    async getItems(userId: string): Promise<ContentItem[]> {
+      return findByUser(userId).sort(
+        (a, b) =>
+          new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime(),
+      );
+    },
 
-    const [calendarSnap, postsSnap] = await Promise.all([
-      getDocs(calendarQuery),
-      getDocs(postsQuery),
-    ]);
+    async getItemById(id: string): Promise<ContentItem | null> {
+      return items.get(id) ?? null;
+    },
 
-    const calendarItems = calendarSnap.docs.map((doc) =>
-      mapCalendarDocument(doc as unknown as CalendarDoc),
-    );
+    async createItem(
+      userId: string,
+      item: CreateContentItemParams,
+    ): Promise<ContentItem> {
+      const created: ContentItem = {
+        id: `item-${items.size + 1}-${userId}`,
+        title: item.title ?? '',
+        description: item.description ?? '',
+        scheduled_at: resolveScheduledAt(item.scheduled_at),
+        platforms: item.platforms ?? [],
+        app_name: item.app_name ?? '',
+        status: item.status ?? 'draft',
+        type: item.type ?? 'post',
+        user_id: userId,
+        created_at: new Date().toISOString(),
+      };
+      items.set(created.id, created);
+      return created;
+    },
 
-    const postItems = postsSnap.docs.map((doc) =>
-      mapPostDocument(doc as unknown as CalendarDoc),
-    );
+    async updateItem(id: string, updates: UpdateContentItemParams): Promise<void> {
+      const current = items.get(id);
+      if (!current) {
+        throw new Error(`Calendar item not found: ${id}`);
+      }
+      items.set(id, {
+        ...current,
+        ...updates,
+        scheduled_at:
+          updates.scheduled_at !== undefined
+            ? resolveScheduledAt(updates.scheduled_at)
+            : current.scheduled_at,
+      });
+    },
 
-    return [...calendarItems, ...postItems].sort(
-      (a, b) =>
-        new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime(),
-    );
-  }
-
-  async getItemById(id: string): Promise<ContentItem | null> {
-    const { doc, getDoc } = await import('firebase/firestore');
-    const { getFirebaseDB } = await import('@umituz/web-firebase');
-    const db = getFirebaseDB() as Firestore;
-
-    const docRef = doc(db, 'calendar_items', id);
-    const snap = await getDoc(docRef);
-
-    if (!snap.exists()) {
-      return null;
-    }
-
-    return mapCalendarDocument(snap as unknown as CalendarDoc);
-  }
-
-  async createItem(userId: string, item: CreateContentItemParams): Promise<ContentItem> {
-    const { collection, addDoc, serverTimestamp } = await import('firebase/firestore');
-    const { getFirebaseDB } = await import('@umituz/web-firebase');
-    const db = getFirebaseDB() as Firestore;
-
-    const scheduledAt = resolveScheduledAt(item.scheduled_at);
-
-    const docRef = await addDoc(collection(db, 'calendar_items'), {
-      ...item,
-      scheduled_at: scheduledAt,
-      user_id: userId,
-      created_at: serverTimestamp(),
-      updated_at: serverTimestamp(),
-    });
-
-    return {
-      id: docRef.id,
-      title: item.title ?? '',
-      description: item.description ?? '',
-      scheduled_at: scheduledAt,
-      platforms: item.platforms ?? [],
-      app_name: item.app_name ?? '',
-      status: item.status ?? 'draft',
-      type: item.type ?? 'post',
-      user_id: userId,
-      created_at: new Date().toISOString(),
-    };
-  }
-
-  async updateItem(id: string, updates: UpdateContentItemParams): Promise<void> {
-    const { doc, updateDoc, serverTimestamp } = await import('firebase/firestore');
-    const { getFirebaseDB } = await import('@umituz/web-firebase');
-    const db = getFirebaseDB() as Firestore;
-
-    const docRef = doc(db, 'calendar_items', id);
-
-    const updateData: Record<string, unknown> = { ...updates };
-    if (updates.scheduled_at) {
-      updateData.scheduled_at = resolveScheduledAt(updates.scheduled_at);
-    }
-
-    await updateDoc(docRef, {
-      ...updateData,
-      updated_at: serverTimestamp(),
-    });
-  }
-
-  async deleteItem(id: string): Promise<void> {
-    const { doc, deleteDoc } = await import('firebase/firestore');
-    const { getFirebaseDB } = await import('@umituz/web-firebase');
-    const db = getFirebaseDB() as Firestore;
-
-    const docRef = doc(db, 'calendar_items', id);
-    await deleteDoc(docRef);
-  }
-}
+    async deleteItem(id: string): Promise<void> {
+      items.delete(id);
+    },
+  };
+};
 
 /**
  * Apply a CalendarFilter to a list of items.
@@ -208,7 +153,7 @@ const applyCalendarFilter = (items: ContentItem[], filter?: CalendarFilter): Con
 export class CalendarService implements ICalendarService {
   private database: ICalendarDatabase;
 
-  constructor(database: ICalendarDatabase = new FirebaseCalendarDatabase()) {
+  constructor(database: ICalendarDatabase = createInMemoryCalendarDatabase()) {
     this.database = database;
   }
 
@@ -251,7 +196,8 @@ export class CalendarService implements ICalendarService {
 }
 
 /**
- * Default singleton instance using the Firebase implementation
+ * Default singleton instance (in-memory — swap the backend via
+ * `setDatabase` or construct your own `CalendarService`).
  */
 export const calendarService = new CalendarService();
 

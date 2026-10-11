@@ -23,7 +23,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { cn } from "../../../primitives";
 import type { ChartConfig, ChartData, TimeSeriesData } from "../types/analytics";
 import { generateChartColors } from "../utils/analytics";
@@ -73,7 +73,7 @@ const renderOverlay = (config: ChartConfig) => (
 );
 
 export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProps) => {
-  const { t } = useTranslation();
+  const t = useT();
   const colors = useMemo(
     () => config.colors ?? generateChartColors(config.yAxisKeys?.length ?? DEFAULT_SERIES_COUNT),
     [config.colors, config.yAxisKeys],

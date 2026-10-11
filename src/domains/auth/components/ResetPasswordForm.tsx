@@ -7,7 +7,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { Loader2, CheckCircle2 } from "lucide-react";
 import { Button, Input } from "../../../primitives";
 import { cn } from "../../../primitives";
@@ -43,7 +43,7 @@ export const ResetPasswordForm = ({
   onError,
 }: ResetPasswordFormProps) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const t = useT();
   const translate: Translate = t;
 
   const [password, setPassword] = useState("");

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 
 import { Button, cn } from "../../../primitives";
 import { BrandLogo } from "./BrandLogo";
@@ -45,7 +45,7 @@ export const DashboardSidebar = ({
   user,
 }: DashboardSidebarPropsExtended) => {
   const location = useLocation();
-  const { t } = useTranslation();
+  const t = useT();
   const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
 
   const toggleGroup = (title: string) => {

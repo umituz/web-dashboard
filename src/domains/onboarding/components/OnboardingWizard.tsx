@@ -9,7 +9,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { Button } from "../../../primitives";
 import { useOnboarding } from "../hooks/useOnboarding";
 import { StepProgress } from "./StepProgress";
@@ -29,7 +29,7 @@ export const OnboardingWizard = ({
   onCancel,
 }: OnboardingWizardProps) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const t = useT();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<OnboardingError | null>(null);
 

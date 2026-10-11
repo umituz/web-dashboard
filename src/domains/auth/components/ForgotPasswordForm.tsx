@@ -8,7 +8,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { ArrowLeft, Loader2, CheckCircle2, Check } from "lucide-react";
 import { Button } from "../../../primitives";
 import type { ForgotPasswordFormProps, Translate } from "../types/auth";
@@ -42,7 +42,7 @@ export const ForgotPasswordForm = ({
   showBackLink = true,
 }: ForgotPasswordFormProps) => {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const t = useT();
   const translate: Translate = t;
 
   const [email, setEmail] = useState("");

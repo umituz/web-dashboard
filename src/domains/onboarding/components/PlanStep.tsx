@@ -9,7 +9,7 @@
 
 import { useMemo } from "react";
 import { Check, Sparkles } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { cn } from "../../../primitives";
 import type { OnboardingState, PlanOption } from "../types/onboarding";
 import { ONBOARDING_KEYS } from "../utils/i18nKeys";
@@ -85,7 +85,7 @@ export const PlanStep = ({
   yearlyDiscountPercent = DEFAULT_YEARLY_DISCOUNT,
   trialDays = DEFAULT_TRIAL_DAYS,
 }: PlanStepProps) => {
-  const { t } = useTranslation();
+  const t = useT();
   const planOptions = plans ?? DEFAULT_PLANS;
 
   /**

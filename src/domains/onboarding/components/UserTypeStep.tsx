@@ -7,7 +7,7 @@
  */
 
 import { Check } from "lucide-react";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { cn } from "../../../primitives";
 import type { OnboardingState, UserTypeOption } from "../types/onboarding";
 import type { ComponentType } from "react";
@@ -42,7 +42,7 @@ export const UserTypeStep = ({
   updateState,
   options = [],
 }: UserTypeStepProps) => {
-  const { t } = useTranslation();
+  const t = useT();
   const userTypeOptions = options.length > 0 ? options : DEFAULT_OPTIONS;
 
   return (

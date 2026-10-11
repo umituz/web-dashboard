@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, Outlet, Navigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import { useT } from "../../../i18n";
 import { Skeleton } from "../../../primitives";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
@@ -72,7 +72,7 @@ export const DashboardLayout = ({
   routeTransitionMs = 0,
 }: DashboardLayoutProps) => {
   const location = useLocation();
-  const { t } = useTranslation();
+  const t = useT();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loading, setLoading] = useState(routeTransitionMs > 0);
