@@ -1,7 +1,7 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "3.2.5",
-  "description": "Dashboard Layout System - Comprehensive analytics, calendar, customizable layouts, and config-based architecture",
+  "version": "4.0.0",
+  "description": "Installable app skeleton for the fleet — layouts, auth, onboarding, analytics (dependency-free SVG charts), calendar, i18n injection, permissions/session/module registry; ships its own udb-* stylesheet and --u-* tokens",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -72,8 +72,7 @@
   },
   "dependencies": {
     "clsx": "^2.1.1",
-    "lucide-react": "^0.577.0",
-    "recharts": "^2.15.0"
+    "lucide-react": "^0.577.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.14",
@@ -112,7 +111,7 @@
     "metrics",
     "kpi",
     "visualization",
-    "recharts",
+    "svg-charts",
     "react",
     "typescript",
     "components",
