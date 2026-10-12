@@ -29,6 +29,6 @@ const interpolate = (text: string, params?: Record<string, unknown>): string => 
 
 export const defaultT: TranslateFn = (key, params) => {
   const segments = key.split(".").filter(Boolean);
-  const source = segments.length > 0 ? segments[segments.length - 1] : key;
+  const source = segments[segments.length - 1] ?? key;
   return interpolate(humanizeSegment(source), params);
 };
