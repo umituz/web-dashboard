@@ -81,7 +81,7 @@ export const RegisterForm = ({
       setError(null);
 
       const validation = validateRegister(
-        { email, password, name },
+        { email, password, name, confirmPassword },
         false,
         requirePasswordConfirm,
       );
