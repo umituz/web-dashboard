@@ -100,6 +100,12 @@ describe("validateRegister", () => {
       error: AUTH_VALIDATION_KEYS.passwordsDoNotMatch,
     });
   });
+
+  it("accepts matching confirmation when required (the RegisterForm call shape)", () => {
+    expect(
+      validateRegister({ ...base, name: "A", confirmPassword: base.password }, false, true),
+    ).toEqual({ valid: true });
+  });
 });
 
 describe("validateResetPassword", () => {
