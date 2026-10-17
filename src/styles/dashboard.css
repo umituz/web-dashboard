@@ -2729,3 +2729,131 @@
   white-space: nowrap;
   color: var(--u-color-muted);
 }
+
+/* ============================================================
+ * 12. Charts — card frame, legend, hover tooltip
+ * ============================================================ */
+
+.udb-chartcard {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--u-color-surface);
+  border: 1px solid var(--u-color-border);
+  border-radius: var(--u-radius-lg);
+  box-shadow: var(--u-shadow-sm);
+}
+
+.udb-chartcard__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--u-space-3);
+  padding: 14px 18px 4px;
+  flex-wrap: wrap;
+}
+
+.udb-chartcard__heading {
+  min-width: 0;
+}
+
+.udb-chartcard__title {
+  font-size: var(--u-font-size-md);
+  font-weight: 600;
+  color: var(--u-color-text);
+}
+
+.udb-chartcard__sub {
+  font-size: var(--u-font-size-sm);
+  color: var(--u-color-muted);
+  margin-top: 1px;
+}
+
+.udb-chartcard__tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.udb-chartcard__body {
+  padding: 10px 14px 14px;
+  min-width: 0;
+}
+
+.udb-chartcard__body svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.udb-chartcard__plot {
+  position: relative;
+}
+
+.udb-chartlegend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 14px;
+}
+
+.udb-chartlegend__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--u-font-size-sm);
+  color: var(--u-color-text);
+  white-space: nowrap;
+}
+
+.udb-chartlegend__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2.5px;
+  flex: none;
+}
+
+.udb-chartlegend__value {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--u-color-muted);
+  font-size: var(--u-font-size-xs);
+}
+
+.udb-charttip {
+  position: absolute;
+  pointer-events: none;
+  background: var(--u-color-text);
+  color: var(--u-color-bg);
+  border-radius: var(--u-radius-md);
+  padding: 7px 10px;
+  font-size: var(--u-font-size-sm);
+  box-shadow: var(--u-shadow-lg);
+  z-index: 30;
+  min-width: 120px;
+  transform: translate(-50%, calc(-100% - 10px));
+}
+
+.udb-charttip__title {
+  font-weight: 600;
+  margin-bottom: 2px;
+  white-space: nowrap;
+}
+
+.udb-charttip__row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  justify-content: space-between;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: var(--u-font-size-xs);
+}
+
+.udb-charttip__row b {
+  font-weight: 600;
+}
+
+.udb-charttip__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
