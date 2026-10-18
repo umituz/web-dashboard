@@ -2908,3 +2908,216 @@
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
+
+.udb-barchart {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  width: 100%;
+}
+
+.udb-barchart__col {
+  position: relative;
+  display: flex;
+  flex: 1;
+  align-items: flex-end;
+  min-width: 0;
+  height: 100%;
+}
+
+.udb-barchart__bar {
+  width: 100%;
+  min-height: 2px;
+  border-radius: 3px 3px 0 0;
+  transition: opacity 150ms ease, height 300ms ease;
+}
+
+.udb-barchart__tip {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  z-index: 10;
+  padding: 4px 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  border: 1px solid var(--u-color-border);
+  border-radius: var(--u-radius-sm);
+  background: var(--u-color-surface);
+  box-shadow: var(--u-shadow-sm);
+  font-size: var(--u-font-size-xs);
+  color: var(--u-color-muted);
+}
+
+.udb-barchart__tip b {
+  margin-right: 4px;
+  font-weight: var(--u-font-weight-medium);
+  color: var(--u-color-text);
+}
+
+.udb-donut {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.udb-donut__wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.udb-donut__seg {
+  cursor: pointer;
+  transition: stroke-width 150ms ease, opacity 150ms ease;
+}
+
+.udb-donut__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.udb-donut__value {
+  font-size: var(--u-font-size-lg);
+  font-weight: var(--u-font-weight-bold);
+  color: var(--u-color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.udb-donut__label {
+  margin-top: 2px;
+  font-size: var(--u-font-size-xs);
+  color: var(--u-color-muted);
+}
+
+.udb-donut__list {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.udb-donut__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: var(--u-radius-sm);
+}
+
+.udb-donut__item:hover {
+  background: var(--u-color-surface-muted);
+}
+
+.udb-donut__itemlabel {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--u-font-size-sm);
+  color: var(--u-color-text);
+}
+
+.udb-donut__dot {
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+  border-radius: 3px;
+}
+
+.udb-donut__itemvalue {
+  flex-shrink: 0;
+  font-size: var(--u-font-size-sm);
+  font-weight: var(--u-font-weight-medium);
+  color: var(--u-color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.udb-donut__pct {
+  margin-left: 6px;
+  color: var(--u-color-muted);
+}
+
+.udb-linechart {
+  position: relative;
+  width: 100%;
+  user-select: none;
+}
+
+.udb-linechart__svg {
+  display: block;
+  width: 100%;
+}
+
+.udb-linechart__axis {
+  fill: var(--u-color-muted);
+  font-size: var(--u-font-size-xs);
+  font-family: var(--u-font-sans);
+}
+
+.udb-linechart__grid {
+  stroke: var(--u-color-border);
+  stroke-width: 1;
+}
+
+.udb-linechart__crosshair {
+  stroke: var(--u-color-border-strong);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.udb-linechart__tip {
+  position: absolute;
+  top: 8px;
+  z-index: 10;
+  min-width: 132px;
+  padding: 8px;
+  pointer-events: none;
+  border: 1px solid var(--u-color-border);
+  border-radius: var(--u-radius-md);
+  background: var(--u-color-surface);
+  box-shadow: var(--u-shadow-md);
+}
+
+.udb-linechart__tiptitle {
+  margin-bottom: 4px;
+  font-size: var(--u-font-size-xs);
+  color: var(--u-color-muted);
+}
+
+.udb-linechart__tiprow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: var(--u-font-size-sm);
+}
+
+.udb-linechart__tiprow span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--u-color-muted);
+}
+
+.udb-linechart__tiprow b {
+  font-weight: var(--u-font-weight-medium);
+  color: var(--u-color-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.udb-linechart__swatch {
+  display: inline-block;
+  width: 12px;
+  height: 3px;
+  border-radius: 999px;
+}
+
+.udb-linechart__legendhost {
+  margin-top: 4px;
+  padding: 0 8px;
+}

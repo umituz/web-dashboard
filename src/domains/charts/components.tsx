@@ -1,6 +1,6 @@
-import { useId } from 'react';
+import { useId, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
-import type { TipState } from './utils';
+import { PALETTE, gridTicks, niceMax, type TipState } from './utils';
 
 export function ChartTip({ tip }: { tip: TipState }) {
   return (
@@ -134,6 +134,349 @@ export function HBars({ rows, formatValue = (n: number) => String(n) }: { rows: 
           <span className="udb-hbars__value">{formatValue(r.value)}</span>
         </div>
       ))}
+    </div>
+  );
+}
+
+export interface BarDatum {
+  label: string;
+  value: number;
+  tone?: string;
+  highlight?: boolean;
+}
+
+export function BarChart({
+  data,
+  height = 130,
+  tone = PALETTE[0]!,
+  highlightTone = '#c2410c',
+  formatValue = (v: number) => String(v),
+  formatLabel = (l: string) => l,
+}: {
+  data: BarDatum[];
+  height?: number;
+  tone?: string;
+  highlightTone?: string;
+  formatValue?: (v: number) => string;
+  formatLabel?: (l: string) => string;
+}) {
+  const [hover, setHover] = useState<number | null>(null);
+  const max = Math.max(1, ...data.map((d) => d.value));
+  return (
+    <div className="udb-barchart" style={{ height }}>
+      {data.map((d, i) => (
+        <div
+          key={i}
+          className="udb-barchart__col"
+          onMouseEnter={() => setHover(i)}
+          onMouseLeave={() => setHover(null)}
+        >
+          <div
+            className="udb-barchart__bar"
+            style={{
+              height: `${Math.max(2, (d.value / max) * 100)}%`,
+              background: d.highlight ? highlightTone : (d.tone ?? tone),
+              opacity: hover === null || hover === i ? 1 : 0.4,
+            }}
+          />
+          {hover === i && (
+            <div className="udb-barchart__tip">
+              <b>{formatValue(d.value)}</b>
+              {formatLabel(d.label)}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export interface DonutSegment {
+  label: string;
+  value: number;
+  tone?: string;
+}
+
+export function Donut({
+  segments,
+  size = 148,
+  thickness = 18,
+  centerValue,
+  centerLabel,
+  formatValue = (v: number) => String(v),
+}: {
+  segments: DonutSegment[];
+  size?: number;
+  thickness?: number;
+  centerValue?: string;
+  centerLabel?: string;
+  formatValue?: (v: number) => string;
+}) {
+  const [active, setActive] = useState<number | null>(null);
+  const total = segments.reduce((sum, seg) => sum + seg.value, 0) || 1;
+  const radius = (size - thickness) / 2;
+  const circumference = 2 * Math.PI * radius;
+  let offset = 0;
+  return (
+    <div className="udb-donut">
+      <div className="udb-donut__wrap" style={{ width: size, height: size }}>
+        <svg width={size} height={size} style={{ transform: 'rotate(-90deg)' }}>
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={radius}
+            fill="none"
+            stroke="var(--u-color-surface-muted)"
+            strokeWidth={thickness}
+          />
+          {segments.map((seg, i) => {
+            const dash = (seg.value / total) * circumference;
+            const el = (
+              <circle
+                key={seg.label}
+                cx={size / 2}
+                cy={size / 2}
+                r={radius}
+                fill="none"
+                stroke={seg.tone ?? PALETTE[i % PALETTE.length]!}
+                strokeWidth={active === i ? thickness + 3 : thickness}
+                strokeDasharray={`${dash} ${circumference - dash}`}
+                strokeDashoffset={-offset}
+                strokeLinecap="butt"
+                opacity={active === null || active === i ? 1 : 0.35}
+                className="udb-donut__seg"
+                onMouseEnter={() => setActive(i)}
+                onMouseLeave={() => setActive(null)}
+              />
+            );
+            offset += dash;
+            return el;
+          })}
+        </svg>
+        <div className="udb-donut__center">
+          <span className="udb-donut__value">
+            {active !== null ? formatValue(segments[active]!.value) : centerValue}
+          </span>
+          <span className="udb-donut__label">{active !== null ? segments[active]!.label : centerLabel}</span>
+        </div>
+      </div>
+      <div className="udb-donut__list">
+        {segments.map((seg, i) => (
+          <div
+            key={seg.label}
+            className="udb-donut__item"
+            onMouseEnter={() => setActive(i)}
+            onMouseLeave={() => setActive(null)}
+          >
+            <span className="udb-donut__itemlabel">
+              <span className="udb-donut__dot" style={{ background: seg.tone ?? PALETTE[i % PALETTE.length]! }} />
+              {seg.label}
+            </span>
+            <span className="udb-donut__itemvalue">
+              {formatValue(seg.value)}
+              <span className="udb-donut__pct">{Math.round((seg.value / total) * 100)}%</span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export interface LineSeries {
+  key: string;
+  label: string;
+  values: number[];
+  tone?: string;
+  kind?: 'line' | 'bars';
+  axis?: 'left' | 'right';
+  dashed?: boolean;
+  area?: boolean;
+}
+
+export interface LineChartPoint {
+  label: string;
+}
+
+export function LineChart({
+  points,
+  series,
+  height = 220,
+  formatLeft = (v: number) => String(Math.round(v)),
+  formatRight = (v: number) => String(Math.round(v)),
+  yLabelLeft,
+  yLabelRight,
+}: {
+  points: LineChartPoint[];
+  series: LineSeries[];
+  height?: number;
+  formatLeft?: (v: number) => string;
+  formatRight?: (v: number) => string;
+  yLabelLeft?: string;
+  yLabelRight?: string;
+}) {
+  const [hover, setHover] = useState<number | null>(null);
+  const w = 720;
+  const padLeft = 52;
+  const padRight = series.some((s) => s.axis === 'right') ? 46 : 14;
+  const padTop = 12;
+  const padBottom = 24;
+  const innerW = w - padLeft - padRight;
+  const innerH = height - padTop - padBottom;
+  const n = points.length;
+
+  const toneOf = (s: LineSeries, i: number) => s.tone ?? PALETTE[i % PALETTE.length]!;
+
+  const leftMax = useMemo(
+    () => niceMax(Math.max(1, ...series.filter((s) => s.axis !== 'right').flatMap((s) => s.values))),
+    [series],
+  );
+  const rightMax = useMemo(
+    () => niceMax(Math.max(1, ...series.filter((s) => s.axis === 'right').flatMap((s) => s.values))),
+    [series],
+  );
+  const leftTicks = useMemo(() => gridTicks(Math.max(...series.filter((s) => s.axis !== 'right').flatMap((s) => s.values), 1)), [series]);
+
+  const xAt = (i: number) => padLeft + (n <= 1 ? innerW / 2 : (i / (n - 1)) * innerW);
+  const yLeft = (v: number) => padTop + innerH - (v / leftMax) * innerH;
+  const yRight = (v: number) => padTop + innerH - (v / rightMax) * innerH;
+  const labelEvery = Math.max(1, Math.ceil(n / 8));
+
+  if (n === 0) return null;
+
+  return (
+    <div className="udb-linechart">
+      <svg
+        viewBox={`0 0 ${w} ${height}`}
+        className="udb-linechart__svg"
+        style={{ height }}
+        onMouseLeave={() => setHover(null)}
+        onMouseMove={(e) => {
+          const rect = e.currentTarget.getBoundingClientRect();
+          const x = ((e.clientX - rect.left) / rect.width) * w;
+          const idx = Math.round(((x - padLeft) / innerW) * (n - 1));
+          setHover(Math.max(0, Math.min(n - 1, idx)));
+        }}
+      >
+        {leftTicks.map((v, i) => (
+          <g key={i}>
+            <line x1={padLeft} x2={w - padRight} y1={yLeft(v)} y2={yLeft(v)} className="udb-linechart__grid" />
+            <text x={padLeft - 6} y={yLeft(v) + 3} textAnchor="end" className="udb-linechart__axis">
+              {formatLeft(v)}
+            </text>
+          </g>
+        ))}
+        {series.some((s) => s.axis === 'right') && (
+          <g>
+            {leftTicks.map((v, i) => (
+              <text key={i} x={w - padRight + 6} y={yLeft(v) + 3} textAnchor="start" className="udb-linechart__axis">
+                {formatRight((v / leftMax) * rightMax)}
+              </text>
+            ))}
+          </g>
+        )}
+        {points.map((p, i) =>
+          i % labelEvery === 0 ? (
+            <text key={i} x={xAt(i)} y={height - 8} textAnchor="middle" className="udb-linechart__axis">
+              {p.label}
+            </text>
+          ) : null,
+        )}
+        {series.map((s, si) => {
+          const yFn = s.axis === 'right' ? yRight : yLeft;
+          if (s.kind === 'bars') {
+            const barW = Math.max(3, (innerW / Math.max(1, n - 1)) * 0.5);
+            return (
+              <g key={s.key}>
+                {s.values.slice(0, n).map((v, i) => (
+                  <rect
+                    key={i}
+                    x={xAt(i) - barW / 2}
+                    y={yFn(v)}
+                    width={barW}
+                    height={Math.max(0, padTop + innerH - yFn(v))}
+                    rx={1.5}
+                    fill={toneOf(s, si)}
+                    opacity={hover === null || hover === i ? 0.85 : 0.35}
+                  />
+                ))}
+              </g>
+            );
+          }
+          const path = s.values
+            .slice(0, n)
+            .map((v, i) => `${i === 0 ? 'M' : 'L'}${xAt(i).toFixed(1)},${yFn(v).toFixed(1)}`)
+            .join(' ');
+          const areaPath = `${path} L${xAt(n - 1).toFixed(1)},${padTop + innerH} L${xAt(0).toFixed(1)},${padTop + innerH} Z`;
+          return (
+            <g key={s.key}>
+              {s.area !== false && !s.dashed && <path d={areaPath} fill={toneOf(s, si)} opacity={0.07} />}
+              <path
+                d={path}
+                fill="none"
+                stroke={toneOf(s, si)}
+                strokeWidth={2}
+                strokeLinejoin="round"
+                strokeLinecap="round"
+                strokeDasharray={s.dashed ? '4 4' : undefined}
+              />
+              {s.values.slice(0, n).map((v, i) => (
+                <circle
+                  key={i}
+                  cx={xAt(i)}
+                  cy={yFn(v)}
+                  r={hover === i ? 3.4 : 0}
+                  fill="var(--u-color-surface)"
+                  stroke={toneOf(s, si)}
+                  strokeWidth={2}
+                />
+              ))}
+            </g>
+          );
+        })}
+        {hover !== null && (
+          <line
+            x1={xAt(hover)}
+            x2={xAt(hover)}
+            y1={padTop}
+            y2={padTop + innerH}
+            className="udb-linechart__crosshair"
+          />
+        )}
+        {yLabelLeft && (
+          <text x={4} y={10} className="udb-linechart__axis">
+            {yLabelLeft}
+          </text>
+        )}
+        {yLabelRight && (
+          <text x={w - 4} y={10} textAnchor="end" className="udb-linechart__axis">
+            {yLabelRight}
+          </text>
+        )}
+      </svg>
+      {hover !== null && (
+        <div
+          className="udb-linechart__tip"
+          style={{
+            left: `${(xAt(hover) / w) * 100}%`,
+            transform: hover > n / 2 ? 'translateX(calc(-100% - 10px))' : 'translateX(10px)',
+          }}
+        >
+          <div className="udb-linechart__tiptitle">{points[hover]!.label}</div>
+          {series.map((s, si) => (
+            <div key={s.key} className="udb-linechart__tiprow">
+              <span>
+                <span className="udb-linechart__swatch" style={{ background: toneOf(s, si) }} />
+                {s.label}
+              </span>
+              <b>{(s.axis === 'right' ? formatRight : formatLeft)(s.values[hover]!)}</b>
+            </div>
+          ))}
+        </div>
+      )}
+      <div className="udb-linechart__legendhost">
+        <Legend items={series.map((s, si) => ({ label: s.label, color: toneOf(s, si) }))} />
+      </div>
     </div>
   );
 }
