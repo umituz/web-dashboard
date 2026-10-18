@@ -3153,3 +3153,39 @@
   margin-top: 4px;
   padding: 0 8px;
 }
+
+.udb-pageheader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.udb-pageheader__main {
+  min-width: 0;
+}
+
+.udb-pageheader__title {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--color-foreground);
+}
+
+.udb-pageheader__subtitle {
+  margin: 0.25rem 0 0;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  color: var(--color-muted-foreground);
+}
+
+.udb-pageheader__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
