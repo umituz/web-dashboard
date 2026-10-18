@@ -10,14 +10,21 @@ describe('charts markup smoke', () => {
     expect(renderToString(<Sparkline data={[1]} />)).toBe('');
   });
 
-  it('BarChart renders one column per datum with height proportional to value', () => {
+  it('BarChart renders one grouped column per label with one bar per series', () => {
     const html = renderToString(
-      <BarChart data={[{ label: 'mon', value: 4 }, { label: 'tue', value: 8 }, { label: 'wed', value: 0, highlight: true }]} />,
+      <BarChart
+        labels={['mon', 'tue', 'wed']}
+        series={[
+          { key: 'a', label: 'A', values: [4, 8, 0] },
+          { key: 'b', label: 'B', values: [2, 4, 6], tone: '#111111' },
+        ]}
+      />,
     );
-    expect(html.match(/udb-barchart__col/g)?.length).toBe(3);
-    expect(html).toContain('height:50%');
+    expect(html.match(/udb-barchart__col(?![a-z])/g)?.length).toBe(3);
+    expect(html.match(/udb-barchart__bar(?![a-z_])/g)?.length).toBe(6);
     expect(html).toContain('height:100%');
-    expect(html).toContain('#c2410c');
+    expect(html).toContain('height:50%');
+    expect(html).toContain('#111111');
   });
 
   it('Donut renders a segment circle per label with dash math and center fallback', () => {

@@ -2925,6 +2925,20 @@
   height: 100%;
 }
 
+.udb-barchart__bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  height: 100%;
+}
+
+.udb-barchart__bars .udb-barchart__bar {
+  flex: 1;
+  width: auto;
+}
+
 .udb-barchart__bar {
   width: 100%;
   min-height: 2px;
@@ -2946,6 +2960,24 @@
   box-shadow: var(--u-shadow-sm);
   font-size: var(--u-font-size-xs);
   color: var(--u-color-muted);
+}
+
+.udb-barchart__tiptitle {
+  font-weight: var(--u-font-weight-medium);
+  color: var(--u-color-text);
+}
+
+.udb-barchart__tiprow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.udb-barchart__tiplabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .udb-barchart__tip b {

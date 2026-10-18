@@ -5,7 +5,7 @@ export type {
   ChartCardProps,
   LegendItem,
   HBarRow,
-  BarDatum,
+  BarSeries,
   DonutSegment,
   LineSeries,
   LineChartPoint,

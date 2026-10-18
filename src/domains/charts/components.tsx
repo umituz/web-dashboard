@@ -138,51 +138,63 @@ export function HBars({ rows, formatValue = (n: number) => String(n) }: { rows: 
   );
 }
 
-export interface BarDatum {
+export interface BarSeries {
+  key: string;
   label: string;
-  value: number;
+  values: number[];
   tone?: string;
-  highlight?: boolean;
 }
 
 export function BarChart({
-  data,
+  labels,
+  series,
   height = 130,
-  tone = PALETTE[0]!,
-  highlightTone = '#c2410c',
   formatValue = (v: number) => String(v),
   formatLabel = (l: string) => l,
 }: {
-  data: BarDatum[];
+  labels: string[];
+  series: BarSeries[];
   height?: number;
-  tone?: string;
-  highlightTone?: string;
   formatValue?: (v: number) => string;
   formatLabel?: (l: string) => string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
-  const max = Math.max(1, ...data.map((d) => d.value));
+  const max = Math.max(1, ...series.flatMap((s) => [...s.values]));
+  const toneOf = (s: BarSeries, i: number) => s.tone ?? PALETTE[i % PALETTE.length]!;
   return (
     <div className="udb-barchart" style={{ height }}>
-      {data.map((d, i) => (
+      {labels.map((label, i) => (
         <div
-          key={i}
+          key={label}
           className="udb-barchart__col"
           onMouseEnter={() => setHover(i)}
           onMouseLeave={() => setHover(null)}
         >
-          <div
-            className="udb-barchart__bar"
-            style={{
-              height: `${Math.max(2, (d.value / max) * 100)}%`,
-              background: d.highlight ? highlightTone : (d.tone ?? tone),
-              opacity: hover === null || hover === i ? 1 : 0.4,
-            }}
-          />
+          <div className="udb-barchart__bars">
+            {series.map((s, si) => (
+              <div
+                key={s.key}
+                className="udb-barchart__bar"
+                style={{
+                  height: `${Math.max(2, ((s.values[i] ?? 0) / max) * 100)}%`,
+                  background: toneOf(s, si),
+                  opacity: hover === null || hover === i ? 1 : 0.4,
+                }}
+              />
+            ))}
+          </div>
           {hover === i && (
             <div className="udb-barchart__tip">
-              <b>{formatValue(d.value)}</b>
-              {formatLabel(d.label)}
+              <div className="udb-barchart__tiptitle">{formatLabel(label)}</div>
+              {series.map((s, si) => (
+                <div key={s.key} className="udb-barchart__tiprow">
+                  <span className="udb-barchart__tiplabel">
+                    <span className="udb-chartlegend__dot" style={{ background: toneOf(s, si) }} />
+                    {s.label}
+                  </span>
+                  <b>{formatValue(s.values[i] ?? 0)}</b>
+                </div>
+              ))}
             </div>
           )}
         </div>
