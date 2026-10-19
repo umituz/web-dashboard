@@ -1,27 +1,13 @@
-/**
- * AnalyticsLayout
- *
- * Top-level analytics page shell. All actions delegate to the
- * consumer via callbacks — no console.log, no no-op handlers.
- * The legacy "kpis" prop has been removed in favor of the typed
- * `metrics` array (breaking change called out in changelog).
- */
-
 import { useMemo } from "react";
 import { RefreshCw, Download, Calendar, Loader2 } from "lucide-react";
-import { useT } from "../../../i18n";
-import { cn } from "../../../primitives";
-import { Button } from "../../../primitives";
+import { useT } from "@umituz/web-localization/react";
+import { cn } from "@umituz/web-design-system/utils/cn";
+import { Button } from "@umituz/web-design-system/atoms";
 import type { AnalyticsLayoutProps, AnalyticsPeriod } from "../types/analytics";
 import { AnalyticsCard } from "./AnalyticsCard";
 import { MetricCard } from "./MetricCard";
 import { ANALYTICS_KEYS } from "../utils/i18nKeys";
 
-/**
- * Map analytics period tokens to localized display labels.
- * Periods not in this map fall back to the raw token — better
- * to show the key than an empty select option.
- */
 const PERIOD_LABEL: Record<AnalyticsPeriod, string> = {
   '7d': ANALYTICS_KEYS.common.last7Days,
   '30d': ANALYTICS_KEYS.common.last30Days,

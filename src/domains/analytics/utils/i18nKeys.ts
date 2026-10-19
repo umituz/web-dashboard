@@ -1,9 +1,4 @@
-/**
- * Analytics Domain i18n Keys
- */
-
 export const ANALYTICS_KEYS = {
-  // Common
   common: {
     export: 'analytics.common.export',
     refresh: 'analytics.common.refresh',
@@ -16,23 +11,19 @@ export const ANALYTICS_KEYS = {
     loading: 'analytics.common.loading',
   },
 
-  // Metric card
   metric: {
     noData: 'analytics.metric.noData',
     change: 'analytics.metric.change',
   },
 
-  // Analytics card
   card: {
     title: 'analytics.card.title',
   },
 
-  // Chart
   chart: {
     noData: 'analytics.chart.noData',
   },
 
-  // Layout
   layout: {
     title: 'analytics.layout.title',
     export: 'analytics.layout.export',

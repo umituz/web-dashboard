@@ -1,11 +1,5 @@
-/**
- * PermissionMatrixScreen — admin skeleton rendering the role x
- * permission matrix. Read-only by default; pass `onToggle` to make
- * cells interactive (delegated — persistence is the host's job).
- */
-
 import { Check, Minus } from "lucide-react";
-import { cn } from "../../../primitives";
+import { cn } from "@umituz/web-design-system/utils/cn";
 import { hasPermission } from "../../permissions/hasPermission";
 import type {
   Permission,
@@ -16,7 +10,6 @@ import type {
 export interface PermissionMatrixScreenProps {
   matrix: PermissionMatrix;
   roles: RoleInfo[];
-  /** Permission column keys, in display order. */
   permissions: Permission[];
   onToggle?: (role: string, permission: Permission, granted: boolean) => void;
 }

@@ -1,15 +1,7 @@
-/**
- * LoginForm
- *
- * Composed from shared auth primitives (EmailInput, PasswordInput,
- * AuthErrorBanner, SocialLoginButtons). The form's job is to
- * orchestrate them — UI rendering and validation live elsewhere.
- */
-
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useT } from "../../../i18n";
-import { Button, Checkbox } from "../../../primitives";
+import { useT } from "@umituz/web-localization/react";
+import { Button, Checkbox } from "@umituz/web-design-system/atoms";
 import { Loader2 } from "lucide-react";
 import { validateLogin } from "../utils/auth";
 import type {
@@ -68,11 +60,6 @@ export const LoginForm = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Auth execution. A real provider is supplied via onLoginAttempt.
-   * The mock path accepts ANY credentials and is therefore opt-in
-   * (`enableMockAuth`) — never a silent default in production builds.
-   */
   const performLogin = useCallback(
     async (credentials: LoginCredentials): Promise<User> => {
       if (onLoginAttempt) {

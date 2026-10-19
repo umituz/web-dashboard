@@ -1,11 +1,5 @@
-/**
- * UserManagementTable — admin skeleton for the users screen.
- * Config-driven: rows and role catalog come in as props, role
- * changes delegate out.
- */
-
 import { DataTable, type Column } from "@umituz/web-design-system/organisms";
-import { useT } from "../../../i18n";
+import { useT } from "@umituz/web-localization/react";
 import { SETTINGS_ADMIN_KEYS } from "../utils/i18nKeys";
 import type { RoleKey, RoleInfo } from "../../permissions/types";
 
@@ -20,7 +14,6 @@ export interface ManagedUser {
 export interface UserManagementTableProps {
   users: ManagedUser[];
   roles: RoleInfo[];
-  /** Provide to render an editable role select per row. */
   onRoleChange?: (userId: string, role: RoleKey) => void;
 }
 

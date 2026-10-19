@@ -1,39 +1,20 @@
-/**
- * PasswordInput
- *
- * Password field with show/hide toggle, used across all auth forms.
- * Centralizes the visibility toggle, autoComplete, and label structure
- * so individual forms can stay focused on their unique concerns.
- */
-
 import { forwardRef, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
-import { Input } from "../../../../primitives";
-import { Button } from "../../../../primitives";
-import { cn } from "../../../../primitives";
+import { Input } from "@umituz/web-design-system/atoms";
+import { Button } from "@umituz/web-design-system/atoms";
+import { cn } from "@umituz/web-design-system/utils/cn";
 
 export interface PasswordInputProps {
-  /** Input id (used to wire up the label) */
   id: string;
-  /** Label i18n key */
   labelKey: string;
-  /** Placeholder i18n key */
   placeholderKey: string;
-  /** Current value */
   value: string;
-  /** Change handler */
   onChange: (value: string) => void;
-  /** Translation function */
   translate: (key: string) => string;
-  /** Auto-complete hint (e.g., "current-password", "new-password") */
   autoComplete?: string;
-  /** Disable the input */
   disabled?: boolean;
-  /** Whether to mark the field as required (renders an asterisk) */
   required?: boolean;
-  /** Optional error message to display below the field */
   error?: string | null;
-  /** Custom className */
   className?: string;
 }
 

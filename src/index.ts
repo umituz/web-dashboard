@@ -1,13 +1,3 @@
-/**
- * @umituz/web-dashboard
- *
- * Dashboard Layout System - Customizable, themeable dashboard layouts
- * with comprehensive analytics services and config-based architecture.
- *
- * @version 3.0.0
- */
-
-// Core domains with complete public API
 export * from './domains/layouts';
 export * from './domains/settings';
 export * from './domains/calendar';
@@ -21,7 +11,6 @@ export {
   type User,
 } from './domains/auth';
 
-// Analytics with conflict resolution
 export {
   useAnalytics,
   MetricCard,
@@ -46,7 +35,6 @@ export {
   roundTo,
   generateColor,
   generateChartColors,
-  // Types
   type Metric,
   type TimeSeriesData,
   type ChartData,
@@ -66,13 +54,10 @@ export {
   type AnalyticsExportOptions,
 } from './domains/analytics';
 
-// Calendar
 export {
   useCalendar,
   calendarService,
-  // Services
   CalendarService,
-  // Utils
   getWeekDates,
   getMonthDays,
   isDateInRange,
@@ -80,7 +65,6 @@ export {
   isSameDay,
   getViewRange,
   generateTimeSlots,
-  // Types
   type ContentItem,
   DEFAULT_CALENDAR_CONFIG,
   type CalendarEvent,
@@ -94,7 +78,6 @@ export {
   type ICalendarService,
 } from './domains/calendar';
 
-// Config with renamed exports to avoid conflicts
 export {
   DEFAULT_DASHBOARD_CONFIG,
   type AnalyticsServiceType,

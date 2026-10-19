@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useT } from "../../../i18n";
+import { useT } from "@umituz/web-localization/react";
 
-import { Button, cn } from "../../../primitives";
+import { Button } from "@umituz/web-design-system/atoms";
+import { cn } from "@umituz/web-design-system/utils/cn";
 import { BrandLogo } from "./BrandLogo";
 import { PenTool, Menu, ChevronLeft, ChevronDown, ChevronRight } from "lucide-react";
 import type { DashboardSidebarProps } from "../types/layout";
@@ -11,29 +12,14 @@ import type { SidebarGroup } from "../types/sidebar";
 import { filterSidebarItems } from "../utils/dashboard";
 
 interface DashboardSidebarPropsExtended extends DashboardSidebarProps {
-  /** Sidebar groups configuration */
   sidebarGroups: SidebarGroup[];
-  /** Brand name */
   brandName?: string;
-  /** Brand tagline */
   brandTagline?: string;
-  /** Create post route */
   createPostRoute?: string;
-  /** Whether to show the primary create button (default: true) */
   showCreatePost?: boolean;
-  /** Auth user */
   user?: DashboardUser;
 }
 
-/**
- * Dashboard Sidebar Component
- *
- * Displays collapsible sidebar with navigation menu items.
- * Supports app-based filtering (mobile/web) and collapsible groups.
- * Styling is entirely `udb-sidebar*` classes from the package stylesheet.
- *
- * @param props - Dashboard sidebar props
- */
 export const DashboardSidebar = ({
   collapsed,
   setCollapsed,
@@ -57,7 +43,6 @@ export const DashboardSidebar = ({
 
   return (
     <div className={cn("udb-sidebar", collapsed && "udb-sidebar--collapsed")}>
-      {/* Brand Section */}
       <div className="udb-sidebar__brand">
         <BrandLogo size={32} />
         {!collapsed && (
@@ -68,7 +53,6 @@ export const DashboardSidebar = ({
         )}
       </div>
 
-      {/* Create Button */}
       {showCreatePost && createPostRoute && (
         <div className="udb-sidebar__create">
           <Link to={createPostRoute}>
@@ -84,7 +68,6 @@ export const DashboardSidebar = ({
         </div>
       )}
 
-      {/* Navigation */}
       <nav className="udb-sidebar__nav">
         <div className="udb-sidebar__groups">
           {sidebarGroups.map((group) => {
@@ -135,7 +118,6 @@ export const DashboardSidebar = ({
         </div>
       </nav>
 
-      {/* Collapse Toggle */}
       <div className="udb-sidebar__footer">
         {!collapsed && (
           <p className="udb-sidebar__footer-label">

@@ -1,28 +1,15 @@
 import { useEffect, useState } from "react";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Skeleton, Button } from "../../../primitives";
+import { Skeleton, Button } from "@umituz/web-design-system/atoms";
 import { ChevronLeft, Menu } from "lucide-react";
 import { SettingsSection } from "./SettingsSection";
 import type { SettingsConfig } from "../types/settings";
 
 interface SettingsLayoutProps {
-  /** Settings configuration */
   config: SettingsConfig;
-  /**
-   * Artificial route-transition skeleton duration in ms (default: 0 = off).
-   * Content renders immediately by default; set > 0 only if you want
-   * a skeleton to mask route swaps.
-   */
   routeTransitionMs?: number;
 }
 
-/**
- * Settings Layout Component
- *
- * Main layout wrapper for settings pages.
- * Provides sidebar navigation and content area. Styling is entirely
- * `udb-settings*` classes from the package stylesheet.
- */
 export const SettingsLayout = ({
   config,
   routeTransitionMs = 0,
@@ -33,9 +20,6 @@ export const SettingsLayout = ({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loading, setLoading] = useState(routeTransitionMs > 0);
 
-  // Optional route-change skeleton. Cleanup is essential: setTimeout must be
-  // cancelled on unmount/route change. With routeTransitionMs = 0 (default)
-  // no artificial delay is applied at all.
   useEffect(() => {
     if (routeTransitionMs <= 0) {
       setLoading(false);
@@ -78,7 +62,6 @@ export const SettingsLayout = ({
 
   return (
     <div className="udb-root udb-settings">
-      {/* Desktop Sidebar */}
       <aside className={`udb-settings__sidebar${collapsed ? " udb-settings__sidebar--collapsed" : ""}`}>
         {renderSidebarHeader(() => setCollapsed((prev) => !prev), false)}
         <nav className="udb-settings__nav">
@@ -94,7 +77,6 @@ export const SettingsLayout = ({
         </nav>
       </aside>
 
-      {/* Mobile Menu Overlay */}
       {mobileOpen && (
         <div className="udb-settings__mobile">
           <div
@@ -118,9 +100,7 @@ export const SettingsLayout = ({
         </div>
       )}
 
-      {/* Main Content Area */}
       <div className="udb-settings__main">
-        {/* Mobile Header */}
         <header className="udb-settings__mobile-header">
           <div className="udb-settings__mobile-lead">
             <Button

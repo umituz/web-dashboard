@@ -1,13 +1,4 @@
-/**
- * Auth Domain i18n Keys
- *
- * Centralized catalog of i18n keys used across auth components.
- * Components stay free of hardcoded strings and consume these
- * constants — the consumer app provides the actual translations.
- */
-
 export const AUTH_KEYS = {
-  // Login screen
   login: {
     welcomeBack: 'auth.login.welcomeBack',
     signInTo: 'auth.login.signInTo',
@@ -20,7 +11,6 @@ export const AUTH_KEYS = {
     orContinueWith: 'auth.login.orContinueWith',
   },
 
-  // Register screen
   register: {
     createAccount: 'auth.register.createAccount',
     join: 'auth.register.join',
@@ -39,7 +29,6 @@ export const AUTH_KEYS = {
     passwordsDoNotMatch: 'auth.register.passwordsDoNotMatch',
   },
 
-  // Forgot password
   forgotPassword: {
     title: 'auth.forgotPassword.title',
     description: 'auth.forgotPassword.description',
@@ -55,7 +44,6 @@ export const AUTH_KEYS = {
     step3: 'auth.forgotPassword.steps.step3',
   },
 
-  // Reset password
   resetPassword: {
     title: 'auth.resetPassword.title',
     description: 'auth.resetPassword.description',
@@ -68,7 +56,6 @@ export const AUTH_KEYS = {
     goToSignIn: 'auth.resetPassword.goToSignIn',
   },
 
-  // Shared fields
   fields: {
     email: 'auth.fields.email',
     password: 'auth.fields.password',
@@ -81,7 +68,6 @@ export const AUTH_KEYS = {
     fullName: 'auth.placeholders.fullName',
   },
 
-  // Errors
   errors: {
     invalidCredentials: 'auth.errors.invalidCredentials',
     loginFailed: 'auth.errors.loginFailed',
@@ -96,7 +82,6 @@ export const AUTH_KEYS = {
     resetFailed: 'auth.errors.resetFailed',
   },
 
-  // Password strength
   passwordStrength: {
     weak: 'auth.passwordStrength.weak',
     fair: 'auth.passwordStrength.fair',
@@ -104,20 +89,17 @@ export const AUTH_KEYS = {
     strong: 'auth.passwordStrength.strong',
   },
 
-  // Social
   social: {
     continueWithGoogle: 'auth.social.continueWithGoogle',
     continueWithApple: 'auth.social.continueWithApple',
   },
 
-  // Layout shell
   layout: {
     backToHome: 'auth.layout.backToHome',
     orContinueWith: 'auth.layout.orContinueWith',
     allRightsReserved: 'auth.layout.allRightsReserved',
   },
 
-  // Accessibility
   a11y: {
     showPassword: 'auth.a11y.showPassword',
     hidePassword: 'auth.a11y.hidePassword',

@@ -1,16 +1,6 @@
-/**
- * AnalyticsChart
- *
- * Dependency-free SVG chart renderer (line / area / bar / pie / donut).
- * Replaced the recharts wrapper in v4 — same ChartConfig contract,
- * colors from `--u-*`-friendly CSS color strings, geometry centered
- * here (no magic numbers at call sites). Tooltips are native SVG
- * <title> elements; unsupported types render the empty state.
- */
-
 import { useMemo } from "react";
-import { cn } from "../../../primitives";
-import { useT } from "../../../i18n";
+import { cn } from "@umituz/web-design-system/utils/cn";
+import { useT } from "@umituz/web-localization/react";
 import type { ChartConfig, ChartData, TimeSeriesData } from "../types/analytics";
 import { generateChartColors } from "../utils/analytics";
 import { ANALYTICS_KEYS } from "../utils/i18nKeys";
@@ -46,7 +36,6 @@ const toNumber = (value: unknown): number => {
   return Number.isFinite(num) ? num : 0;
 };
 
-/** Normalize config.data into labeled rows of series values. */
 const toRows = (
   data: TimeSeriesData[] | ChartData[],
   keys: string[],
@@ -66,7 +55,6 @@ const rowsDomain = (rows: ChartRow[]): { min: number; max: number } => {
   return { min, max };
 };
 
-/** Keep at most `X_LABEL_SAMPLE` x labels evenly spaced. */
 const shouldShowLabel = (index: number, count: number): boolean => {
   if (count <= X_LABEL_SAMPLE) return true;
   const step = Math.ceil((count - 1) / (X_LABEL_SAMPLE - 1));

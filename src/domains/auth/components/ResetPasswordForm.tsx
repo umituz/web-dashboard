@@ -1,16 +1,9 @@
-/**
- * ResetPasswordForm
- *
- * Composed from shared auth primitives (PasswordInput, PasswordStrengthIndicator,
- * AuthErrorBanner). All copy is i18n-keyed.
- */
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useT } from "../../../i18n";
+import { useT } from "@umituz/web-localization/react";
 import { Loader2, CheckCircle2 } from "lucide-react";
-import { Button, Input } from "../../../primitives";
-import { cn } from "../../../primitives";
+import { Button, Input } from "@umituz/web-design-system/atoms";
+import { cn } from "@umituz/web-design-system/utils/cn";
 import type { ResetPasswordFormProps, Translate } from "../types/auth";
 import { validateResetPassword } from "../utils/auth";
 import { AUTH_KEYS } from "../utils/i18nKeys";
@@ -68,11 +61,7 @@ export const ResetPasswordForm = ({
 
     setIsLoading(true);
     try {
-      // Hand off the actual reset to the consumer. The form is
-      // pure orchestration; no network knowledge here. Token and the
-      // new password are passed through so the consumer can persist it.
       await onSuccess?.({ token, password });
-      // Don't keep the new password in component state after completion.
       setPassword("");
       setConfirmPassword("");
       setSuccess(true);

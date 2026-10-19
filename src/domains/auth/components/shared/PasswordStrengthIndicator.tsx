@@ -1,16 +1,6 @@
-/**
- * PasswordStrengthIndicator
- *
- * Renders a 4-segment strength bar plus a localized label band.
- * The label i18n key is computed from the strength band so the
- * component stays free of hardcoded strings. Bar/label colors come
- * from `--u-*` tones (weak/danger, fair/warning-2, good/warning,
- * strong/success).
- */
-
 import { useMemo } from "react";
 import { calculatePasswordStrength } from "../../utils/auth";
-import { cn } from "../../../../primitives";
+import { cn } from "@umituz/web-design-system/utils/cn";
 
 const STRENGTH_KEYS = {
   weak: 'auth.passwordStrength.weak',
@@ -29,9 +19,7 @@ const scoreToBand = (score: number): StrengthBand => {
 };
 
 export interface PasswordStrengthIndicatorProps {
-  /** Password to evaluate */
   password: string;
-  /** Translation function */
   translate: (key: string) => string;
 }
 

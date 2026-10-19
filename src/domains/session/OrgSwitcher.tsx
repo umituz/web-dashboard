@@ -1,15 +1,7 @@
-/**
- * OrgSwitcher — tenant switcher trigger + dropdown.
- *
- * Controlled component: tenants and the active id come in as props,
- * switches are delegated via onSwitch. Styled entirely with existing
- * udb-* classes (profile button, avatar, menu).
- */
-
 import { useState } from "react";
 import { Building2, Check, ChevronDown } from "lucide-react";
-import { cn } from "../../primitives";
-import { useT } from "../../i18n";
+import { cn } from "@umituz/web-design-system/utils/cn";
+import { useT } from "@umituz/web-localization/react";
 import { SESSION_KEYS } from "./utils/i18nKeys";
 import type { Tenant } from "./types";
 

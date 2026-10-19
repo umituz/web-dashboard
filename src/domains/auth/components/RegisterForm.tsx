@@ -1,18 +1,9 @@
-/**
- * RegisterForm
- *
- * Composed from shared auth primitives (EmailInput, PasswordInput,
- * PasswordStrengthIndicator, AuthErrorBanner, SocialLoginButtons).
- * Hardcoded mock user data + 1s setTimeout are gone — the form is
- * pure orchestration over the consumer's `onRegisterAttempt` provider.
- */
-
 import { useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useT } from "../../../i18n";
+import { useT } from "@umituz/web-localization/react";
 import { Loader2 } from "lucide-react";
-import { Button, Checkbox, Input } from "../../../primitives";
-import { cn } from "../../../primitives";
+import { Button, Checkbox, Input } from "@umituz/web-design-system/atoms";
+import { cn } from "@umituz/web-design-system/utils/cn";
 import type { RegisterFormProps, RegisterData, Translate } from "../types/auth";
 import { validateRegister } from "../utils/auth";
 import { AUTH_KEYS } from "../utils/i18nKeys";
@@ -101,8 +92,6 @@ export const RegisterForm = ({
       setIsLoading(true);
       try {
         if (!onRegisterAttempt) {
-          // The form has no auth provider — fail loud rather than
-          // silently inserting a mock user.
           throw new Error('No register handler configured');
         }
         const registerData: RegisterData = { email, password, name };

@@ -1,36 +1,18 @@
-/**
- * EmailInput
- *
- * Standardized email input used across all auth forms.
- * Renders label, input, error state, and disabled state consistently.
- */
-
 import { forwardRef } from "react";
-import { Input } from "../../../../primitives";
-import { cn } from "../../../../primitives";
+import { Input } from "@umituz/web-design-system/atoms";
+import { cn } from "@umituz/web-design-system/utils/cn";
 
 export interface EmailInputProps {
-  /** Input id (used to wire up the label) */
   id: string;
-  /** Label i18n key — resolved via `translate` */
   labelKey: string;
-  /** Placeholder i18n key */
   placeholderKey: string;
-  /** Current value */
   value: string;
-  /** Change handler */
   onChange: (value: string) => void;
-  /** Translation function */
   translate: (key: string) => string;
-  /** Auto-complete hint (default: "email") */
   autoComplete?: string;
-  /** Disable the input */
   disabled?: boolean;
-  /** Whether to mark the field as required (renders an asterisk) */
   required?: boolean;
-  /** Optional error message to display below the field */
   error?: string | null;
-  /** Custom className */
   className?: string;
 }
 

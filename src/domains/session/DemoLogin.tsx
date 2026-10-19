@@ -1,18 +1,10 @@
-/**
- * DemoLogin — one-click demo entry (fleet pattern: log in as a demo
- * persona without a password). Controlled: the click delegates to
- * `onDemo` (typically `session.demoLogin`); the label defaults to
- * the i18n catalog.
- */
-
 import { UserRound } from "lucide-react";
-import { Button } from "../../primitives";
-import { useT } from "../../i18n";
+import { Button } from "@umituz/web-design-system/atoms";
+import { useT } from "@umituz/web-localization/react";
 import { SESSION_KEYS } from "./utils/i18nKeys";
 
 export interface DemoLoginProps {
   onDemo: (userId: string) => void | Promise<void>;
-  /** Demo user id to log in as. */
   userId: string;
   label?: string;
   variant?: "default" | "outline" | "ghost";

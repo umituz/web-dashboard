@@ -244,7 +244,7 @@ export function Donut({
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke="var(--u-color-surface-muted)"
+            stroke="var(--color-muted)"
             strokeWidth={thickness}
           />
           {segments.map((seg, i) => {
@@ -454,7 +454,7 @@ export function LineChart({
                   cx={xAt(i)}
                   cy={yFn(v)}
                   r={hover === i ? 3.4 : 0}
-                  fill="var(--u-color-surface)"
+                  fill="var(--color-card)"
                   stroke={toneOf(s, si)}
                   strokeWidth={2}
                 />

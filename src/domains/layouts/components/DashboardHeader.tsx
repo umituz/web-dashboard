@@ -3,43 +3,25 @@ import {
   Bell, X, Sun, Moon, Menu, User, Settings, LogOut,
   ChevronDown
 } from "lucide-react";
-import { Button } from "../../../primitives";
+import { Button } from "@umituz/web-design-system/atoms";
 import { useNavigate } from "react-router-dom";
-import { useT } from "../../../i18n";
+import { useT } from "@umituz/web-localization/react";
 import type { DashboardHeaderProps, HeaderProfileItem } from "../types/layout";
 import type { DashboardNotification } from "../types/notification";
 import type { DashboardUser } from "../types/user";
 import { formatNotificationTime } from "../utils/dashboard";
 
 interface DashboardHeaderPropsExtended extends DashboardHeaderProps {
-  /** Auth user */
   user?: DashboardUser;
-  /** Notifications */
   notifications?: DashboardNotification[];
-  /** Logout function */
   onLogout?: () => Promise<void>;
-  /** Mark all as read function */
   onMarkAllRead?: () => void;
-  /** Dismiss notification function */
   onDismissNotification?: (id: string) => void;
-  /** Settings route */
   settingsRoute?: string;
-  /** Profile route */
   profileRoute?: string;
-  /** Host-injected profile-menu entries — billing and friends live here,
-    *  not in the skeleton. */
   extraProfileItems?: HeaderProfileItem[];
 }
 
-/**
- * Dashboard Header Component
- *
- * Displays top navigation bar with theme toggle, notifications,
- * user menu, and organisation selector. Styling is entirely
- * `udb-header*` / `udb-menu*` classes from the package stylesheet.
- *
- * @param props - Dashboard header props
- */
 export const DashboardHeader = ({
   collapsed,
   setCollapsed,
@@ -72,7 +54,6 @@ export const DashboardHeader = ({
       await onLogout?.();
       navigate("/login");
     } catch {
-      // Error handling can be added by parent component
     }
   };
 
@@ -93,7 +74,6 @@ export const DashboardHeader = ({
       </div>
 
       <div className="udb-header__actions">
-        {/* Theme Toggle — rendered only when the host app wires it up */}
         {onToggleTheme && (
           <Button
             variant="ghost"
@@ -107,7 +87,6 @@ export const DashboardHeader = ({
           </Button>
         )}
 
-        {/* Notifications */}
         <div className="udb-header__anchor">
           <Button
             variant="ghost"

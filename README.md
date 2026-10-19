@@ -1,56 +1,31 @@
 # @umituz/web-dashboard
 
-Installable app skeleton for SaaS dashboards: layouts, auth, onboarding,
-analytics, a content calendar, an i18n bridge, and a permissions/session/
-module registry. Every domain is an independent entry point — import only
-what your app uses. Camp-agnostic by construction: the package ships its
-own `udb-*` stylesheet driven by `--u-*` tokens, so it works identically in
-vanilla-CSS and Tailwind hosts.
+Installable app skeleton for SaaS dashboards: layouts, auth, analytics, a
+content calendar, and a permissions/session/module registry. Every domain is
+an independent entry point — import only what your app uses. UI atoms and
+design tokens come from [@umituz/web-design-system](https://github.com/umituz/web-design-system);
+translations from [@umituz/web-localization](https://github.com/umituz/web-localization).
 
 The package is **source-distributed** (published as raw TypeScript in `src/`).
 Your bundler compiles it alongside your app; no prebuilt bundle ships.
 
-## What changed in v4 (major)
+## What changed in v5 (major)
 
-- **Billing moved to [@umituz/web-polar-payment](https://github.com/umituz/web-polar-payment)**
-  under the `./portal` entry point. The old `./billing*` entry points are gone.
-- **Styling is shipped, not assumed.** Import `@umituz/web-dashboard/styles.css`
-  once; all components use `udb-*` BEM classes.
-- **No i18n runtime.** `react-i18next` is out; hosts bridge their own `t` via
-  `<DashboardI18nProvider t={i18n.t}>` (see below). Without a provider,
-  keys humanize to readable English.
-- **No Firebase.** The calendar persists through the injected
-  `ICalendarDatabase` seam; `createInMemoryCalendarDatabase()` is the default.
-- **recharts is out.** `AnalyticsChart` renders line/area/bar/pie/donut as
-  dependency-free SVG with native `<title>` tooltips.
-- **New fleet modules**: `./permissions`, `./session`, `./modules` — the
-  texora/visora pattern (one module list drives routes + nav + guards) as
-  reusable building blocks.
-
-## What changed in 4.1
-
-- **The design system is back — for real this time.** 4.0 dropped
-  `@umituz/web-design-system` entirely; 4.1 makes it a runtime dependency
-  again and actually renders it:
-  - `./primitives` (`Button`, `Input`, `Checkbox`, `Skeleton`, `cn`) are thin
-    adapters that **delegate to the DS components** — the dashboard prop API
-    is unchanged, call sites need zero edits.
-  - `UserManagementTable` renders the DS `DataTable`; `MetricCard` composes
-    the DS `MetricCard`; `AnalyticsCard` is built on DS `Card` primitives.
-  - `styles.css` imports `@umituz/web-design-system/styles.css` transitively
-    (Tailwind v4 precompiled) — hosts still import only the dashboard
-    stylesheet.
-- **`--u-*` tokens are now bridges.** `tokens.css` maps every color/radius/
-  shadow token to the DS `--color-*`/`--radius-*` variables (with the old
-  literal as fallback). Override either side; dark mode (`data-udb-theme="dark"`)
-  now sets DS variables and the bridge flows through.
-- **Primitive base CSS is gone from `dashboard.css`.** Only dashboard-owned
-  modifiers remain (`udb-btn__spinner`, `udb-input--error/--with-toggle`,
-  `udb-skeleton--*`, `udb-card--sm/--lg`, `udb-table` for the permission
-  matrix); bases come from the DS stylesheet.
-- **Peer footprint**: pulling the dashboard in transitively installs the DS's
-  Radix UI peers (npm 7+ handles this automatically; only imported components
-  end up in the bundle).
+- **No more local primitives.** The `./primitives` entry point is gone;
+  components import `@umituz/web-design-system` directly. Hosts that need
+  `Button`/`Input`/`Checkbox`/`Skeleton`/`cn` import them from the design
+  system.
+- **No more `--u-*` token layer.** `tokens.css` is deleted. The `udb-*`
+  stylesheet consumes the design-system variables (`--color-*`, `--radius-*`,
+  `--font-*`, `--shadow-*`) directly; dashboard-specific knobs (typography
+  scale, sidebar geometry) are `--udb-*` custom properties defined in
+  `styles.css` itself.
+- **No more local i18n copy.** The `./i18n` entry point is gone; `useT` now
+  comes from `@umituz/web-localization/react` (`I18nProvider` there replaces
+  `DashboardI18nProvider`, same `t` signature).
+- **No bundled dark preset.** Dark mode follows the design system: hosts set
+  dark values on the DS variables under `[data-theme="dark"]` / `.dark`
+  (see the design system's `bridge.css` contract).
 
 ## Installation
 
@@ -60,7 +35,8 @@ import "@umituz/web-dashboard/styles.css";
 ```
 
 Peers: `react` + `react-dom` (^18 or ^19) and `react-router-dom` (^6 or ^7).
-Runtime deps: `@umituz/web-design-system` + `lucide-react`. Nothing else.
+Runtime deps: `@umituz/web-design-system`, `@umituz/web-localization`,
+`lucide-react`. Nothing else.
 
 ### Tailwind hosts
 
@@ -70,56 +46,53 @@ resets: import the package stylesheet **after** your base layer.
 
 ### Theming & dark mode
 
-`tokens.css` bridges every `--u-*` token to a design-system variable
-(`--u-color-primary: var(--color-primary, #2563eb)`), so you can theme two
-ways: override the `--u-*` bridge heads, or set the DS `--color-*`/`--radius-*`
-variables (e.g. from your own Tailwind `@theme`). Dark mode is host-driven:
-put `data-udb-theme="dark"` on any ancestor — the dashboard dark block sets
-the DS variables and both layers switch together.
+`styles.css` imports `@umituz/web-design-system/styles.css` transitively and
+reads its variables, so theming has exactly one path: set the DS variables.
+Vanilla-CSS hosts define `--app-*` slots via the design system's `bridge.css`;
+Tailwind hosts override `--color-*` from their own `@theme`. Dashboard-only
+knobs (`--udb-font-size-*`, `--udb-sidebar-*`, `--udb-header-height`,
+`--udb-border-strong`) can be overridden anywhere in the cascade.
 
 ## Entry points
 
 ```bash
 @umituz/web-dashboard/styles.css    # component stylesheet (udb-* BEM)
-@umituz/web-dashboard/tokens.css    # --u-* custom properties only
-@umituz/web-dashboard/primitives    # Button, Input, Checkbox, Skeleton, cn
-@umituz/web-dashboard/i18n          # DashboardI18nProvider, useT, defaultT
 @umituz/web-dashboard/permissions   # PermissionMatrix, hasPermission, guards
 @umituz/web-dashboard/session       # AuthAdapter, SessionProvider, OrgSwitcher, DemoLogin
 @umituz/web-dashboard/modules       # DashboardModule, buildRoutes, buildNav
 @umituz/web-dashboard/layouts       # DashboardLayout, DashboardSidebar, DashboardHeader
 @umituz/web-dashboard/settings      # SettingsLayout, admin skeletons (users, matrix, audit)
-@umituz/web-dashboard/onboarding    # OnboardingWizard + steps, useOnboarding
 @umituz/web-dashboard/auth          # Login/Register/Forgot/Reset forms, AuthLayout
 @umituz/web-dashboard/analytics     # AnalyticsLayout, SVG AnalyticsChart, services
 @umituz/web-dashboard/calendar      # useCalendar, CalendarService (injected DB)
 @umituz/web-dashboard/config        # dashboard config helpers
+@umituz/web-dashboard/charts        # dependency-free SVG chart components
 ```
 
 Each domain also exposes `components`, `hooks`, `utils`, `types`
-sub-entries (and `services` for analytics/calendar). The new v4 modules
+sub-entries (and `services` for analytics/calendar). The v4 modules
 (`permissions`, `session`, `modules`) are **deep-entry only** — they are not
 re-exported from the root, so router-less hosts never pull router code in
 transitively.
 
-## The v4 composition
+## The composition
 
 A host app assembles the skeleton from four seams:
 
 ```tsx
-import { DashboardI18nProvider } from "@umituz/web-dashboard/i18n";
+import { I18nProvider } from "@umituz/web-localization/react";
 import { SessionProvider, createInMemoryAuthAdapter } from "@umituz/web-dashboard/session";
 import { PermissionsProvider } from "@umituz/web-dashboard/permissions";
 
 const adapter = createInMemoryAuthAdapter({ users: DEMO_USERS });
 
-<DashboardI18nProvider t={i18n.t}>
+<I18nProvider t={i18n.t}>
   <SessionProvider adapter={adapter}>
     <PermissionsProvider matrix={ROLE_PERMISSIONS} role={user?.role}>
       <App />
     </PermissionsProvider>
   </SessionProvider>
-</DashboardI18nProvider>
+</I18nProvider>
 ```
 
 ### One module list → routes + nav + guards
@@ -176,20 +149,20 @@ const demo = new CalendarService(createInMemoryCalendarDatabase());
 
 ### Analytics
 
-`AnalyticsChart` consumes the same `ChartConfig` as v3 for
-line/area/bar/pie/donut. Tooltips are native SVG `<title>` elements;
-legends are color chips; unsupported types render an empty state.
-`useAnalytics` stays dependency-injected (`createStubAnalyticsApiClient`).
+`AnalyticsChart` consumes `ChartConfig` for line/area/bar/pie/donut. Tooltips
+are native SVG `<title>` elements; legends are color chips; unsupported types
+render an empty state. `useAnalytics` stays dependency-injected
+(`createStubAnalyticsApiClient`).
 
 ## i18n contract
 
 Components render **i18n keys**, never English strings. Bridge your runtime
-once:
+once with `@umituz/web-localization/react`:
 
 ```tsx
-import { DashboardI18nProvider } from "@umituz/web-dashboard/i18n";
+import { I18nProvider } from "@umituz/web-localization/react";
 
-<DashboardI18nProvider t={i18n.t}>  {/* i18next's t — signature already matches */}
+<I18nProvider t={i18n.t}>  {/* i18next's t — signature already matches */}
 ```
 
 Interpolation uses the standard `{{placeholder}}` syntax. Without a
@@ -200,7 +173,6 @@ readably. The per-domain key catalogs are the string contract:
 ```ts
 import { AUTH_KEYS } from "@umituz/web-dashboard/auth";
 import { ANALYTICS_KEYS } from "@umituz/web-dashboard/analytics";
-import { ONBOARDING_KEYS } from "@umituz/web-dashboard/onboarding";
 import { SETTINGS_ADMIN_KEYS } from "@umituz/web-dashboard/settings/utils";
 import { PERMISSIONS_KEYS } from "@umituz/web-dashboard/permissions";
 import { SESSION_KEYS } from "@umituz/web-dashboard/session";
@@ -223,23 +195,25 @@ npm test            # vitest unit tests (pure utils + module builders)
 npm run test:watch
 ```
 
-CI runs lint + typecheck + test on every push/PR to `main`.
+## Migration: 4.x → 5.0
 
-## Migration: 3.x → 4.0
-
-1. Billing UI: switch imports to `@umituz/web-polar-payment/portal`.
-2. Design-system imports: use `@umituz/web-dashboard/primitives`
-   (`Button`/`Input`/`Checkbox`/`Skeleton` cover the used surface).
-3. Styling: import `styles.css` once; Tailwind utility classes no longer
-   exist inside the package. Config values that used to carry Tailwind
-   strings changed: `PlatformOption.color` is a plain CSS color string,
-   `PlanOption.badgeColor` became `badgeTone: "muted" | "primary" | "accent"`.
-4. i18n: wrap your app in `DashboardI18nProvider t={i18n.t}`; the
-   `react-i18next` peer is gone.
-5. Calendar: pass your own `ICalendarDatabase` (or the in-memory default);
-   the Firebase implementation was removed.
-6. v3.2.5 behavioral notes still apply (opt-in mock auth, route skeletons
-   off by default, `PerformanceService.startMonitoring()` explicit).
+1. `@umituz/web-dashboard/primitives` → import `Button`/`Input`/`Checkbox`/
+   `Skeleton` from `@umituz/web-design-system/atoms` and `cn` from
+   `@umituz/web-design-system/utils/cn`.
+2. `@umituz/web-dashboard/i18n` → `DashboardI18nProvider` becomes
+   `I18nProvider` from `@umituz/web-localization/react`; `useT`, `defaultT`
+   and `TranslateFn` come from the same entry point.
+3. `@umituz/web-dashboard/tokens.css` → drop the import; `styles.css` is the
+   only stylesheet. Migrate `--u-*` overrides to the DS variables
+   (`--u-color-primary` → `--color-primary`, `--u-color-surface` →
+   `--color-card`, `--u-color-bg` → `--color-background`, `--u-color-text` →
+   `--color-foreground`, `--u-color-muted` → `--color-muted-foreground`,
+   `--u-color-surface-muted` → `--color-muted`, `--u-color-danger` →
+   `--color-destructive`) and dashboard knobs to their `--udb-*` names
+   (`--u-font-size-*` → `--udb-font-size-*`, `--u-color-border-strong` →
+   `--udb-border-strong`, `--u-sidebar-*` → `--udb-sidebar-*`).
+4. Dark mode: replace `data-udb-theme="dark"` with the design-system
+   convention (`[data-theme="dark"]` / `.dark` + dark DS variable values).
 
 ## License
 

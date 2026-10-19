@@ -1,7 +1,7 @@
 {
   "name": "@umituz/web-dashboard",
   "version": "4.7.1",
-  "description": "Installable app skeleton for the fleet — layouts, auth, analytics (dependency-free SVG charts), calendar, i18n injection, permissions/session/module registry; ships its own udb-* stylesheet and --u-* tokens",
+  "description": "Installable app skeleton for the fleet — layouts, auth, analytics (dependency-free SVG charts), calendar, i18n via @umituz/web-localization, permissions/session/module registry; udb-* stylesheet on design-system tokens",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -11,9 +11,6 @@
   "exports": {
     ".": "./src/index.ts",
     "./styles.css": "./src/styles/dashboard.css",
-    "./tokens.css": "./src/styles/tokens.css",
-    "./primitives": "./src/primitives/index.ts",
-    "./i18n": "./src/i18n/index.ts",
     "./permissions": "./src/domains/permissions/index.ts",
     "./session": "./src/domains/session/index.ts",
     "./modules": "./src/domains/modules/index.ts",
@@ -67,8 +64,9 @@
     "react-router-dom": "^6.0.0 || ^7.0.0"
   },
   "dependencies": {
-    "@umituz/web-design-system": "^4.5.3",
-    "lucide-react": "^0.577.0"
+    "@umituz/web-design-system": "^4.8.1",
+    "lucide-react": "^0.577.0",
+    "@umituz/web-localization": "^1.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

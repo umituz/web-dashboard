@@ -1,27 +1,16 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRight } from "lucide-react";
-import { cn } from "../../../primitives";
+import { cn } from "@umituz/web-design-system/utils/cn";
 import type { SettingsSection as SettingsSectionType } from "../types/settings";
 
 interface SettingsSectionProps {
-  /** Section configuration */
   section: SettingsSectionType;
-  /** Current path */
   currentPath?: string;
-  /** On navigate callback */
   onNavigate?: (path: string) => void;
-  /** Collapsed state */
   collapsed?: boolean;
 }
 
-/**
- * Settings Section Component
- *
- * Displays a section of settings items.
- * Items without a path and without an onClick handler are hidden
- * (an empty interactive element violates a11y and is dead code).
- */
 export const SettingsSection = ({
   section,
   currentPath,
@@ -48,7 +37,6 @@ export const SettingsSection = ({
           const isActive = currentPath === item.path;
           const hasNavigation = Boolean(item.path) || Boolean(item.onClick);
 
-          // Skip rendering items that have neither a path nor a click handler.
           if (!hasNavigation) {
             return null;
           }

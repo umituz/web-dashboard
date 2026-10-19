@@ -1,16 +1,8 @@
-/**
- * ForgotPasswordForm
- *
- * Composed of shared auth primitives (EmailInput, AuthErrorBanner).
- * All copy is i18n-keyed; the success state uses lucide icons
- * instead of the previous `✓` Unicode glyphs.
- */
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useT } from "../../../i18n";
+import { useT } from "@umituz/web-localization/react";
 import { ArrowLeft, Loader2, CheckCircle2, Check } from "lucide-react";
-import { Button } from "../../../primitives";
+import { Button } from "@umituz/web-design-system/atoms";
 import type { ForgotPasswordFormProps, Translate } from "../types/auth";
 import { validateForgotPassword } from "../utils/auth";
 import { AUTH_KEYS } from "../utils/i18nKeys";
@@ -64,10 +56,6 @@ export const ForgotPasswordForm = ({
 
     setIsLoading(true);
     try {
-      // Hand off to the consumer's auth provider. The form has
-      // no network knowledge of its own — it's pure orchestration.
-      // The submitted email is passed through so the consumer can
-      // actually trigger the reset email.
       await onSuccess?.({ email });
       setSuccess(true);
     } catch (err) {

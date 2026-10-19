@@ -1,12 +1,7 @@
-/**
- * MetricCard — dashboard logic (growth, i18n, a11y) on top of the
- * design-system MetricCard presentation.
- */
-
 import {
   MetricCard as DSMetricCard,
 } from "@umituz/web-design-system/organisms";
-import { useT } from "../../../i18n";
+import { useT } from "@umituz/web-localization/react";
 import type { MetricCardProps } from "../types/analytics";
 import { formatMetricValue, calculateGrowth, getTrend } from "../utils/analytics";
 import { ANALYTICS_KEYS } from "../utils/i18nKeys";

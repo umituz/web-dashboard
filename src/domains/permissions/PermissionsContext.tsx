@@ -1,20 +1,12 @@
-/**
- * Permissions context — provides the matrix + active role and a
- * `can(permission)` helper bound to them. Guard components
- * (<RequirePermission>, <Can>) consume this context.
- */
-
 import { createContext, useCallback, useContext, useMemo, type ReactNode } from "react";
 import { Lock } from "lucide-react";
-import { useT } from "../../i18n";
+import { useT } from "@umituz/web-localization/react";
 import { hasPermission } from "./hasPermission";
 import { PERMISSIONS_KEYS } from "./utils/i18nKeys";
 import type { Permission, PermissionMatrix, RoleKey } from "./types";
 
 export interface PermissionsProviderProps {
-  /** Role x permission matrix. */
   matrix: PermissionMatrix;
-  /** Active user's role. */
   role: RoleKey | null | undefined;
   children: ReactNode;
 }
@@ -57,7 +49,6 @@ export const usePermissions = (): PermissionsContextValue => {
   return context;
 };
 
-/** Default lock screen rendered by RequirePermission when denied. */
 const ForbiddenFallback = () => {
   const t = useT();
   return (
@@ -72,17 +63,11 @@ const ForbiddenFallback = () => {
 };
 
 export interface RequirePermissionProps {
-  /** Permission required to render the children. */
   permission: Permission;
   children: ReactNode;
-  /** Rendered instead of the default lock screen when denied. */
   fallback?: ReactNode;
 }
 
-/**
- * Page-level permission gate — renders the fallback (lock screen by
- * default) instead of the children when `can(permission)` is false.
- */
 export const RequirePermission = ({
   permission,
   children,
@@ -95,7 +80,6 @@ export const RequirePermission = ({
 
 export interface CanProps extends RequirePermissionProps {}
 
-/** Declarative twin of RequirePermission for inline use. */
 export const Can = ({ permission, children, fallback }: CanProps) => (
   <RequirePermission permission={permission} fallback={fallback}>
     {children}

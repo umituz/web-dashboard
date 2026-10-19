@@ -1,21 +1,12 @@
-/**
- * AuditLogList — admin skeleton for the audit trail screen.
- * Entries arrive as props; the list is display-only.
- */
-
 import { ScrollText } from "lucide-react";
-import { useT } from "../../../i18n";
+import { useT } from "@umituz/web-localization/react";
 import { SETTINGS_ADMIN_KEYS } from "../utils/i18nKeys";
 
 export interface AuditEntry {
   id: string;
-  /** Who performed the action. */
   actor: string;
-  /** What happened, e.g. "role.changed". */
   action: string;
-  /** Optional target of the action (user, invoice...). */
   target?: string;
-  /** ISO timestamp. */
   at: string;
 }
 

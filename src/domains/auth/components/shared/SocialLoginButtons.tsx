@@ -1,28 +1,14 @@
-/**
- * SocialLoginButtons
- *
- * Renders a list of social auth providers as a row of icon buttons.
- * Generic over the provider id so adding a new provider is a config change,
- * not a code change.
- */
-
-import { Button } from "../../../../primitives";
+import { Button } from "@umituz/web-design-system/atoms";
 import { GoogleIcon, AppleIcon } from "./SocialProviderIcons";
 
 export type SocialProviderId = 'google' | 'apple';
 
 export interface SocialLoginButtonsProps {
-  /** Provider handlers keyed by provider id */
   onProvider: (id: SocialProviderId) => void;
-  /** Translation function */
   translate: (key: string) => string;
-  /** Disable all buttons (e.g., during form submission) */
   disabled?: boolean;
 }
 
-/**
- * Centralized provider config. Add new providers here and the UI follows.
- */
 const SOCIAL_PROVIDERS: ReadonlyArray<{
   id: SocialProviderId;
   labelKey: string;

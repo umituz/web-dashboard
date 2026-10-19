@@ -1,8 +1,3 @@
-/**
- * Analytics Card — chart/metric container on the design-system Card.
- * Size modifiers ("sm"/"lg") are dashboard-owned padding overrides.
- */
-
 import { Loader2, AlertCircle } from "lucide-react";
 import {
   Card,
@@ -11,7 +6,7 @@ import {
   CardDescription,
   CardContent,
 } from "@umituz/web-design-system/organisms";
-import { cn } from "../../../primitives";
+import { cn } from "@umituz/web-design-system/utils/cn";
 import type { AnalyticsCardProps } from "../types/analytics";
 import { MetricCard } from "./MetricCard";
 import { AnalyticsChart } from "./AnalyticsChart";
