@@ -1,9 +1,3 @@
-/**
- * Analytics Utilities
- *
- * Export all analytics utilities
- */
-
 export {
   formatNumber,
   formatPercentage,

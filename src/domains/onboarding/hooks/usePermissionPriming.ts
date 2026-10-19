@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from 'react';
-import type { PermissionStatus, PermissionType } from '../../types/screens';
+import type { PermissionStatus, PermissionType } from '../types/screens';
 import {
   isPermissionDecided,
   isPermissionUnsupported,
-} from '../../predicates/permission-granted';
-import { queryPermissionStatus, requestPermission } from '../../utils/permission-bridge';
+} from '../predicates/permission-granted';
+import { queryPermissionStatus, requestPermission } from '../utils/permission-bridge';
 
 export interface UsePermissionPrimingReturn {
   status: PermissionStatus;
@@ -13,13 +13,6 @@ export interface UsePermissionPrimingReturn {
   reset: () => void;
 }
 
-/**
- * Owns permission state for a single permission type.
- * Single responsibility: query + request lifecycle, no UI.
- *
- * The `requestPermission` callback is a no-op (returns the current status)
- * once the permission has been decided or the runtime reports no support.
- */
 export function usePermissionPriming(permission: PermissionType): UsePermissionPrimingReturn {
   const [status, setStatus] = useState<PermissionStatus>('prompt');
   const [isRequesting, setIsRequesting] = useState(false);

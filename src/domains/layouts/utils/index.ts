@@ -1,7 +1,3 @@
-/**
- * Layout Utils Export
- */
-
 export {
   formatNotificationTime,
   isPathActive,

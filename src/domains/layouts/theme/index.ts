@@ -1,7 +1,3 @@
-/**
- * Layout Theme Export
- */
-
 export {
   DEFAULT_DASHBOARD_THEME,
   DEFAULT_DASHBOARD_THEME_DARK,

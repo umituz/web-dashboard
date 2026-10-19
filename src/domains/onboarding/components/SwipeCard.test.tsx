@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { SwipeCard } from './SwipeCard';
-import { OnboardingIntlProvider } from '../OnboardingIntl';
+import { OnboardingIntlProvider } from './OnboardingIntl';
 
 function renderCard(props: Partial<React.ComponentProps<typeof SwipeCard>> = {}) {
   return render(
@@ -17,8 +17,6 @@ function renderCard(props: Partial<React.ComponentProps<typeof SwipeCard>> = {})
   );
 }
 
-// TEST_SCENARIOS.md §6.4 — the gesture math itself is covered in calc tests;
-// here we verify the keyboard contract and label rendering.
 describe('SwipeCard', () => {
   it('triggers onSwipeRight on ArrowRight and onSwipeLeft on ArrowLeft', () => {
     const onSwipeLeft = vi.fn();

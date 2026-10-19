@@ -1,21 +1,21 @@
 import { useCallback, useEffect, useMemo, useReducer } from 'react';
-import type { OnboardingScreen } from '../../types/screens';
-import type { OnboardingResult } from '../../types/config';
+import type { OnboardingScreen } from '../types/screens';
+import type { OnboardingResult } from '../types/config';
 import {
   advanceStepIndex,
   clampStepIndex,
   retreatStepIndex,
-} from '../../calc/step-index-clamp';
+} from '../calc/step-index-clamp';
 import {
   computeProgressFraction,
   computeRemainingSteps,
-} from '../../calc/progress-percentage';
+} from '../calc/progress-percentage';
 import {
   buildOnboardingResult,
   clearOnboardingProgress,
   loadOnboardingProgress,
   saveOnboardingProgress,
-} from '../../utils/local-storage-bridge';
+} from '../utils/local-storage-bridge';
 
 interface ProgressState {
   currentStep: number;
@@ -97,22 +97,19 @@ function reducer(state: ProgressState, action: ProgressAction): ProgressState {
 interface UseOnboardingProgressOptions {
   screens: ReadonlyArray<OnboardingScreen>;
   storageKey?: string;
-  /** Disable persistence (e.g. tests, ephemeral previews). */
-  ephemeral?: boolean;
+    ephemeral?: boolean;
 }
 
 export interface UseOnboardingProgressReturn {
   currentStep: number;
   totalSteps: number;
-  progress: number; // 0..1
-  completedSteps: ReadonlyArray<string>;
+  progress: number;   completedSteps: ReadonlyArray<string>;
   collected: Record<string, unknown>;
   remainingSteps: number;
   isFirst: boolean;
   isLast: boolean;
   isFinished: boolean;
-  /** When the current run started (restored from storage on rehydration). */
-  startedAt: Date;
+    startedAt: Date;
   next: (data?: unknown) => void;
   prev: () => void;
   goTo: (index: number) => void;
@@ -121,11 +118,6 @@ export interface UseOnboardingProgressReturn {
   result: OnboardingResult | null;
 }
 
-/**
- * Owns the state machine for an onboarding flow.
- * Single responsibility: step transitions, persistence, completion.
- * Math is delegated to `src/calc/`; storage I/O to `src/utils/local-storage-bridge`.
- */
 export function useOnboardingProgress(
   options: UseOnboardingProgressOptions,
 ): UseOnboardingProgressReturn {
@@ -157,14 +149,11 @@ export function useOnboardingProgress(
       lastUpdated: now,
       finishedAt: null,
     };
-    // useReducer reads `initialState` only on mount, so this is effectively mount-only.
-    // We recompute if the screen set actually changes (different totalSteps).
-  }, [totalSteps, storageKey, ephemeral]);
+          }, [totalSteps, storageKey, ephemeral]);
 
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  // Persist whenever the state changes.
-  useEffect(() => {
+    useEffect(() => {
     if (ephemeral) return;
     saveOnboardingProgress(storageKey, {
       currentStep: state.currentStep,

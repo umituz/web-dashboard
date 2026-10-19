@@ -1,7 +1,8 @@
 import { useId, useState } from 'react';
-import { PrimaryButton } from '../shared/PrimaryButton';
-import { QuestionWrapper } from '../shared/QuestionWrapper';
+import { PrimaryButton } from '../PrimaryButton';
+import { QuestionWrapper } from '../QuestionWrapper';
 import { useOnboardingIntl } from '../OnboardingIntl';
+import { cn } from '@umituz/web-design-system/utils/cn';
 import {
   clampValueToBounds,
   resolveSliderBounds,
@@ -64,7 +65,7 @@ export function PreferencesScreen({ config, onNext }: PreferencesScreenProps) {
 
   return (
     <QuestionWrapper title={config.title} subtitle={labels.tailorExperience}>
-      <div className="flex flex-col gap-5">
+      <div className="udb-onb-prefs">
         {config.preferences.map((item) => (
           <PreferenceRow key={item.id} item={item} value={values[item.id]} onChange={(v) => update(item.id, v)} />
         ))}
@@ -85,8 +86,8 @@ interface PreferenceRowProps {
 function PreferenceRow({ item, value, onChange }: PreferenceRowProps) {
   const fieldId = useId();
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-sm font-semibold text-[rgb(var(--uob-text-primary))]" htmlFor={fieldId}>
+    <div className="udb-onb-field">
+      <label className="udb-onb-field__label" htmlFor={fieldId}>
         {item.label}
       </label>
       <PreferenceControl item={item} value={value} onChange={onChange} fieldId={fieldId} />
@@ -104,7 +105,7 @@ function PreferenceControl({ item, value, onChange, fieldId }: PreferenceControl
       return (
         <select
           id={fieldId}
-          className="rounded-md border border-[rgb(var(--uob-border))] bg-[rgb(var(--uob-surface))] p-2 text-sm"
+          className="udb-onb-select"
           value={typeof value === 'string' ? value : ''}
           onChange={(e) => onChange(e.target.value)}
         >
@@ -118,7 +119,7 @@ function PreferenceControl({ item, value, onChange, fieldId }: PreferenceControl
     case 'multi-select': {
       const list = Array.isArray(value) ? value : [];
       return (
-        <div className="flex flex-wrap gap-2" role="group" aria-label={item.label}>
+        <div className="udb-onb-chips" role="group" aria-label={item.label}>
           {item.options?.map((opt) => {
             const isOn = list.includes(opt.id);
             return (
@@ -127,11 +128,7 @@ function PreferenceControl({ item, value, onChange, fieldId }: PreferenceControl
                 type="button"
                 aria-pressed={isOn}
                 onClick={() => onChange(toggleMulti(list, opt.id))}
-                className={
-                  isOn
-                    ? 'rounded-full bg-[rgb(var(--uob-primary-500))] px-3 py-1 text-sm text-white'
-                    : 'rounded-full border border-[rgb(var(--uob-border))] bg-[rgb(var(--uob-surface))] px-3 py-1 text-sm hover:border-[rgb(var(--uob-primary-500))]'
-                }
+                className={cn('udb-onb-chip', isOn && 'udb-onb-chip--on')}
               >
                 {opt.label}
               </button>
@@ -148,26 +145,16 @@ function PreferenceControl({ item, value, onChange, fieldId }: PreferenceControl
           role="switch"
           aria-checked={value === true}
           onClick={() => onChange(!value)}
-          className={
-            value === true
-              ? 'h-6 w-11 rounded-full bg-[rgb(var(--uob-primary-500))] p-0.5'
-              : 'h-6 w-11 rounded-full bg-[rgb(var(--uob-border))] p-0.5'
-          }
+          className={cn('udb-onb-switch', value === true && 'udb-onb-switch--on')}
         >
-          <span
-            className={
-              value === true
-                ? 'block h-5 w-5 translate-x-5 rounded-full bg-white transition-transform'
-                : 'block h-5 w-5 translate-x-0 rounded-full bg-white transition-transform'
-            }
-          />
+          <span className="udb-onb-switch__thumb" />
         </button>
       );
     case 'slider': {
       const { min, max } = resolveSliderBounds(item.min, item.max);
       const numeric = typeof value === 'number' ? value : min;
       return (
-        <div className="flex flex-col gap-1">
+        <div className="udb-onb-slider">
           <input
             type="range"
             id={fieldId}
@@ -178,9 +165,8 @@ function PreferenceControl({ item, value, onChange, fieldId }: PreferenceControl
             aria-valuemin={min}
             aria-valuemax={max}
             aria-valuenow={numeric}
-            className="w-full"
           />
-          <div className="flex justify-between text-xs text-[rgb(var(--uob-text-muted))]">
+          <div className="udb-onb-slider__scale">
             <span>{min}</span>
             <span>{numeric}</span>
             <span>{max}</span>

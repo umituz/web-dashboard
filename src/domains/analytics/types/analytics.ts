@@ -1,132 +1,66 @@
-/**
- * Analytics Types
- *
- * Type definitions for analytics system
- */
-
 import type { ComponentType } from "react";
 
-/**
- * Metric card data
- */
 export interface Metric {
-  /** Unique identifier */
-  id: string;
-  /** Metric name */
-  name: string;
-  /** Current value */
-  value: number;
-  /** Previous period value */
-  previousValue?: number;
-  /** Unit (%, $, etc.) */
-  unit?: string;
-  /** Trend direction */
-  trend?: "up" | "down" | "stable";
-  /** Icon component */
-  icon?: ComponentType<{ className?: string }>;
+    id: string;
+    name: string;
+    value: number;
+    previousValue?: number;
+    unit?: string;
+    trend?: "up" | "down" | "stable";
+    icon?: ComponentType<{ className?: string }>;
 }
 
-/**
- * Time series data point
- */
 export interface TimeSeriesData {
-  /** Date/label */
-  date: string;
-  /** Metric values */
-  [key: string]: string | number;
+    date: string;
+    [key: string]: string | number;
 }
 
-/**
- * Chart data point
- */
 export interface ChartData {
-  /** X-axis label */
-  label: string;
-  /** Y-axis value */
-  value: number;
-  /** Additional data */
-  [key: string]: string | number | boolean;
+    label: string;
+    value: number;
+    [key: string]: string | number | boolean;
 }
 
-/**
- * Funnel step
- */
 export interface FunnelStep {
-  /** Step name */
-  name: string;
-  /** User count at this step */
-  count: number;
-  /** Conversion rate to this step */
-  conversionRate: number;
-  /** Drop-off rate from previous step */
-  dropOffRate: number;
-  /** Average time spent at step */
-  averageTime?: number;
+    name: string;
+    count: number;
+    conversionRate: number;
+    dropOffRate: number;
+    averageTime?: number;
 }
 
-/**
- * Funnel data
- */
 export interface FunnelData {
-  /** Funnel title */
-  title: string;
-  /** Funnel steps */
-  steps: FunnelStep[];
-  /** Total starting users */
-  totalUsers: number;
-  /** Final conversion rate */
-  finalConversion: number;
+    title: string;
+    steps: FunnelStep[];
+    totalUsers: number;
+    finalConversion: number;
 }
 
-/**
- * Cohort analysis data
- */
 export interface CohortAnalysis {
-  /** Cohort identifier */
-  cohort: string;
-  /** Cohort size */
-  size: number;
-  /** Retention rates over time */
-  retention: number[];
-  /** Average retention rate */
-  averageRetention: number;
+    cohort: string;
+    size: number;
+    retention: number[];
+    averageRetention: number;
 }
 
-/**
- * User segment
- */
 export interface UserSegment {
-  /** Segment name */
-  name: string;
-  /** User count */
-  count: number;
-  /** Percentage of total users */
-  percentage: number;
-  /** Segment characteristics */
-  characteristics: string[];
-  /** Behavioral metrics */
-  behavior: {
+    name: string;
+    count: number;
+    percentage: number;
+    characteristics: string[];
+    behavior: {
     avgSessionDuration: number;
     pagesPerSession: number;
     bounceRate: number;
   };
 }
 
-/**
- * KPI data with comparison
- */
 export interface KPIData {
-  /** Current period value */
-  current: number;
-  /** Previous period value */
-  previous: number;
-  /** Growth rate percentage */
-  growth: number;
+    current: number;
+    previous: number;
+    growth: number;
 }
 
-/**
- * KPIs container
- */
 export interface KPIs {
   downloads: KPIData;
   engagement: KPIData;
@@ -135,9 +69,6 @@ export interface KPIs {
   retention: KPIData;
 }
 
-/**
- * Chart types
- */
 export type ChartType =
   | "line"
   | "bar"
@@ -149,202 +80,101 @@ export type ChartType =
   | "metric"
   | "table";
 
-/**
- * Chart configuration
- */
 export interface ChartConfig {
-  /** Stable identifier — used as React key, also for telemetry */
-  id: string;
-  /** Chart type */
-  type: ChartType;
-  /** Chart title */
-  title?: string;
-  /** Chart description */
-  description?: string;
-  /** Data */
-  data: TimeSeriesData[] | ChartData[] | Metric[];
-  /** X-axis key */
-  xAxisKey?: string;
-  /** Y-axis keys */
-  yAxisKeys?: string[];
-  /** Color scheme (CSS variable names, e.g. "hsl(var(--primary))") */
-  colors?: string[];
-  /** Show legend */
-  showLegend?: boolean;
-  /** Show grid */
-  showGrid?: boolean;
-  /** Show tooltip */
-  showTooltip?: boolean;
-  /** Chart height */
-  height?: number | string;
-  /** Chart aspect ratio */
-  aspectRatio?: string;
+    id: string;
+    type: ChartType;
+    title?: string;
+    description?: string;
+    data: TimeSeriesData[] | ChartData[] | Metric[];
+    xAxisKey?: string;
+    yAxisKeys?: string[];
+    colors?: string[];
+    showLegend?: boolean;
+    showGrid?: boolean;
+    showTooltip?: boolean;
+    height?: number | string;
+    aspectRatio?: string;
 }
 
-/**
- * Supported analytics period tokens.
- * Typed union to prevent stringly-typed comparison elsewhere.
- */
 export type AnalyticsPeriod = '7d' | '30d' | '90d' | '1y' | (string & {});
 
-/**
- * Metric card props
- */
 export interface MetricCardProps {
-  /** Metric data */
-  metric: Metric;
-  /** Card size variant */
-  size?: "sm" | "md" | "lg";
-  /** Show trend indicator */
-  showTrend?: boolean;
-  /** Show icon */
-  showIcon?: boolean;
-  /** Custom class name */
-  className?: string;
-  /** On click handler */
-  onClick?: () => void;
+    metric: Metric;
+    size?: "sm" | "md" | "lg";
+    showTrend?: boolean;
+    showIcon?: boolean;
+    className?: string;
+    onClick?: () => void;
 }
 
-/**
- * Analytics card props
- */
 export interface AnalyticsCardProps {
-  /** Card title */
-  title?: string;
-  /** Card description */
-  description?: string;
-  /** Chart configuration */
-  chart?: ChartConfig;
-  /** Metrics to display */
-  metrics?: Metric[];
-  /** Card size */
-  size?: "sm" | "md" | "lg" | "full";
-  /** Loading state */
-  loading?: boolean;
-  /** Error message */
-  error?: string;
-  /** Custom class name */
-  className?: string;
-  /** Children content */
-  children?: React.ReactNode;
+    title?: string;
+    description?: string;
+    chart?: ChartConfig;
+    metrics?: Metric[];
+    size?: "sm" | "md" | "lg" | "full";
+    loading?: boolean;
+    error?: string;
+    className?: string;
+    children?: React.ReactNode;
 }
 
-/**
- * Analytics layout props
- */
 export interface AnalyticsLayoutProps {
-  /** Analytics configuration */
-  config?: AnalyticsConfig;
-  /** Page title */
-  title?: string;
-  /** Page description */
-  description?: string;
-  /** Metrics data */
-  metrics?: Metric[];
-  /** Loading state */
-  loading?: boolean;
-  /** Current period */
-  period?: AnalyticsPeriod;
-  /** Period change handler */
-  onPeriodChange?: (period: AnalyticsPeriod) => void;
-  /** Date range selector */
-  showDateRange?: boolean;
-  /** Refresh button */
-  showRefresh?: boolean;
-  /** Export button */
-  showExport?: boolean;
-  /** Charts configuration */
-  charts?: ChartConfig[];
-  /** Refresh handler — required when showRefresh is true */
-  onRefresh?: () => void;
-  /** Export handler — required when showExport is true */
-  onExport?: () => void;
-  /** Custom header content */
-  headerContent?: React.ReactNode;
-  /** Children content */
-  children?: React.ReactNode;
+    config?: AnalyticsConfig;
+    title?: string;
+    description?: string;
+    metrics?: Metric[];
+    loading?: boolean;
+    period?: AnalyticsPeriod;
+    onPeriodChange?: (period: AnalyticsPeriod) => void;
+    showDateRange?: boolean;
+    showRefresh?: boolean;
+    showExport?: boolean;
+    charts?: ChartConfig[];
+    onRefresh?: () => void;
+    onExport?: () => void;
+    headerContent?: React.ReactNode;
+    children?: React.ReactNode;
 }
 
-/**
- * Date range preset
- */
 export interface DateRangePreset {
-  /** Preset label */
-  label: string;
-  /** Preset value */
-  value: string;
-  /** Number of days */
-  days: number;
-  /** Range start (ISO yyyy-mm-dd), resolved at creation time */
-  from?: string;
-  /** Range end (ISO yyyy-mm-dd), resolved at creation time */
-  to?: string;
+    label: string;
+    value: string;
+    days: number;
+    from?: string;
+    to?: string;
 }
 
-/**
- * Date range value
- */
 export interface DateRangeValue {
-  /** Start date */
-  from: string;
-  /** End date */
-  to: string;
-  /** Preset label */
-  preset?: string;
+    from: string;
+    to: string;
+    preset?: string;
 }
 
-/**
- * Export format
- */
 export type ExportFormat = "csv" | "json" | "xlsx" | "pdf";
 
-/**
- * Analytics export options
- */
 export interface AnalyticsExportOptions {
-  /** Export format */
-  format: ExportFormat;
-  /** Include charts */
-  includeCharts?: boolean;
-  /** Include metrics */
-  includeMetrics?: boolean;
-  /** Date range */
-  dateRange?: DateRangeValue;
-  /** Filename */
-  filename?: string;
+    format: ExportFormat;
+    includeCharts?: boolean;
+    includeMetrics?: boolean;
+    dateRange?: DateRangeValue;
+    filename?: string;
 }
 
-/**
- * Analytics configuration
- */
 export interface AnalyticsConfig {
-  /** Brand/application name */
-  brandName: string;
-  /** Default period selection */
-  defaultPeriod?: string;
-  /** Available period options */
-  availablePeriods?: string[];
-  /** Show export button */
-  showExport?: boolean;
-  /** Show refresh button */
-  showRefresh?: boolean;
-  /** Enable real-time updates */
-  enableRealTime?: boolean;
-  /** Metrics configuration */
-  metrics?: MetricConfig[];
+    brandName: string;
+    defaultPeriod?: string;
+    availablePeriods?: string[];
+    showExport?: boolean;
+    showRefresh?: boolean;
+    enableRealTime?: boolean;
+    metrics?: MetricConfig[];
 }
 
-/**
- * Metric configuration
- */
 export interface MetricConfig {
-  /** Metric identifier */
-  id: string;
-  /** Metric name */
-  name: string;
-  /** Unit type */
-  unit?: string;
-  /** Icon identifier */
-  icon?: string;
+    id: string;
+    name: string;
+    unit?: string;
+    icon?: string;
 }
 

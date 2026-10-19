@@ -1,11 +1,3 @@
-/**
- * useAnalytics
- *
- * Pure state + side-effect container. Mock data, commented-out
- * fetch calls, and Math.random()-driven time series are gone.
- * All persistence is delegated to the injected `apiClient`.
- */
-
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import type {
   KPIs,
@@ -14,10 +6,6 @@ import type {
   AnalyticsExportOptions,
 } from "../types/analytics";
 
-/**
- * API client contract. Replace `loadAnalytics` with a real fetch wrapper
- * and `exportAnalytics` with a server-side exporter.
- */
 export interface AnalyticsApiClient {
   loadAnalytics: (range: DateRangeValue) => Promise<AnalyticsDataPayload>;
   exportAnalytics: (payload: AnalyticsDataPayload, options: AnalyticsExportOptions) => Promise<Blob>;
@@ -30,8 +18,7 @@ export interface AnalyticsDataPayload {
 
 export interface UseAnalyticsOptions {
   initialDateRange?: DateRangeValue;
-  /** Auto-refresh interval in ms (0 to disable) */
-  refreshInterval?: number;
+    refreshInterval?: number;
   apiClient: AnalyticsApiClient;
 }
 
@@ -83,12 +70,7 @@ export function useAnalytics(options: UseAnalyticsOptions): UseAnalyticsReturn {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Refs track the latest request so an in-flight call can't be
-   * overridden by a slower one (e.g. user changes the range while
-   * the previous fetch is still resolving).
-   */
-  const requestIdRef = useRef(0);
+    const requestIdRef = useRef(0);
 
   const refresh = useCallback(async () => {
     const requestId = ++requestIdRef.current;

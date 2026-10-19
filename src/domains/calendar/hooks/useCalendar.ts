@@ -1,12 +1,3 @@
-/**
- * useCalendar
- *
- * React hook for the calendar domain. Delegates persistence
- * to the injected `CalendarService`, guards refreshes with a
- * request id so a stale response can never overwrite a newer one,
- * and returns a clean discriminated CRUD contract.
- */
-
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import type {
   CalendarConfig,
@@ -20,14 +11,10 @@ import type { ICalendarService } from '../types/calendar.types';
 type CalendarView = 'month' | 'week' | 'day' | 'timeline';
 
 export interface UseCalendarOptions {
-  /** Calendar configuration overrides */
-  config?: Partial<CalendarConfig>;
-  /** User ID (required to fetch items) */
-  userId: string;
-  /** Error callback — receives the original Error */
-  onError?: (error: Error) => void;
-  /** Override the default service (useful for tests) */
-  service?: ICalendarService;
+    config?: Partial<CalendarConfig>;
+    userId: string;
+    onError?: (error: Error) => void;
+    service?: ICalendarService;
 }
 
 export interface UseCalendarReturn {
@@ -77,17 +64,12 @@ export function useCalendar(options: UseCalendarOptions): UseCalendarReturn {
   const [selectedDate, setSelectedDate] = useState(() => new Date());
   const [filter, setFilterState] = useState<CalendarFilter>({});
 
-  // Keep the latest onError in a ref so refresh identity stays stable
-  // when consumers pass a fresh closure each render.
-  const onErrorRef = useRef(onError);
+      const onErrorRef = useRef(onError);
   useEffect(() => {
     onErrorRef.current = onError;
   }, [onError]);
 
-  // Guards against out-of-order responses: only the most recent
-  // refresh may commit state (e.g. user changes the filter while a
-  // previous fetch is still resolving).
-  const requestIdRef = useRef(0);
+        const requestIdRef = useRef(0);
 
   const refresh = useCallback(async () => {
     if (!userId) {
@@ -178,9 +160,7 @@ export function useCalendar(options: UseCalendarOptions): UseCalendarReturn {
     setFilterState((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  // Single source of truth for filtering (shared with the service layer)
-  // so client-side refiltering can never drift from server-side semantics.
-  const filteredItems = useMemo(
+      const filteredItems = useMemo(
     () => applyCalendarFilter(items, filter),
     [items, filter],
   );

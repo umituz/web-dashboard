@@ -47,14 +47,12 @@ const minimalConfig = (overrides: Partial<OnboardingConfig> = {}): OnboardingCon
 
 type FlowProps = Omit<Partial<React.ComponentProps<typeof OnboardingFlow>>, 'config'>;
 
-/** Ephemeral render — keeps tests isolated from localStorage unless persistence is under test. */
 function renderFlow(config: OnboardingConfig, props: FlowProps = {}) {
   return render(
     <OnboardingFlow config={{ ...config, storageKey: 'test:flow' }} ephemeral {...props} />,
   );
 }
 
-/** Advance past the account gate. `onSignIn` is async — wait for the next screen. */
 async function passAccountGate(nextTitle: string) {
   fireEvent.click(screen.getByRole('button', { name: 'Continue with email' }));
   await waitFor(() => expect(screen.getByText(nextTitle)).toBeTruthy());
@@ -62,16 +60,13 @@ async function passAccountGate(nextTitle: string) {
 
 beforeEach(() => {
   window.localStorage.clear();
-  // Silence React's error-boundary logging; the boundary's own console.error
-  // is asserted behaviorally, not via the spy.
-  vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      vi.spyOn(console, 'error').mockImplementation(() => undefined);
 });
 
 afterEach(() => {
   vi.restoreAllMocks();
 });
 
-// TEST_SCENARIOS.md §1.1–§1.3
 describe('OnboardingFlow — navigation', () => {
   it('renders the first screen with the progress label "Step 1 of 3"', () => {
     renderFlow(minimalConfig());
@@ -116,7 +111,6 @@ describe('OnboardingFlow — navigation', () => {
   });
 });
 
-// TEST_SCENARIOS.md §17
 describe('OnboardingFlow — analytics funnel', () => {
   it('emits started, per-step completed, and completed — each exactly once', async () => {
     const tracker = vi.fn();
@@ -145,8 +139,7 @@ describe('OnboardingFlow — analytics funnel', () => {
     const tracker = vi.fn();
     const analytics = { trackEvents: true, provider: 'custom', customTracker: tracker } as const;
     const first = renderFlow(minimalConfig({ analytics }));
-    first.unmount(); // no engagement yet -> no abandonment event
-    expect(tracker.mock.calls.map((c) => c[0].name)).not.toContain('onboarding_abandoned');
+    first.unmount();     expect(tracker.mock.calls.map((c) => c[0].name)).not.toContain('onboarding_abandoned');
 
     const second = renderFlow(minimalConfig({ analytics }));
     fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
@@ -167,7 +160,6 @@ describe('OnboardingFlow — analytics funnel', () => {
   });
 });
 
-// TEST_SCENARIOS.md §1.11, §1.7, §1.8
 describe('OnboardingFlow — validation & error boundary', () => {
   it('fails fast on duplicate step ids (§1.11)', () => {
     const bad = minimalConfig({ screens: [welcome, { ...welcome }] });
@@ -213,7 +205,6 @@ describe('OnboardingFlow — validation & error boundary', () => {
   });
 });
 
-// TEST_SCENARIOS.md §1.4, §1.5
 describe('OnboardingFlow — persistence', () => {
   it('restores progress across remounts (non-ephemeral)', () => {
     const config = { ...minimalConfig(), storageKey: 'persist:1' };
@@ -259,8 +250,6 @@ describe('OnboardingFlow — labels & locale', () => {
   });
 });
 
-// TEST_SCENARIOS.md §14, §15 — with the REVISED paywall error contract:
-// a failed purchase attempt must NOT advance the user.
 describe('screens — account gate & paywall contracts', () => {
   it('account gate: no skip affordance when required (§14.1)', () => {
     renderFlow(minimalConfig());
@@ -296,8 +285,7 @@ describe('screens — account gate & paywall contracts', () => {
     await waitFor(() =>
       expect(screen.getByRole('alert').textContent).toContain('provider down'),
     );
-    expect(screen.getByText('Create your account')).toBeTruthy(); // still here
-  });
+    expect(screen.getByText('Create your account')).toBeTruthy();   });
 
   it('paywall: accept advances and fires paywall_accepted (§15.1)', async () => {
     const tracker = vi.fn();
@@ -356,8 +344,7 @@ describe('screens — account gate & paywall contracts', () => {
     await waitFor(() =>
       expect(screen.getByRole('alert').textContent).toContain('charge failed'),
     );
-    // Still on the paywall — a failed purchase must never silently advance.
-    expect(screen.getByText('Go Premium')).toBeTruthy();
+        expect(screen.getByText('Go Premium')).toBeTruthy();
     expect(onComplete).not.toHaveBeenCalled();
   });
 
@@ -378,7 +365,6 @@ describe('screens — account gate & paywall contracts', () => {
   });
 });
 
-// TEST_SCENARIOS.md §10
 describe('permission priming screen — funnel events', () => {
   const priming: OnboardingScreen = {
     id: 'perm',
@@ -423,12 +409,10 @@ describe('permission priming screen — funnel events', () => {
     await waitFor(() =>
       expect(screen.getByRole('alert').textContent).toContain('user cancelled'),
     );
-    expect(screen.getByText('Stay on track')).toBeTruthy(); // still here
-    expect(tracker.mock.calls.map((c) => c[0].name)).toContain('permission_denied');
+    expect(screen.getByText('Stay on track')).toBeTruthy();     expect(tracker.mock.calls.map((c) => c[0].name)).toContain('permission_denied');
   });
 });
 
-// TEST_SCENARIOS.md §11
 describe('processing screen — auto-advance', () => {
   it('completes each step on its timer, then advances the flow (§11.1)', async () => {
     vi.useFakeTimers();
@@ -438,30 +422,24 @@ describe('processing screen — auto-advance', () => {
         type: 'processing',
         title: 'Building your plan',
         steps: ['A', 'B', 'C'],
-        durationMs: 300, // 100ms per step
-        onComplete: () => undefined,
+        durationMs: 300,         onComplete: () => undefined,
       };
       renderFlow(minimalConfig({ screens: [welcome, processing, accountGate] }));
       fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
       expect(screen.getByText('Building your plan')).toBeTruthy();
 
-      // Advance one step-timer at a time: each state update schedules the next
-      // timeout inside an effect, which only runs once act flushes the update.
-      for (let i = 0; i < 3; i++) {
+                  for (let i = 0; i < 3; i++) {
         await act(async () => {
           vi.advanceTimersByTime(100);
         });
       }
-      // All three steps completed -> the flow advanced to the account gate.
-      expect(screen.getByText('Create your account')).toBeTruthy();
+            expect(screen.getByText('Create your account')).toBeTruthy();
     } finally {
       vi.useRealTimers();
     }
   });
 });
 
-// TEST_SCENARIOS.md §19 — template regression: every template must mount
-// without an analytics crash (the old `provider: 'custom'` with no tracker).
 describe('templates — mount regression (§19)', () => {
   const cases: Array<[string, OnboardingConfig]> = [
     ['health', healthOnboardingTemplate],

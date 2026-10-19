@@ -1,20 +1,6 @@
-/**
- * Dashboard Hooks
- *
- * Custom React hooks for dashboard functionality
- */
-
 import { useState, useCallback } from "react";
 import type { DashboardNotification } from "../types/notification";
 
-/**
- * Use Notifications Hook
- *
- * Manages notification state and actions
- *
- * @param initialNotifications - Initial notification list
- * @returns Notification state and actions
- */
 export function useNotifications(initialNotifications: DashboardNotification[] = []) {
   const [notifications, setNotifications] = useState<DashboardNotification[]>(initialNotifications);
 
@@ -46,13 +32,6 @@ export function useNotifications(initialNotifications: DashboardNotification[] =
   };
 }
 
-/**
- * Use Sidebar Hook
- *
- * Manages sidebar state
- *
- * @returns Sidebar state and actions
- */
 export function useSidebar(initialCollapsed = false) {
   const [collapsed, setCollapsed] = useState(initialCollapsed);
   const [mobileOpen, setMobileOpen] = useState(false);

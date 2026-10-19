@@ -1,11 +1,3 @@
-/**
- * hasPermission — pure permission lookup against a matrix.
- *
- * Deny-by-default: unknown roles, unknown permissions and empty
- * grants all resolve to `false`. Only an exact entry, a module
- * wildcard ("sales.*") or the full wildcard ("*") grants access.
- */
-
 import {
   PERMISSION_WILDCARD,
   type Permission,

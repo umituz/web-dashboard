@@ -1,14 +1,3 @@
-/**
- * buildRoutes / buildNav — derive route configs and sidebar groups
- * from a single DashboardModule list.
- *
- * - buildRoutes wraps every permissioned module's element in
- *   <RequirePermission>, so hosts only map the result to <Route>.
- * - buildNav filters by the same permissions via `can`, hides
- *   inNav:false detail routes, groups by navGroup (first-appearance
- *   order) and sorts items by `order` (stable for ties).
- */
-
 import type { ReactNode } from "react";
 import type { SidebarGroup } from "../layouts/types";
 import { RequirePermission } from "../permissions";
@@ -33,8 +22,7 @@ export const buildRoutes = (modules: readonly DashboardModule[]): RouteConfig[] 
   }));
 
 export interface BuildNavOptions {
-  /** Permission check, e.g. usePermissions().can. */
-  can: (permission: Permission) => boolean;
+    can: (permission: Permission) => boolean;
 }
 
 export const buildNav = (
@@ -45,9 +33,7 @@ export const buildNav = (
     .filter((module) => module.inNav !== false)
     .filter((module) => !module.permission || can(module.permission));
 
-  // Groups keep their first-appearance order in the module list;
-  // `order` sorts items within their group.
-  const grouped = new Map<string, DashboardModule[]>();
+      const grouped = new Map<string, DashboardModule[]>();
   for (const module of visible) {
     const items = grouped.get(module.navGroup) ?? [];
     items.push(module);

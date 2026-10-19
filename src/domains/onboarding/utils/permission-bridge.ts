@@ -1,9 +1,3 @@
-/**
- * Browser permission API bridge.
- * Owns the I/O — the predicates and the validation module decide whether
- * the runtime supports the call, and how to normalize the raw status.
- */
-
 import {
   doesBrowserSupportMediaCapture,
   doesBrowserSupportGeolocation,
@@ -14,7 +8,6 @@ import type { PermissionStatus, PermissionType } from '../types/screens';
 
 const GEOLOCATION_TIMEOUT_MS = 5000;
 
-/** Read the current permission status without prompting the user. */
 export async function queryPermissionStatus(permission: PermissionType): Promise<PermissionStatus> {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return 'unsupported';
 
@@ -51,7 +44,6 @@ export async function queryPermissionStatus(permission: PermissionType): Promise
   }
 }
 
-/** Prompt the user for the given permission. Never throws — failures map to a status. */
 export async function requestPermission(permission: PermissionType): Promise<PermissionStatus> {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return 'unsupported';
 

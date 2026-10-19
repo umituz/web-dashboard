@@ -1,7 +1,3 @@
-/**
- * Tests for the calendar Firestore → ContentItem mappers.
- */
-
 import { describe, it, expect } from "vitest";
 import { mapCalendarDocument, mapPostDocument } from "./contentItemMapper";
 import type { FirestoreDocument } from "./contentItemMapper";

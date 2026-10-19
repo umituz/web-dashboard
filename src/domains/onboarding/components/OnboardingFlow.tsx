@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { OnboardingScreen } from '../types/screens';
 import type { OnboardingConfig } from '../types/config';
-import { useOnboardingProgress } from './hooks/useOnboardingProgress';
-import { useOnboardingAnalytics } from './hooks/useOnboardingAnalytics';
+import { useOnboardingProgress } from '../hooks/useOnboardingProgress';
+import { useOnboardingAnalytics } from '../hooks/useOnboardingAnalytics';
 import { OnboardingIntlProvider } from './OnboardingIntl';
-import { ProgressBar } from './shared/ProgressBar';
-import { ScreenContainer } from './shared/ScreenContainer';
-import { AnimationWrapper, type ScreenTransition } from './shared/AnimationWrapper';
-import { OnboardingErrorBoundary } from './shared/OnboardingErrorBoundary';
+import { ProgressBar } from './ProgressBar';
+import { ScreenContainer } from './ScreenContainer';
+import { AnimationWrapper, type ScreenTransition } from './AnimationWrapper';
+import { OnboardingErrorBoundary } from './OnboardingErrorBoundary';
 import { useOnboardingIntl } from './OnboardingIntl';
 import { checkFlowStructure } from '../validation/flow-structure-check';
 import {
@@ -29,26 +29,15 @@ import {
 
 export interface OnboardingFlowProps {
   config: OnboardingConfig;
-  /** Test/Storybook hook: skip persistence. */
   ephemeral?: boolean;
-  /** Show progress bar — defaults to true. */
   showProgress?: boolean;
-  /** Show back button on non-first screens — defaults to true. */
   allowBack?: boolean;
-  /** Show skip button — defaults to true. Calls config.onSkip on click. */
   allowSkip?: boolean;
-  /** Custom label for the skip button (overrides `labels.skip`). */
   skipLabel?: string;
-  /** Transition style between screens — defaults to 'slide'. */
   transition?: ScreenTransition;
-  /** Override the default error UI from inside the boundary. */
   renderError?: (error: Error, retry: () => void) => React.ReactNode;
 }
 
-/**
- * Factory + dispatch table: maps a screen type to its component.
- * Each screen is responsible for emitting its own data shape via onNext.
- */
 type ProgressReturn = ReturnType<typeof useOnboardingProgress>;
 
 function renderScreen(
@@ -85,9 +74,6 @@ function renderScreen(
     case 'tinder-cards':
       return <TinderCardsScreen config={screen} onNext={(data) => onStepCompleted(data)} />;
     case 'personalized-solution': {
-      // Deterministic: personalization is driven by the pain-points screen's
-      // collected selections — never by "whichever screen happens to have a
-      // `selected` field".
       const painScreen = config.screens.find((s) => s.type === 'pain-points');
       const painIds = painScreen
         ? ((progress.collected[painScreen.id] as { selected?: string[] } | undefined)
@@ -129,14 +115,12 @@ function renderScreen(
         />
       );
     default: {
-      // Exhaustive check — TypeScript will flag missing cases at compile time.
       const _exhaustive: never = screen;
       return _exhaustive;
     }
   }
 }
 
-/** Back/skip affordances. Rendered inside the intl provider so label overrides apply. */
 function FlowFooterNavigation({
   allowBack,
   allowSkip,
@@ -157,24 +141,16 @@ function FlowFooterNavigation({
   const { labels } = useOnboardingIntl();
   if (!visible) return null;
   return (
-    <div className="flex items-center justify-between">
+    <div className="udb-onb-nav">
       {allowBack && !isFirst ? (
-        <button
-          type="button"
-          onClick={onBack}
-          className="text-sm font-semibold text-[rgb(var(--uob-text-muted))] underline-offset-4 hover:underline"
-        >
+        <button type="button" onClick={onBack} className="udb-onb-link">
           {labels.back}
         </button>
       ) : (
         <span />
       )}
       {allowSkip ? (
-        <button
-          type="button"
-          onClick={onSkip}
-          className="text-sm font-semibold text-[rgb(var(--uob-text-muted))] underline-offset-4 hover:underline"
-        >
+        <button type="button" onClick={onSkip} className="udb-onb-link">
           {skipLabel ?? labels.skip}
         </button>
       ) : (
@@ -184,22 +160,6 @@ function FlowFooterNavigation({
   );
 }
 
-/**
- * OnboardingFlow — the orchestrator.
- * Responsibilities (SRP):
- *  1. Validate the configured flow at mount (fail fast on bad config).
- *  2. Own the progress state machine via useOnboardingProgress.
- *  3. Dispatch the active screen via the factory above.
- *  4. Emit lifecycle analytics (started / step / completed / abandoned — each exactly once).
- *  5. Provide skip/back affordances and progress.
- *  6. Wrap everything in an Error Boundary so a single broken screen never breaks the flow.
- *
- * Does NOT own:
- *  - Styling tokens (theme/cn)
- *  - Analytics provider internals (useOnboardingAnalytics)
- *  - Storage (useOnboardingProgress)
- *  - Screen-specific UI (rendered components)
- */
 export function OnboardingFlow({
   config,
   ephemeral = false,
@@ -217,16 +177,13 @@ export function OnboardingFlow({
   });
   const analytics = useOnboardingAnalytics(config.analytics);
 
-  // Validate configuration once at mount. Surface errors rather than render broken UI.
   const validation = useMemo(() => checkFlowStructure(config.screens), [config.screens]);
   useEffect(() => {
     if (!validation.ok) {
-      throw new Error(`[web-onboarding] invalid flow: ${validation.reason}`);
+      throw new Error(`[onboarding] invalid flow: ${validation.reason}`);
     }
   }, [validation]);
 
-  // Lifecycle analytics — started fires exactly once, even if the consumer
-  // recreates the config object on every render.
   const startedRef = useRef(false);
   useEffect(() => {
     if (startedRef.current) return;
@@ -238,7 +195,6 @@ export function OnboardingFlow({
     });
   }, [analytics, config.category]);
 
-  // Completion — fires exactly once per finished run.
   const completedRef = useRef(false);
   useEffect(() => {
     if (!progress.isFinished || !progress.result) return;
@@ -252,10 +208,8 @@ export function OnboardingFlow({
     config.onComplete?.(progress.result);
   }, [progress.isFinished, progress.result, analytics, config]);
 
-  // Abandonment — when the flow unmounts without finishing AND the user had
-  // engaged (advanced at least one step), report where they dropped off.
-  // React StrictMode dev double-mounts happen before engagement, so they do not
-  // produce spurious events.
+  // Abandonment: unmount without finishing AND after engaging at least one step.
+  // StrictMode dev double-mounts happen before engagement, so no spurious events.
   const abandonSnapshotRef = useRef({ engaged: false, finished: false, currentStep: 0, startedAt: new Date() });
   useEffect(() => {
     abandonSnapshotRef.current = {
@@ -276,8 +230,6 @@ export function OnboardingFlow({
         timestamp: Date.now(),
       });
     };
-    // Config/analytics are read via closure on unmount; the effect intentionally
-    // installs once for the lifetime of the flow.
   }, []);
 
   const handleStepCompleted = useCallback(
@@ -321,7 +273,7 @@ export function OnboardingFlow({
   return (
     <OnboardingIntlProvider labels={config.labels} locale={config.locale}>
       <OnboardingErrorBoundary {...(renderError ? { renderError } : {})}>
-        <div className="uob-flow">
+        <div className="udb-onb">
           <ScreenContainer
             header={
               <>

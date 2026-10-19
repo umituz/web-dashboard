@@ -1,15 +1,6 @@
-/**
- * Dashboard Theme - Presets
- *
- * Pre-configured theme presets
- */
-
 import type { DashboardThemePreset } from '../types/theme';
 import { DEFAULT_DASHBOARD_THEME, DEFAULT_DASHBOARD_THEME_DARK } from './default';
 
-/**
- * Available theme presets
- */
 export const DASHBOARD_THEME_PRESETS: DashboardThemePreset[] = [
   {
     name: "default",

@@ -1,7 +1,7 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "6.1.0",
-  "description": "Installable app skeleton for the fleet — layouts, analytics (dependency-free SVG charts), calendar, onboarding flow, i18n via @umituz/web-localization, permissions/module registry; udb-* stylesheet on design-system tokens (auth lives in @umituz/web-auth)",
+  "version": "6.2.0",
+  "description": "Installable app skeleton for the fleet — layouts, analytics (dependency-free SVG charts), calendar, onboarding flow, i18n via @umituz/web-localization, permissions/module registry; udb-* stylesheet on design-system tokens",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -38,8 +38,7 @@
     "./config": "./src/config/index.ts",
     "./package.json": "./package.json",
     "./charts": "./src/domains/charts/index.ts",
-    "./onboarding": "./src/domains/onboarding/index.ts",
-    "./onboarding.css": "./src/domains/onboarding/onboarding.css"
+    "./onboarding": "./src/domains/onboarding/index.ts"
   },
   "files": [
     "src",
@@ -61,12 +60,9 @@
     "framer-motion": "^12.0.0"
   },
   "dependencies": {
-    "@umituz/web-design-system": "^4.8.1",
+    "@umituz/web-design-system": "^4.9.0",
     "lucide-react": "^0.577.0",
-    "@umituz/web-localization": "^1.2.1",
-    "@radix-ui/react-progress": "^1.1.7",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^3.5.0"
+    "@umituz/web-localization": "^1.2.1"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

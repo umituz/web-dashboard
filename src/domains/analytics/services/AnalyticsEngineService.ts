@@ -1,10 +1,3 @@
-/**
- * Analytics Engine Service
- *
- * Advanced analytics operations including cohort analysis, funnel analysis,
- * user segmentation, behavior prediction, and conversion path analysis.
- */
-
 import type {
   CohortAnalysis,
   FunnelData,
@@ -59,10 +52,6 @@ export interface ActivityItem {
   timestamp: string | Date;
 }
 
-/**
- * Numeric metric keys supported by segment aggregation.
- * Constrained to a string union to avoid `any` lookups at runtime.
- */
 type NumericUserMetric =
   | 'session_duration'
   | 'pages_per_session'
@@ -79,37 +68,18 @@ const isUserMetric = (key: string): key is NumericUserMetric =>
     'last_login_days',
   ].includes(key);
 
-/**
- * Safe numeric accessor for a UserData field.
- * Returns 0 when the field is missing or not a number, instead of forcing a cast.
- */
 const getNumericMetric = (user: UserData, key: NumericUserMetric): number => {
   const value = user[key];
   return typeof value === 'number' ? value : 0;
 };
 
-/**
- * Segmentation thresholds (in days since last login).
- */
 const SEGMENT_THRESHOLDS = {
   activeDays: 7,
   moderateDays: 30,
 } as const;
 
-/**
- * Analytics Engine Service
- *
- * Pure-functional service for advanced analytics calculations.
- * Stateless and testable: instantiate with `new AnalyticsEngineService()`.
- */
 export class AnalyticsEngineService {
-  /**
-   * Calculate cohort retention analysis
-   *
-   * @param data - User data with signup and activity dates
-   * @returns Cohort analysis with retention rates
-   */
-  public calculateRetention(data: UserData[]): CohortAnalysis[] {
+    public calculateRetention(data: UserData[]): CohortAnalysis[] {
     const cohorts: Map<string, UserData[]> = new Map();
 
     data.forEach((user) => {
@@ -156,13 +126,7 @@ export class AnalyticsEngineService {
     return cohortAnalysis;
   }
 
-  /**
-   * Analyze conversion paths
-   *
-   * @param data - Conversion data with paths and values
-   * @returns Conversion path analysis
-   */
-  public analyzeConversionPaths(data: ConversionData[]): ConversionPath[] {
+    public analyzeConversionPaths(data: ConversionData[]): ConversionPath[] {
     const paths: Map<string, { count: number; value: number }> = new Map();
     let totalConversions = 0;
 
@@ -194,14 +158,7 @@ export class AnalyticsEngineService {
       .sort((a, b) => b.conversions - a.conversions);
   }
 
-  /**
-   * Calculate funnel analysis
-   *
-   * @param data - Funnel data with step indicators
-   * @param steps - Funnel step names
-   * @returns Funnel analysis data
-   */
-  public calculateFunnel(data: FunnelItem[], steps: string[]): FunnelData {
+    public calculateFunnel(data: FunnelItem[], steps: string[]): FunnelData {
     let previousCount = data.length;
     const funnelSteps = steps.map((step, index) => {
       const stepCount = data.filter((item) => Boolean(item[step])).length;
@@ -233,13 +190,7 @@ export class AnalyticsEngineService {
     };
   }
 
-  /**
-   * Generate activity heatmap
-   *
-   * @param data - Activity data with timestamps
-   * @returns Heatmap data by day and hour (Monday-first)
-   */
-  public generateActivityHeatmap(data: ActivityItem[]): HeatmapData[] {
+    public generateActivityHeatmap(data: ActivityItem[]): HeatmapData[] {
     const heatmap: HeatmapData[] = [];
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
 
@@ -247,8 +198,7 @@ export class AnalyticsEngineService {
       for (let hour = 0; hour < 24; hour++) {
         const count = data.filter((item) => {
           const d = new Date(item.timestamp);
-          // getDay() is Sunday-based (0=Sun..6=Sat); convert to Monday-first index
-          const mondayFirst = (d.getDay() + 6) % 7;
+                    const mondayFirst = (d.getDay() + 6) % 7;
           return mondayFirst === day && d.getHours() === hour;
         }).length;
 
@@ -258,13 +208,7 @@ export class AnalyticsEngineService {
     return heatmap;
   }
 
-  /**
-   * Segment users by behavior
-   *
-   * @param data - User data
-   * @returns User segments
-   */
-  public segmentUsers(data: UserData[]): UserSegment[] {
+    public segmentUsers(data: UserData[]): UserSegment[] {
     const defineSegment = (
       name: string,
       filter: (u: UserData) => boolean,
@@ -311,14 +255,7 @@ export class AnalyticsEngineService {
     ];
   }
 
-  /**
-   * Predict user behavior
-   *
-   * @param user - Target user
-   * @param historicalData - Historical user data
-   * @returns Behavior prediction
-   */
-  public predictUserBehavior(
+    public predictUserBehavior(
     user: UserData,
     historicalData: UserData[],
   ): UserBehaviorPrediction {
@@ -360,8 +297,4 @@ export class AnalyticsEngineService {
   }
 }
 
-/**
- * Default instance for convenience.
- * The class is also exported so consumers can instantiate a fresh one for tests.
- */
 export const analyticsEngineService = new AnalyticsEngineService();

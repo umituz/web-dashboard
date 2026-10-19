@@ -8,7 +8,6 @@ import {
 } from './permission-status-check';
 import type { OnboardingScreen } from '../types/screens';
 
-// TEST_SCENARIOS.md §23
 const welcome = (id = 'a'): OnboardingScreen => ({
   id,
   type: 'welcome',
@@ -31,8 +30,7 @@ describe('flow-structure-check (§23.1)', () => {
 
   it('accepts a valid flow and propagates per-screen failures', () => {
     expect(checkFlowStructure([welcome('a'), welcome('b')])).toEqual({ ok: true });
-    // goal-question without options fails at the flow level
-    const bad = checkFlowStructure([
+        const bad = checkFlowStructure([
       welcome('a'),
       { id: 'g', type: 'goal-question', question: 'Q', options: [], onChange: () => undefined },
     ]);
@@ -40,7 +38,6 @@ describe('flow-structure-check (§23.1)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §23.2
 describe('screen-config-check (§23.2)', () => {
   it('rejects malformed screens', () => {
     // @ts-expect-error -- deliberately malformed input (null is not a screen)
@@ -89,7 +86,6 @@ describe('screen-config-check (§23.2)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §23.3
 describe('stored-progress-check (§23.3)', () => {
   const validPayload = JSON.stringify({
     version: 1,
@@ -157,7 +153,6 @@ describe('stored-progress-check (§23.3)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §23.4
 describe('permission-status-check (§23.4)', () => {
   it('normalizes browser-level permission strings', () => {
     expect(normalizePermissionStatus('granted')).toBe('granted');

@@ -1,7 +1,6 @@
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import type { OnboardingLabels } from '../types/labels';
 
-/** English source strings. Override any subset via `OnboardingConfig.labels`. */
 export const defaultOnboardingLabels: Readonly<OnboardingLabels> = {
   continueAction: 'Continue',
   back: 'Back',
@@ -52,7 +51,6 @@ export const defaultOnboardingLabels: Readonly<OnboardingLabels> = {
   tryAgain: 'Try again',
 };
 
-/** Replace `{placeholder}` tokens in a pattern label. */
 export function formatLabel(
   pattern: string,
   vars: Record<string, string | number>,
@@ -62,14 +60,11 @@ export function formatLabel(
   );
 }
 
-/** Labels + locale bundled for React context. */
 export interface OnboardingIntl {
   labels: Readonly<OnboardingLabels>;
-  /** BCP-47 tag used for locale-aware formatting (e.g. large counts). */
-  locale: string | undefined;
+    locale: string | undefined;
 }
 
-/** Exported for class-based consumers (error boundaries) that cannot call hooks. */
 export const OnboardingIntlContext = createContext<OnboardingIntl>({
   labels: defaultOnboardingLabels,
   locale: undefined,
@@ -81,10 +76,6 @@ export interface OnboardingIntlProviderProps {
   children: ReactNode;
 }
 
-/**
- * Provides label/locale overrides to every screen in the flow. Screens used
- * standalone (outside `OnboardingFlow`) fall back to the English defaults.
- */
 export function OnboardingIntlProvider({
   labels,
   locale,
@@ -102,7 +93,6 @@ export function OnboardingIntlProvider({
   );
 }
 
-/** Access the active labels and locale. English defaults when no provider. */
 export function useOnboardingIntl(): OnboardingIntl {
   return useContext(OnboardingIntlContext);
 }

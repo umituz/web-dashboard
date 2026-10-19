@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
-import { OptionCard } from '../shared/OptionCard';
-import { PrimaryButton } from '../shared/PrimaryButton';
-import { QuestionWrapper } from '../shared/QuestionWrapper';
+import { OptionCard } from '@umituz/web-design-system/molecules';
+import { PrimaryButton } from '../PrimaryButton';
+import { QuestionWrapper } from '../QuestionWrapper';
+import { renderBundledIcon } from '../renderBundledIcon';
 import { formatLabel, useOnboardingIntl } from '../OnboardingIntl';
 import type { PainPointsScreenConfig } from '../../types/screens';
 
@@ -38,21 +39,20 @@ export function PainPointsScreen({ config, onNext, initialSelected }: PainPoints
   );
 
   return (
-    <QuestionWrapper
-      title={config.title}
-      subtitle={subtitle}
-    >
+    <QuestionWrapper title={config.title} subtitle={subtitle}>
       <div
-        className="flex flex-col gap-2"
+        className="udb-onb-list"
         role={multiSelect ? 'group' : 'radiogroup'}
         aria-label={config.title}
       >
         {config.painPoints.map((point) => (
           <OptionCard
             key={point.id}
-            option={point}
+            label={point.label}
+            description={point.description}
+            icon={renderBundledIcon(point.iconName)}
             selected={selected.includes(point.id)}
-            onToggle={toggle}
+            onSelect={() => toggle(point.id)}
             multiSelect={multiSelect}
           />
         ))}

@@ -1,9 +1,3 @@
-/**
- * Card stack motion math.
- * Owns the scale/opacity transitions used by TinderCardsScreen and similar
- * stack-style screens. Tuning these in one place keeps the stack feel consistent.
- */
-
 const MOTION_ENTER_DURATION_MS = 250;
 const INITIAL_SCALE = 0.95;
 const STEADY_SCALE = 1;

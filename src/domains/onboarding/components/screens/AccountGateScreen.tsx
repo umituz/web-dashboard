@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PrimaryButton } from '../shared/PrimaryButton';
+import { PrimaryButton } from '../PrimaryButton';
 import {
   accountGateAllowsSkip,
   hasOnSignIn,
@@ -31,9 +31,6 @@ export function AccountGateScreen({ config, onNext }: AccountGateScreenProps) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Step lifecycle analytics (`onboarding_step_completed`) are owned by the
-  // orchestrator — the screen stays presentation-only.
-
   async function handleSignIn(method: SignInMethod) {
     setBusy(true);
     setError(null);
@@ -49,22 +46,15 @@ export function AccountGateScreen({ config, onNext }: AccountGateScreenProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-6 text-center">
-      {config.title && (
-        <h2 className="text-3xl font-bold text-[rgb(var(--uob-text-primary))]">{config.title}</h2>
-      )}
-      {config.subtitle && (
-        <p className="text-base text-[rgb(var(--uob-text-muted))]">{config.subtitle}</p>
-      )}
+    <div className="udb-onb-stage">
+      {config.title && <h2 className="udb-onb-title udb-onb-title--display">{config.title}</h2>}
+      {config.subtitle && <p className="udb-onb-lead">{config.subtitle}</p>}
       {error && (
-        <p
-          role="alert"
-          className="w-full rounded-md border border-[rgb(var(--uob-error))] bg-[rgb(var(--uob-error))]/10 p-3 text-sm text-[rgb(var(--uob-error))]"
-        >
+        <p role="alert" className="udb-onb-error">
           {error}
         </p>
       )}
-      <div className="flex w-full flex-col gap-3">
+      <div className="udb-onb-question__body">
         {config.signInMethod && hasOnSignIn(config) && (
           <PrimaryButton
             onClick={() => handleSignIn(config.signInMethod as SignInMethod)}
@@ -78,7 +68,7 @@ export function AccountGateScreen({ config, onNext }: AccountGateScreenProps) {
             type="button"
             disabled={busy}
             onClick={() => onNext({ signedIn: false })}
-            className="text-sm font-semibold text-[rgb(var(--uob-text-muted))] underline-offset-4 hover:underline disabled:opacity-50"
+            className="udb-onb-link"
           >
             {config.skipText ?? labels.skipForNow}
           </button>

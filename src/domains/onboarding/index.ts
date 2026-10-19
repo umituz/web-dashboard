@@ -1,16 +1,6 @@
-/**
- * @umituz/web-onboarding — Public API surface.
- * Designed for tree-shaking: only import what you use.
- */
-
-import './theme/index.css';
-
-// Orchestrator (the entry point)
 export { OnboardingFlow } from './components/OnboardingFlow';
 export type { OnboardingFlowProps } from './components/OnboardingFlow';
 
-// Localization / labels (i18n hooks for consumers + class-component access
-// to the same context the function components use)
 export {
   OnboardingIntlProvider,
   OnboardingIntlContext,
@@ -20,7 +10,6 @@ export {
 } from './components/OnboardingIntl';
 export type { OnboardingIntl, OnboardingIntlProviderProps } from './components/OnboardingIntl';
 
-// Screens
 export {
   WelcomeScreen,
   GoalQuestionScreen,
@@ -38,33 +27,33 @@ export {
   PaywallScreen,
 } from './components/screens';
 
-// Shared / atomic
-export {
-  ProgressBar,
-  QuestionWrapper,
-  OptionCard,
-  SwipeCard,
-  AnimationWrapper,
-  ScreenContainer,
-  PrimaryButton,
-  OnboardingErrorBoundary,
-} from './components/shared';
-export type { ScreenTransition } from './components/shared';
+export { ProgressBar } from './components/ProgressBar';
+export type { ProgressBarProps } from './components/ProgressBar';
+export { QuestionWrapper } from './components/QuestionWrapper';
+export type { QuestionWrapperProps } from './components/QuestionWrapper';
+export { SwipeCard } from './components/SwipeCard';
+export type { SwipeCardProps } from './components/SwipeCard';
+export { AnimationWrapper } from './components/AnimationWrapper';
+export type { AnimationWrapperProps, ScreenTransition } from './components/AnimationWrapper';
+export { ScreenContainer } from './components/ScreenContainer';
+export type { ScreenContainerProps } from './components/ScreenContainer';
+export { PrimaryButton } from './components/PrimaryButton';
+export type { PrimaryButtonProps } from './components/PrimaryButton';
+export { OnboardingErrorBoundary } from './components/OnboardingErrorBoundary';
+export type { OnboardingErrorBoundaryProps } from './components/OnboardingErrorBoundary';
 
-// Hooks
 export {
   useOnboardingProgress,
   usePermissionPriming,
   useOnboardingAnalytics,
   useReducedMotion,
-} from './components/hooks';
+} from './hooks';
 export type {
   UseOnboardingProgressReturn,
   UsePermissionPrimingReturn,
   UseOnboardingAnalyticsReturn,
-} from './components/hooks';
+} from './hooks';
 
-// Templates
 export {
   healthOnboardingTemplate,
   artOnboardingTemplate,
@@ -76,7 +65,6 @@ export {
 } from './templates';
 export type { TemplateDemoResult } from './templates';
 
-// Calculations (pure math)
 export {
   computeProgressFraction,
   computeProgressPercentage,
@@ -107,7 +95,6 @@ export {
 } from './calc';
 export type { CardMotionState } from './calc';
 
-// Validation
 export {
   checkFlowStructure,
   checkScreenConfig,
@@ -118,7 +105,6 @@ export {
 } from './validation';
 export type { ValidationOutcome, StoredProgressShape, StoredProgressOutcome } from './validation';
 
-// Predicates
 export {
   isPermissionGranted,
   isPermissionDenied,
@@ -140,7 +126,6 @@ export {
   screenEmitsData,
 } from './predicates';
 
-// I/O utilities
 export {
   trackOnboardingEvent,
   dispatchAnalyticsEvent,
@@ -154,20 +139,6 @@ export {
 } from './utils';
 export type { RehydratedProgress } from './utils';
 
-// Theme tokens (for consumers that want to rebrand)
-export {
-  spacing,
-  radius,
-  typography,
-  zIndex,
-  motion as motionTokens,
-  breakpoint,
-  colorCssVar,
-  cn,
-} from './theme';
-export type { SpacingToken, RadiusToken, FontSizeToken } from './theme';
-
-// Types
 export type {
   OnboardingScreen,
   OnboardingScreenType,

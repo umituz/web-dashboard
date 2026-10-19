@@ -1,13 +1,3 @@
-/**
- * Calendar Service
- *
- * Camp-agnostic calendar service for managing content items.
- * Persistence is injected via the `ICalendarDatabase` seam — the
- * package ships no Firebase (or any other) backend. Use
- * `createInMemoryCalendarDatabase()` for demos and tests, or adapt
- * your own backend to the interface.
- */
-
 import type {
   ContentItem,
   CalendarFilter,
@@ -16,10 +6,6 @@ import type {
   ICalendarService,
 } from '../types/calendar.types';
 
-/**
- * Database interface for calendar operations
- * Implementations can provide different backends
- */
 export interface ICalendarDatabase {
   getItems(userId: string): Promise<ContentItem[]>;
   getItemById(id: string): Promise<ContentItem | null>;
@@ -28,9 +14,6 @@ export interface ICalendarDatabase {
   deleteItem(id: string): Promise<void>;
 }
 
-/**
- * Resolve scheduled_at to ISO string regardless of source type
- */
 const resolveScheduledAt = (value: string | Date | undefined): string => {
   if (value === undefined) {
     throw new Error('scheduled_at is required to create or update a content item');
@@ -39,10 +22,6 @@ const resolveScheduledAt = (value: string | Date | undefined): string => {
   return value.toISOString();
 };
 
-/**
- * In-memory calendar database — zero-dependency default for demos
- * and tests. Data lives per-instance for the lifetime of the page.
- */
 export const createInMemoryCalendarDatabase = (): ICalendarDatabase => {
   const items = new Map<string, ContentItem>();
 

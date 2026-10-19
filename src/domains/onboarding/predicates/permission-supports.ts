@@ -1,8 +1,3 @@
-/**
- * Browser-feature predicates for the runtime.
- * Each predicate answers "does the user's browser/environment support this API?".
- */
-
 import type { PermissionType } from '../types/screens';
 
 declare const navigator: undefined | {
@@ -26,28 +21,24 @@ function safeNavigator(): typeof navigator | null {
   return navigator;
 }
 
-/** Is `Notification` available in the current runtime? */
 export function doesBrowserSupportNotifications(): boolean {
   const win = safeWindow();
   if (!win) return false;
   return typeof win.Notification !== 'undefined';
 }
 
-/** Is `getUserMedia` available (camera/microphone capture)? */
 export function doesBrowserSupportMediaCapture(): boolean {
   const nav = safeNavigator();
   if (!nav) return false;
   return Boolean(nav.mediaDevices?.getUserMedia);
 }
 
-/** Is geolocation available? */
 export function doesBrowserSupportGeolocation(): boolean {
   const nav = safeNavigator();
   if (!nav) return false;
   return Boolean(nav.geolocation);
 }
 
-/** Aggregate check used by `usePermissionPriming` to report "unsupported" cleanly. */
 export function isRuntimeSupportMissing(permission: PermissionType): boolean {
   switch (permission) {
     case 'notifications':
@@ -59,8 +50,7 @@ export function isRuntimeSupportMissing(permission: PermissionType): boolean {
       return !doesBrowserSupportGeolocation();
     case 'photos':
     case 'contacts':
-      return true; // No web-standard APIs for these in this package.
-    default:
+      return true;     default:
       return true;
   }
 }

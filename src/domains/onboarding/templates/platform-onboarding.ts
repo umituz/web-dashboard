@@ -2,14 +2,6 @@ import type { OnboardingConfig } from '../types/config';
 import type { OnboardingScreen } from '../types/screens';
 import { withDefaultDemo, defaultDemoResult } from './TemplateDemoFallback';
 
-/**
- * Platform category — full 14-screen flow.
- * Use for multi-feature platforms where personalization drives retention.
- *
- * The app-demo screen ships with a working palette-preview fallback so the
- * template is runnable end-to-end out of the box.
- */
-
 const screens: OnboardingScreen[] = [
   {
     id: 'welcome',
@@ -199,7 +191,6 @@ const screens: OnboardingScreen[] = [
   },
 ];
 
-// Replace the no-op demo component with the built-in working fallback.
 const resolvedScreens = screens.map((s) => withDefaultDemo(s));
 
 export const platformOnboardingTemplate: OnboardingConfig = {

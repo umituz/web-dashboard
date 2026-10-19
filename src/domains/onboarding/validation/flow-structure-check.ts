@@ -5,12 +5,6 @@ export type ValidationOutcome = { ok: true } | { ok: false; reason: string };
 
 const MIN_FLOW_LENGTH = 1;
 
-/**
- * Validates the structure of an entire onboarding flow:
- *  - At least one screen exists
- *  - Every screen passes its own check
- *  - Step IDs are unique
- */
 export function checkFlowStructure(screens: ReadonlyArray<OnboardingScreen>): ValidationOutcome {
   if (!Array.isArray(screens) || screens.length < MIN_FLOW_LENGTH) {
     return { ok: false, reason: 'flow must contain at least one screen' };

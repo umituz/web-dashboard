@@ -1,9 +1,3 @@
-/**
- * Analytics Types
- *
- * Export all analytics-related types
- */
-
 export type {
   Metric,
   TimeSeriesData,

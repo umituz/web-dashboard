@@ -1,11 +1,6 @@
 import type { OnboardingConfig } from '../types/config';
 import type { OnboardingScreen } from '../types/screens';
 
-/**
- * Health category — privacy-first, 5–7 screens.
- * Trust is the #1 conversion lever: lead with privacy reassurance.
- */
-
 const screens: OnboardingScreen[] = [
   {
     id: 'welcome',

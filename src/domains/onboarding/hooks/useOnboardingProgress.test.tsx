@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
 import { useOnboardingProgress } from './useOnboardingProgress';
-import { defaultStorageKey } from '../../utils/default-storage-key';
-import type { OnboardingScreen } from '../../types/screens';
+import { defaultStorageKey } from '../utils/default-storage-key';
+import type { OnboardingScreen } from '../types/screens';
 
 function makeScreens(count: number): OnboardingScreen[] {
   return Array.from({ length: count }, (_, i) => ({

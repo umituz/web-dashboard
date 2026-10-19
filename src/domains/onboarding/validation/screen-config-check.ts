@@ -66,10 +66,6 @@ function checkPaywall(screen: OnboardingScreen): ValidationOutcome {
   return { ok: true };
 }
 
-/**
- * Validates a single screen config. Per-screen rules live here so the file
- * is the single place to look when a new screen type is added.
- */
 export function checkScreenConfig(screen: OnboardingScreen): ValidationOutcome {
   if (!isPlainObject(screen)) {
     return { ok: false, reason: 'screen must be an object' };
@@ -99,7 +95,6 @@ export function checkScreenConfig(screen: OnboardingScreen): ValidationOutcome {
   }
 }
 
-/** The set of screen types the orchestrator knows how to render. */
 export function getRecognizedScreenTypes(): ReadonlySet<OnboardingScreenType> {
   return RECOGNIZED_SCREEN_TYPES;
 }

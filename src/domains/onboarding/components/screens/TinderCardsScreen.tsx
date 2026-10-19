@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { SwipeCard } from '../shared/SwipeCard';
-import { PrimaryButton } from '../shared/PrimaryButton';
+import { SwipeCard } from '../SwipeCard';
+import { PrimaryButton } from '../PrimaryButton';
 import {
   getCardEnterAnimate,
   getCardEnterExit,
@@ -22,9 +22,7 @@ export function TinderCardsScreen({ config, onNext }: TinderCardsScreenProps) {
   const [liked, setLiked] = useState<string[]>([]);
   const total = config.statements.length;
   const current = config.statements[index];
-  // Refs make decision handlers always see the latest state without recreating callbacks
-  // on every index change — which would have remounted SwipeCard and lost gestures.
-  const indexRef = useRef(index);
+      const indexRef = useRef(index);
   const likedRef = useRef(liked);
   useEffect(() => {
     indexRef.current = index;
@@ -46,8 +44,8 @@ export function TinderCardsScreen({ config, onNext }: TinderCardsScreenProps) {
 
   if (!current) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-6">
-        <p className="text-lg text-[rgb(var(--uob-text-primary))]">{labels.allDone}</p>
+      <div className="udb-onb-stage">
+        <p className="udb-onb-lead">{labels.allDone}</p>
         <PrimaryButton onClick={() => onNext({ liked: likedRef.current })}>
           {config.cta ?? labels.continueAction}
         </PrimaryButton>
@@ -56,13 +54,9 @@ export function TinderCardsScreen({ config, onNext }: TinderCardsScreenProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-6">
-      {config.title && (
-        <h2 className="text-2xl font-semibold text-[rgb(var(--uob-text-primary))] sm:text-3xl">
-          {config.title}
-        </h2>
-      )}
-      <div className="flex flex-1 items-center justify-center">
+    <div className="udb-onb-proof">
+      {config.title && <h2 className="udb-onb-title">{config.title}</h2>}
+      <div className="udb-onb-proof__stage">
         <AnimatePresence mode="wait">
           <motion.div
             key={current.id}
@@ -70,7 +64,7 @@ export function TinderCardsScreen({ config, onNext }: TinderCardsScreenProps) {
             animate={{ opacity: getCardEnterAnimate().opacity, scale: getCardEnterAnimate().scale }}
             exit={{ opacity: getCardEnterExit().opacity, scale: getCardEnterExit().scale }}
             transition={{ duration: getCardTransitionDurationMs() / 1000 }}
-            className="w-full"
+            className="udb-onb-stage"
           >
             <SwipeCard
               text={current.text}
@@ -81,26 +75,15 @@ export function TinderCardsScreen({ config, onNext }: TinderCardsScreenProps) {
           </motion.div>
         </AnimatePresence>
       </div>
-      <div className="flex items-center justify-between gap-2">
-        <button
-          type="button"
-          onClick={onSwipeLeft}
-          className="flex-1 rounded-xl border-2 border-[rgb(var(--uob-error))] py-3 font-semibold text-[rgb(var(--uob-error))] transition-colors hover:bg-[rgb(var(--uob-error))] hover:text-white"
-        >
+      <div className="udb-onb-proof__nav">
+        <button type="button" onClick={onSwipeLeft} className="udb-onb-choice udb-onb-choice--no">
           {labels.disagree}
         </button>
-        <button
-          type="button"
-          onClick={onSwipeRight}
-          className="flex-1 rounded-xl border-2 border-[rgb(var(--uob-success))] py-3 font-semibold text-[rgb(var(--uob-success))] transition-colors hover:bg-[rgb(var(--uob-success))] hover:text-white"
-        >
+        <button type="button" onClick={onSwipeRight} className="udb-onb-choice udb-onb-choice--yes">
           {labels.agree}
         </button>
       </div>
-      <p
-        className="text-center text-sm text-[rgb(var(--uob-text-muted))]"
-        aria-live="polite"
-      >
+      <p className="udb-onb-note" aria-live="polite">
         {formatLabel(labels.countOfPattern, { current: index + 1, total })}
       </p>
     </div>

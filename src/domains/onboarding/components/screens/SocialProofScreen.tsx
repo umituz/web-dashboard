@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star } from 'lucide-react';
-import { PrimaryButton } from '../shared/PrimaryButton';
-import { cn } from '../../theme/cn';
+import { PrimaryButton } from '../PrimaryButton';
+import { Button } from '@umituz/web-design-system/atoms';
+import { cn } from '@umituz/web-design-system/utils/cn';
 import { useOnboardingIntl } from '../OnboardingIntl';
 import type { SocialProofScreenConfig } from '../../types/screens';
 
@@ -22,13 +23,9 @@ export function SocialProofScreen({ config, onNext }: SocialProofScreenProps) {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-8">
-      {config.title && (
-        <h2 className="text-2xl font-semibold text-[rgb(var(--uob-text-primary))] sm:text-3xl">
-          {config.title}
-        </h2>
-      )}
-      <div className="flex flex-1 flex-col items-center justify-center">
+    <div className="udb-onb-proof">
+      {config.title && <h2 className="udb-onb-title">{config.title}</h2>}
+      <div className="udb-onb-proof__stage">
         <AnimatePresence mode="wait">
           <motion.blockquote
             key={`${current.name}-${index}`}
@@ -36,42 +33,29 @@ export function SocialProofScreen({ config, onNext }: SocialProofScreenProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.3 }}
-            className="flex max-w-xl flex-col items-center gap-4 rounded-2xl border border-[rgb(var(--uob-border))] bg-[rgb(var(--uob-surface))] p-8 text-center"
+            className="udb-onb-quote"
           >
             {current.rating !== undefined && (
-              <div className="flex items-center gap-1" aria-label={`Rated ${current.rating} out of 5`}>
+              <div className="udb-onb-quote__stars" aria-label={`Rated ${current.rating} out of 5`}>
                 {Array.from({ length: 5 }).map((_, i) => (
                   <Star
                     key={i}
-                    className={cn(
-                      'h-5 w-5',
-                      i < current.rating!
-                        ? 'fill-current text-[rgb(var(--uob-warning))]'
-                        : 'text-[rgb(var(--uob-border))]',
-                    )}
+                    className={cn('udb-onb-quote__star', i < current.rating! && 'udb-onb-quote__star--filled')}
                   />
                 ))}
               </div>
             )}
-            <p className="text-lg text-[rgb(var(--uob-text-primary))]">“{current.content}”</p>
-            <footer className="flex flex-col items-center gap-1">
-              {current.avatar && (
-                <img
-                  src={current.avatar}
-                  alt=""
-                  className="h-12 w-12 rounded-full object-cover"
-                />
-              )}
-              <cite className="text-sm font-semibold not-italic text-[rgb(var(--uob-text-primary))]">
-                {current.name}
-              </cite>
-              <span className="text-sm text-[rgb(var(--uob-text-muted))]">{current.role}</span>
+            <p className="udb-onb-quote__content">“{current.content}”</p>
+            <footer className="udb-onb-quote__footer">
+              {current.avatar && <img src={current.avatar} alt="" className="udb-onb-quote__avatar" />}
+              <cite className="udb-onb-quote__cite">{current.name}</cite>
+              <span className="udb-onb-quote__role">{current.role}</span>
             </footer>
           </motion.blockquote>
         </AnimatePresence>
       </div>
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-1.5" role="tablist" aria-label="Testimonials">
+      <div className="udb-onb-proof__bar">
+        <div className="udb-onb-dots" role="tablist" aria-label="Testimonials">
           {config.testimonials.map((t, i) => (
             <button
               key={`${t.name}-${i}`}
@@ -80,32 +64,19 @@ export function SocialProofScreen({ config, onNext }: SocialProofScreenProps) {
               aria-selected={i === index}
               aria-label={`${t.name}: ${t.content}`}
               onClick={() => setIndex(i)}
-              className={cn(
-                'h-2 w-2 rounded-full transition-all',
-                i === index
-                  ? 'w-6 bg-[rgb(var(--uob-primary-500))]'
-                  : 'bg-[rgb(var(--uob-border))]',
-              )}
+              className={cn('udb-onb-dot', i === index && 'udb-onb-dot--active')}
             />
           ))}
         </div>
-        <div className="flex gap-2">
+        <div className="udb-onb-proof__nav">
           {total > 1 && (
             <>
-              <button
-                type="button"
-                onClick={() => go(-1)}
-                className="rounded-md border border-[rgb(var(--uob-border))] bg-[rgb(var(--uob-surface))] px-3 py-1 text-sm hover:bg-[rgb(var(--uob-surface-muted))]"
-              >
+              <Button variant="outline" size="sm" onClick={() => go(-1)}>
                 {labels.previous}
-              </button>
-              <button
-                type="button"
-                onClick={() => go(1)}
-                className="rounded-md border border-[rgb(var(--uob-border))] bg-[rgb(var(--uob-surface))] px-3 py-1 text-sm hover:bg-[rgb(var(--uob-surface-muted))]"
-              >
+              </Button>
+              <Button variant="outline" size="sm" onClick={() => go(1)}>
                 {labels.nextAction}
-              </button>
+              </Button>
             </>
           )}
         </div>

@@ -1,16 +1,7 @@
-/**
- * Dashboard Theme - Utilities
- *
- * Theme utility functions
- */
-
 import type { DashboardTheme, DashboardThemePreset } from '../types/theme';
 import { DEFAULT_DASHBOARD_THEME, DEFAULT_DASHBOARD_THEME_DARK } from './default';
 import { DASHBOARD_THEME_PRESETS } from './presets';
 
-/**
- * Apply theme to document root via CSS variables
- */
 export function applyDashboardTheme(theme: DashboardTheme): void {
   if (typeof document === "undefined") return;
 
@@ -45,16 +36,10 @@ export function applyDashboardTheme(theme: DashboardTheme): void {
   });
 }
 
-/**
- * Get theme preset by name
- */
 export function getDashboardThemePreset(name: string): DashboardThemePreset | undefined {
   return DASHBOARD_THEME_PRESETS.find((preset) => preset.name === name);
 }
 
-/**
- * Merge custom theme with default theme
- */
 export function mergeDashboardTheme(
   customTheme: Partial<DashboardTheme>,
   dark = false

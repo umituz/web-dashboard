@@ -1,17 +1,9 @@
-/**
- * Storage payload integrity check.
- * Decides whether a localStorage string is something we can safely rehydrate
- * from. The shape is versioned so future migrations stay clean.
- */
-
 export interface StoredProgressShape {
   version: 1;
   currentStep: number;
   completedSteps: string[];
   collected: Record<string, unknown>;
-  startedAt: string; // ISO
-  lastUpdated: string; // ISO
-}
+  startedAt: string;   lastUpdated: string; }
 
 export type StoredProgressOutcome =
   | { ok: true; data: StoredProgressShape }
@@ -34,7 +26,6 @@ function isIsoDateString(value: unknown): value is string {
   return Number.isFinite(ms);
 }
 
-/** Is the raw string a valid, current-version stored progress payload? */
 export function checkStoredProgress(raw: string | null): StoredProgressOutcome {
   if (raw === null) return { ok: false, reason: 'no stored progress' };
   let parsed: unknown;

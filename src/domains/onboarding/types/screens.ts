@@ -1,10 +1,5 @@
 import type { ReactNode } from 'react';
 
-/**
- * Discriminated union: every screen is one of 14 strictly-typed shapes.
- * Eliminates `Record<string, any>` masking (project rule: no `any`).
- */
-
 export interface BaseScreen<T extends string, D = unknown> {
   id: string;
   type: T;
@@ -19,8 +14,7 @@ export interface OnboardingOption {
   id: string;
   label: string;
   description?: string;
-  iconName?: string; // lucide-react icon name; resolved by UI layer
-  image?: string;
+  iconName?: string;   image?: string;
 }
 
 export type WelcomeScreenConfig = BaseScreen<'welcome'> & {
@@ -131,8 +125,7 @@ export type ValueDeliveryScreenConfig<TResult = unknown> = BaseScreen<
 > & {
   title: string;
   result: TResult;
-  /** Optional share affordance. Uses the Web Share API with a clipboard fallback. */
-  shareConfig?: {
+    shareConfig?: {
     text: string;
     url?: string;
   };
@@ -148,8 +141,7 @@ export type AccountGateScreenConfig = BaseScreen<'account-gate', { signedIn: boo
 };
 
 export type PaywallFeature = {
-  iconName: string; // lucide-react
-  text: string;
+  iconName: string;   text: string;
   highlighted?: boolean;
 };
 

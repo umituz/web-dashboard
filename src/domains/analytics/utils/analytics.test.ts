@@ -1,7 +1,3 @@
-/**
- * Tests for pure analytics utility functions.
- */
-
 import { describe, it, expect } from "vitest";
 import {
   formatNumber,
@@ -53,9 +49,7 @@ describe("formatCurrency", () => {
   });
 
   it("honors the locale parameter", () => {
-    // Signature is (value, currency, decimals, locale); the assertions
-    // expect 2 decimal places, which "en-US"/"de-DE" format as ,50 / ,50.
-    expect(formatCurrency(1234.5, "USD", 2, "en-US")).toBe("$1,234.50");
+            expect(formatCurrency(1234.5, "USD", 2, "en-US")).toBe("$1,234.50");
     expect(formatCurrency(1234.5, "EUR", 2, "de-DE")).toContain("1.234,50");
   });
 });
@@ -128,8 +122,7 @@ describe("detectOutliers", () => {
   });
 
   it("returns indices of values beyond 2 standard deviations", () => {
-    // mean ≈ 16.7, population stdev ≈ 14.9 → only 50 exceeds 2σ.
-    expect(detectOutliers([10, 10, 10, 10, 10, 50])).toEqual([5]);
+        expect(detectOutliers([10, 10, 10, 10, 10, 50])).toEqual([5]);
   });
 
   it("returns no indices for a uniform series", () => {

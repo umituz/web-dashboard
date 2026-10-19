@@ -1,11 +1,6 @@
 import type { OnboardingConfig } from '../types/config';
 import type { OnboardingScreen } from '../types/screens';
 
-/**
- * Video category — personalization-led, 6–8 screens.
- * Goal: tune the recommendation engine early.
- */
-
 const screens: OnboardingScreen[] = [
   {
     id: 'welcome',

@@ -27,20 +27,17 @@ import {
 import { screenEmitsData } from './screen-emits-data';
 import type { OnboardingScreen } from '../types/screens';
 
-// TEST_SCENARIOS.md §24
 describe('icon-name-resolves (§24.4)', () => {
   it('resolves registered names', () => {
     expect(doesIconNameResolve('HeartPulse')).toBe(true);
     expect(doesIconNameResolve('Sparkles')).toBe(true);
-    // lucide-react icons are forwardRef memo objects, not plain functions.
-    expect(resolveIconByName('Sparkles')).toBeTruthy();
+        expect(resolveIconByName('Sparkles')).toBeTruthy();
   });
 
   it('does not resolve unknown, missing, or case-mismatched names', () => {
     expect(doesIconNameResolve('NonExistentIcon')).toBe(false);
     expect(doesIconNameResolve(undefined)).toBe(false);
-    expect(doesIconNameResolve('sparkles')).toBe(false); // registry is PascalCase
-    expect(resolveIconByName('NonExistentIcon')).toBeNull();
+    expect(doesIconNameResolve('sparkles')).toBe(false);     expect(resolveIconByName('NonExistentIcon')).toBeNull();
   });
 
   it('resolves the reserved-word alias "Infinity"', () => {
@@ -49,8 +46,7 @@ describe('icon-name-resolves (§24.4)', () => {
   });
 
   it('resolves every icon used by the bundled templates — including the video set', () => {
-    // Icons referenced across art/health/platform/video templates.
-    const templateIcons = [
+        const templateIcons = [
       'Activity', 'Apple', 'Award', 'Ban', 'Bell', 'BookOpen', 'Camera', 'Check',
       'CheckCircle2', 'Download', 'Dumbbell', 'GraduationCap', 'Headphones',
       'HeartPulse', 'Image', 'Infinity', 'Lock', 'MapPin', 'MessageCircle',
@@ -66,14 +62,12 @@ describe('icon-name-resolves (§24.4)', () => {
   it('keeps the registry curated (each name maps to a component)', () => {
     const names = getRegisteredIconNames();
     expect(names.length).toBeGreaterThan(30);
-    expect(names.length).toBeLessThan(60); // a namespace import would be ~1,500
-    for (const name of names) {
+    expect(names.length).toBeLessThan(60);     for (const name of names) {
       expect(resolveIconByName(name), `icon "${name}"`).toBeTruthy();
     }
   });
 });
 
-// TEST_SCENARIOS.md §24.1
 describe('permission-granted (§24.1)', () => {
   it('classifies statuses', () => {
     expect(isPermissionGranted('granted')).toBe(true);
@@ -88,13 +82,9 @@ describe('permission-granted (§24.1)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §24.2 — jsdom stands in for the "modern browser" runtime.
 describe('permission-supports (§24.2)', () => {
   it('reports support from the live navigator/window', () => {
-    // jsdom ships geolocation + mediaDevices in recent versions; the exact
-    // answer varies by jsdom build, so assert predicate/API agreement instead
-    // of hardcoding booleans.
-    expect(doesBrowserSupportMediaCapture()).toBe(
+                expect(doesBrowserSupportMediaCapture()).toBe(
       Boolean((globalThis as { navigator?: { mediaDevices?: { getUserMedia?: unknown } } })
         .navigator?.mediaDevices?.getUserMedia),
     );
@@ -117,7 +107,6 @@ describe('permission-supports (§24.2)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §24.3
 describe('storage-available (§24.3)', () => {
   it('works in the jsdom browser environment', () => {
     expect(isLocalStorageAvailable()).toBe(true);
@@ -125,8 +114,7 @@ describe('storage-available (§24.3)', () => {
 
   it('returns false when storage access throws (e.g. blocked cookies)', () => {
     const original = window.localStorage;
-    // Replace with a getter that throws, as Safari private mode historically did.
-    Object.defineProperty(window, 'localStorage', {
+        Object.defineProperty(window, 'localStorage', {
       configurable: true,
       get() {
         throw new DOMException('Access is denied for this document', 'SecurityError');
@@ -144,7 +132,6 @@ describe('storage-available (§24.3)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §24.5
 describe('has-handler (§24.5)', () => {
   const paywall = {
     id: 'w',
@@ -187,7 +174,6 @@ describe('has-handler (§24.5)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §24.6
 describe('screen-emits-data (§24.6)', () => {
   it('marks view-only screens as non-emitting', () => {
     expect(screenEmitsData({ id: 'a', type: 'welcome' } as OnboardingScreen)).toBe(false);

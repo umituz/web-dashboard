@@ -18,8 +18,7 @@ export type AnalyticsProvider = 'google-analytics' | 'amplitude' | 'mixpanel' | 
 export interface AnalyticsConfig {
   trackEvents: boolean;
   provider?: AnalyticsProvider;
-  /** Custom event sink used when provider === 'custom'. */
-  customTracker?: (event: OnboardingAnalyticsEvent) => void;
+    customTracker?: (event: OnboardingAnalyticsEvent) => void;
 }
 
 export type OnboardingAnalyticsEvent =
@@ -41,28 +40,18 @@ export interface OnboardingConfig {
   demo?: DemoConfig;
   paywall?: PaywallScreenConfig;
   analytics?: AnalyticsConfig;
-  /**
-   * Override any user-facing string the library renders. English defaults
-   * apply to keys you omit. See `OnboardingLabels`.
-   */
-  labels?: Partial<OnboardingLabels>;
-  /** BCP-47 locale used for locale-aware formatting (e.g. "250.000" vs "250,000"). */
-  locale?: string;
-  /** Custom slot rendered above the flow (e.g. brand banner). */
-  headerSlot?: ReactNode;
-  /** Custom slot rendered below the flow. */
-  footerSlot?: ReactNode;
+    labels?: Partial<OnboardingLabels>;
+    locale?: string;
+    headerSlot?: ReactNode;
+    footerSlot?: ReactNode;
   onComplete?: (data: OnboardingResult) => void;
   onSkip?: () => void;
-  /** Persistence key — defaults to '@umituz/web-onboarding:progress'. */
-  storageKey?: string;
+    storageKey?: string;
 }
 
-/** Collected data exposed to onComplete. Typed in place of `Record<string, any>`. */
 export interface OnboardingResult {
   completedSteps: ReadonlyArray<string>;
-  /** Per-screen data captured during the run. */
-  collected: Record<string, unknown>;
+    collected: Record<string, unknown>;
   durationMs: number;
   finishedAt: Date;
 }

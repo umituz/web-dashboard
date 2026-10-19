@@ -1,14 +1,5 @@
-/**
- * Content Item Mapper
- *
- * Type-safe transformation between wire-format documents and domain ContentItem objects.
- */
-
 import type { ContentItem, ContentStatus, ContentType } from '../types/calendar.types';
 
-/**
- * Raw wire document shape for calendar_items records
- */
 interface CalendarItemDocument {
   title?: string;
   description?: string;
@@ -27,44 +18,27 @@ interface CalendarItemDocument {
   updated_at?: string | { toDate: () => Date };
 }
 
-/**
- * Firestore document with id
- */
 export interface FirestoreDocument<T = Record<string, unknown>> {
   id: string;
   data: () => T;
 }
 
-/**
- * Convert Firebase timestamp value to ISO string.
- * A missing value maps to the epoch rather than "now" — missing data
- * must not masquerade as freshly-scheduled content in date-sorted views.
- */
 const toIsoString = (value: string | { toDate: () => Date } | undefined): string => {
   if (!value) return new Date(0).toISOString();
   if (typeof value === 'string') return value;
   return value.toDate().toISOString();
 };
 
-/**
- * Normalize status string to ContentStatus union
- */
 const normalizeStatus = (status: string | undefined): ContentStatus => {
   const valid: ContentStatus[] = ['draft', 'scheduled', 'published', 'failed'];
   return valid.includes(status as ContentStatus) ? (status as ContentStatus) : 'draft';
 };
 
-/**
- * Normalize type string to ContentType union
- */
 const normalizeType = (type: string | undefined): ContentType => {
   const valid: ContentType[] = ['post', 'story', 'reel', 'tweet', 'article'];
   return valid.includes(type as ContentType) ? (type as ContentType) : 'post';
 };
 
-/**
- * Map calendar_items document to ContentItem
- */
 export const mapCalendarDocument = (doc: FirestoreDocument<CalendarItemDocument>): ContentItem => {
   const data = doc.data();
   return {
@@ -79,11 +53,6 @@ export const mapCalendarDocument = (doc: FirestoreDocument<CalendarItemDocument>
   };
 };
 
-/**
- * Map posts document to ContentItem.
- * Missing display fields fall back to empty strings so the consuming
- * UI can render its own (localized) placeholder — no package-side copy.
- */
 export const mapPostDocument = (doc: FirestoreDocument<CalendarItemDocument>): ContentItem => {
   const data = doc.data();
   return {

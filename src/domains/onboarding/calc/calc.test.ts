@@ -32,7 +32,6 @@ import {
   getCardTransitionDurationMs,
 } from './card-stack-motion-curve';
 
-// TEST_SCENARIOS.md §22
 describe('progress-percentage (§22.1)', () => {
   it('computes percentages without NaN or Infinity', () => {
     expect(computeProgressPercentage(0, 5)).toBe(0);
@@ -56,7 +55,6 @@ describe('progress-percentage (§22.1)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §22.2
 describe('step-index-clamp (§22.2)', () => {
   it('clamps arbitrary indices into range', () => {
     expect(clampStepIndex(0, 5)).toBe(0);
@@ -78,12 +76,10 @@ describe('step-index-clamp (§22.2)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §22.3
 describe('swipe-gesture-curve (§22.3)', () => {
   it('registers right swipes only above the threshold', () => {
     expect(didCrossRightSwipeThreshold(50)).toBe(false);
-    expect(didCrossRightSwipeThreshold(120)).toBe(false); // boundary is not "above"
-    expect(didCrossRightSwipeThreshold(150)).toBe(true);
+    expect(didCrossRightSwipeThreshold(120)).toBe(false);     expect(didCrossRightSwipeThreshold(150)).toBe(true);
   });
 
   it('registers left swipes only below the negative threshold', () => {
@@ -96,7 +92,6 @@ describe('swipe-gesture-curve (§22.3)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §22.4
 describe('slider-value-bounds (§22.4)', () => {
   it('clamps values into bounds', () => {
     expect(clampValueToBounds(50, 0, 100, 'x')).toBe(50);
@@ -123,7 +118,6 @@ describe('slider-value-bounds (§22.4)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §22.5
 describe('duration-equal-split (§22.5)', () => {
   it('splits a total duration evenly', () => {
     expect(splitTotalDuration(3000, 3)).toBe(1000);
@@ -140,7 +134,6 @@ describe('duration-equal-split (§22.5)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §22.6
 describe('count-with-locale (§22.6)', () => {
   it('formats counts for human display', () => {
     expect(formatCountWithLocale(250000, 'en-US')).toBe('250,000');
@@ -156,7 +149,6 @@ describe('count-with-locale (§22.6)', () => {
   });
 });
 
-// TEST_SCENARIOS.md §22.7
 describe('elapsed-millis (§22.7)', () => {
   it('returns the positive difference', () => {
     const start = new Date('2026-01-01T10:00:00Z');

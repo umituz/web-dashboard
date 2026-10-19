@@ -1,25 +1,9 @@
-/**
- * Calendar Domain Types
- */
-
-/**
- * Content item status
- */
 export type ContentStatus = 'draft' | 'scheduled' | 'published' | 'failed';
 
-/**
- * Content item type
- */
 export type ContentType = 'post' | 'story' | 'reel' | 'tweet' | 'article';
 
-/**
- * Calendar view type
- */
 export type CalendarView = 'month' | 'week' | 'day' | 'timeline';
 
-/**
- * Content item
- */
 export interface ContentItem {
   id: string;
   title: string;
@@ -36,9 +20,6 @@ export interface ContentItem {
   updated_at?: string;
 }
 
-/**
- * Calendar event
- */
 export interface CalendarEvent {
   id: string;
   title: string;
@@ -48,9 +29,6 @@ export interface CalendarEvent {
   color?: string;
 }
 
-/**
- * Calendar filter
- */
 export interface CalendarFilter {
   search?: string;
   platforms?: string[];
@@ -62,34 +40,18 @@ export interface CalendarFilter {
   };
 }
 
-/**
- * Calendar configuration
- */
 export interface CalendarConfig {
-  /** Default view */
-  defaultView?: CalendarView;
-  /** Show weekends */
-  showWeekends?: boolean;
-  /** Start of week (0-6, 0 = Sunday) */
-  startOfWeek?: number;
-  /** Hour range for day/week view */
-  hourRange?: {
-    start: number; // 0-23
-    end: number; // 0-23
-  };
-  /** Enable drag and drop */
-  enableDragDrop?: boolean;
-  /** Show platform filters */
-  showPlatformFilters?: boolean;
-  /** Available platforms */
-  platforms?: string[];
-  /** Time slot duration in minutes */
-  slotDuration?: number;
+    defaultView?: CalendarView;
+    showWeekends?: boolean;
+    startOfWeek?: number;
+    hourRange?: {
+    start: number;     end: number;   };
+    enableDragDrop?: boolean;
+    showPlatformFilters?: boolean;
+    platforms?: string[];
+    slotDuration?: number;
 }
 
-/**
- * Content item creation params
- */
 export interface CreateContentItemParams {
   title: string;
   description: string;
@@ -102,9 +64,6 @@ export interface CreateContentItemParams {
   tags?: string[];
 }
 
-/**
- * Content item update params
- */
 export interface UpdateContentItemParams {
   title?: string;
   description?: string;
@@ -116,9 +75,6 @@ export interface UpdateContentItemParams {
   tags?: string[];
 }
 
-/**
- * Calendar service interface
- */
 export interface ICalendarService {
   getContentItems(userId: string, filter?: CalendarFilter): Promise<ContentItem[]>;
   getContentItemById(id: string): Promise<ContentItem | null>;

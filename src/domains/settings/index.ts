@@ -1,9 +1,3 @@
-/**
- * @umituz/web-dashboard - Settings Domain
- *
- * Config-driven Settings System
- */
-
 export { SettingsLayout, SettingsSection } from './components';
 export { useSettings } from './hooks';
 export {

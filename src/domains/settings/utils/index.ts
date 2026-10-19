@@ -1,7 +1,3 @@
-/**
- * Settings Utils Export
- */
-
 export {
   findSettingsItem,
   findSettingsSection,

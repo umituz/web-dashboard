@@ -1,21 +1,8 @@
-/**
- * Analytics dispatch service.
- * Routes a typed onboarding event to the configured provider.
- * Provider-specific dispatch is isolated here; callers stay provider-agnostic.
- *
- * Contract: dispatch NEVER throws. Analytics is an observation channel — a
- * broken tracker must not take down the onboarding funnel. Failures are
- * surfaced to the console (the library's documented error channel) and
- * dropped.
- */
-
 import type {
   AnalyticsProvider,
   OnboardingAnalyticsEvent,
 } from '../types/config';
 
-/** Provider globals are read through a LOCAL view of `window` — this package
- * must never augment the global `Window` type for its consumers. */
 type AnalyticsWindow = Window & {
   gtag?: (...args: unknown[]) => void;
   amplitude?: {
@@ -25,8 +12,7 @@ type AnalyticsWindow = Window & {
 };
 
 function dispatchToProvider(event: OnboardingAnalyticsEvent, provider: AnalyticsProvider): void {
-  if (typeof window === 'undefined') return; // SSR / non-browser: nothing to do.
-  const win = window as AnalyticsWindow;
+  if (typeof window === 'undefined') return;   const win = window as AnalyticsWindow;
   switch (provider) {
     case 'google-analytics':
       win.gtag?.('event', event.name, event as unknown as Record<string, unknown>);
@@ -40,8 +26,7 @@ function dispatchToProvider(event: OnboardingAnalyticsEvent, provider: Analytics
       win.mixpanel?.track(event.name, event as unknown as Record<string, unknown>);
       return;
     case 'custom':
-      return; // Handled by the caller via the customTracker path.
-  }
+      return;   }
 }
 
 function dispatchToCustomTracker(
@@ -59,10 +44,6 @@ function dispatchToCustomTracker(
   customTracker(event);
 }
 
-/**
- * Routes an event to the configured provider. Never throws: provider failures
- * are logged and dropped so an analytics outage cannot break the flow UI.
- */
 export function dispatchAnalyticsEvent(
   event: OnboardingAnalyticsEvent,
   provider: AnalyticsProvider | undefined,

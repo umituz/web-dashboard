@@ -1,7 +1,3 @@
-/**
- * Layout Types Export
- */
-
 export type { SidebarItem, SidebarGroup } from './sidebar';
 export type { DashboardHeaderProps, DashboardSidebarProps, DashboardLayoutConfig, HeaderProfileItem } from './layout';
 export type { DashboardTheme, DashboardThemePreset } from './theme';

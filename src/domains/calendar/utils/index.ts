@@ -1,15 +1,8 @@
-/**
- * Calendar Domain Utilities
- */
-
 import type { CalendarConfig } from '../types/calendar.types';
 
 export { mapCalendarDocument, mapPostDocument } from './contentItemMapper';
 export type { FirestoreDocument } from './contentItemMapper';
 
-/**
- * Get week dates for a given date
- */
 export function getWeekDates(date: Date, startOfWeek: number = 0): Date[] {
   const week: Date[] = [];
   const current = new Date(date);
@@ -26,9 +19,6 @@ export function getWeekDates(date: Date, startOfWeek: number = 0): Date[] {
   return week;
 }
 
-/**
- * Get month days
- */
 export function getMonthDays(date: Date): Date[] {
   const year = date.getFullYear();
   const month = date.getMonth();
@@ -44,17 +34,10 @@ export function getMonthDays(date: Date): Date[] {
   return days;
 }
 
-/**
- * Check if date is in range
- */
 export function isDateInRange(date: Date, range: { start: Date; end: Date }): boolean {
   return date >= range.start && date <= range.end;
 }
 
-/**
- * Format date for display.
- * The locale is taken as a parameter so the consumer can decide.
- */
 export function formatDate(
   date: Date,
   format: 'short' | 'long' | 'time' = 'short',
@@ -74,9 +57,6 @@ export function formatDate(
   });
 }
 
-/**
- * Check if dates are same day
- */
 export function isSameDay(date1: Date, date2: Date): boolean {
   return (
     date1.getFullYear() === date2.getFullYear() &&
@@ -85,9 +65,6 @@ export function isSameDay(date1: Date, date2: Date): boolean {
   );
 }
 
-/**
- * Get date range for a view
- */
 export function getViewRange(
   view: 'month' | 'week',
   date: Date,
@@ -106,9 +83,6 @@ export function getViewRange(
   return { start: firstDay, end: lastDay };
 }
 
-/**
- * Generate time slots
- */
 export function generateTimeSlots(
   startHour: number,
   endHour: number,

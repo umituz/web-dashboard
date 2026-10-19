@@ -1,9 +1,3 @@
-/**
- * Performance Service
- *
- * Real-time metrics and dashboard performance monitoring
- */
-
 export interface PerformanceMetric {
   name: string;
   value: number;
@@ -37,17 +31,10 @@ export interface RealtimeMetrics {
   revenue: number;
 }
 
-/**
- * Chrome-specific `performance.memory` shape (not in standard lib types).
- */
 interface PerformanceMemoryLike {
   usedJSHeapSize: number;
 }
 
-/**
- * Layout-shift and first-input entry shapes (not in standard lib types
- * for all TS versions). Structurally typed — no `any`.
- */
 interface LayoutShiftEntry extends PerformanceEntry {
   value: number;
 }
@@ -62,27 +49,15 @@ const isLayoutShiftEntry = (entry: PerformanceEntry): entry is LayoutShiftEntry 
 const isFirstInputEntry = (entry: PerformanceEntry): entry is FirstInputEntry =>
   typeof (entry as FirstInputEntry).processingStart === 'number';
 
-/**
- * Performance Service
- *
- * Monitors dashboard performance and provides real-time metrics.
- * Web-vitals observation is opt-in via `startMonitoring()` so that
- * importing the module never registers browser observers as a side effect.
- */
 export class PerformanceService {
   private metrics: Map<string, PerformanceMetric[]> = new Map();
   private observers: PerformanceObserver[] = [];
 
-  /**
-   * Register web-vitals observers (CLS / LCP / FID).
-   * Idempotent — calling it twice will not duplicate observers.
-   */
-  public startMonitoring(): void {
+    public startMonitoring(): void {
     if (typeof window === 'undefined' || !('PerformanceObserver' in window)) return;
     if (this.observers.length > 0) return;
 
-    // Observe layout shifts
-    try {
+        try {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           if (entry.entryType === 'layout-shift' && isLayoutShiftEntry(entry)) {
@@ -93,11 +68,9 @@ export class PerformanceService {
       observer.observe({ entryTypes: ['layout-shift'] });
       this.observers.push(observer);
     } catch {
-      // Layout Shift API not supported
-    }
+          }
 
-    // Observe largest contentful paint
-    try {
+        try {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           if (entry.entryType === 'largest-contentful-paint') {
@@ -108,11 +81,9 @@ export class PerformanceService {
       observer.observe({ entryTypes: ['largest-contentful-paint'] });
       this.observers.push(observer);
     } catch {
-      // LCP API not supported
-    }
+          }
 
-    // Observe first input delay
-    try {
+        try {
       const observer = new PerformanceObserver((list) => {
         for (const entry of list.getEntries()) {
           if (entry.entryType === 'first-input' && isFirstInputEntry(entry)) {
@@ -123,19 +94,10 @@ export class PerformanceService {
       observer.observe({ entryTypes: ['first-input'] });
       this.observers.push(observer);
     } catch {
-      // FID API not supported
-    }
+          }
   }
 
-  /**
-   * Record a performance metric
-   *
-   * @param name - Metric name
-   * @param value - Metric value
-   * @param unit - Unit of measurement
-   * @param threshold - Warning threshold
-   */
-  public recordMetric(name: string, value: number, unit: string, threshold?: number): void {
+    public recordMetric(name: string, value: number, unit: string, threshold?: number): void {
     const status = threshold
       ? value > threshold * 2
         ? 'critical'
@@ -160,55 +122,29 @@ export class PerformanceService {
     const metrics = this.metrics.get(name)!;
     metrics.push(metric);
 
-    // Keep only last 100 metrics per name
-    if (metrics.length > 100) {
+        if (metrics.length > 100) {
       metrics.shift();
     }
   }
 
-  /**
-   * Get metrics by name
-   *
-   * @param name - Metric name
-   * @returns Array of metrics
-   */
-  public getMetrics(name: string): PerformanceMetric[] {
+    public getMetrics(name: string): PerformanceMetric[] {
     return this.metrics.get(name) || [];
   }
 
-  /**
-   * Get latest metric value
-   *
-   * @param name - Metric name
-   * @returns Latest metric or undefined
-   */
-  public getLatestMetric(name: string): PerformanceMetric | undefined {
+    public getLatestMetric(name: string): PerformanceMetric | undefined {
     const metrics = this.getMetrics(name);
     return metrics[metrics.length - 1];
   }
 
-  /**
-   * Get all metrics
-   *
-   * @returns Map of all metrics
-   */
-  public getAllMetrics(): Map<string, PerformanceMetric[]> {
+    public getAllMetrics(): Map<string, PerformanceMetric[]> {
     return new Map(this.metrics);
   }
 
-  /**
-   * Clear all metrics
-   */
-  public clearMetrics(): void {
+    public clearMetrics(): void {
     this.metrics.clear();
   }
 
-  /**
-   * Calculate dashboard performance metrics
-   *
-   * @returns Dashboard performance data
-   */
-  public getDashboardMetrics(): DashboardMetrics {
+    public getDashboardMetrics(): DashboardMetrics {
     const loadTime =
       this.getNavigationLoadTime() ?? this.getLatestMetric('loadTime')?.value ?? 0;
 
@@ -224,60 +160,36 @@ export class PerformanceService {
       apiResponseTime,
       memoryUsage,
       errorRate,
-      activeUsers: 0, // To be implemented with real data
-    };
+      activeUsers: 0,     };
   }
 
-  /**
-   * Page load time from the modern Navigation Timing API.
-   * Returns null when the API or the entry is unavailable.
-   */
-  private getNavigationLoadTime(): number | null {
+    private getNavigationLoadTime(): number | null {
     if (typeof performance === 'undefined' || typeof performance.getEntriesByType !== 'function') {
       return null;
     }
 
-    // getEntriesByType is typed as PerformanceEntry[]; navigation entries
-    // are the only ones with loadEventEnd, hence the narrowing cast.
-    const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
+            const [navigation] = performance.getEntriesByType('navigation') as PerformanceNavigationTiming[];
     if (!navigation || navigation.loadEventEnd <= 0) return null;
     return navigation.loadEventEnd - navigation.startTime;
   }
 
-  /**
-   * JS heap usage in MB via the Chrome-only `performance.memory`.
-   * Returns 0 where unavailable (all other browsers, Node).
-   */
-  private getMemoryUsageMb(): number {
+    private getMemoryUsageMb(): number {
     const memory = (performance as Performance & { memory?: PerformanceMemoryLike }).memory;
     return typeof memory !== 'undefined' ? memory.usedJSHeapSize / 1048576 : 0;
   }
 
-  /**
-   * Calculate error rate from metrics
-   *
-   * @returns Error rate percentage
-   */
-  private calculateErrorRate(): number {
+    private calculateErrorRate(): number {
     const errors = this.getMetrics('error');
     if (errors.length === 0) return 0;
 
-    const recentErrors = errors.filter((e) => e.timestamp > Date.now() - 60000); // Last minute
-    return recentErrors.length;
+    const recentErrors = errors.filter((e) => e.timestamp > Date.now() - 60000);     return recentErrors.length;
   }
 
-  /**
-   * Simulate real-time metrics
-   *
-   * @param previous - Previous metrics
-   * @returns Simulated real-time metrics
-   */
-  public simulateRealtimeMetrics(previous?: RealtimeMetrics): RealtimeMetrics {
+    public simulateRealtimeMetrics(previous?: RealtimeMetrics): RealtimeMetrics {
     const now = Date.now();
 
     if (previous) {
-      // Simulate changes
-      const userChange = Math.floor(Math.random() * 20) - 10;
+            const userChange = Math.floor(Math.random() * 20) - 10;
       const sessionChange = Math.floor(Math.random() * 30) - 15;
       const pageViewChange = Math.floor(Math.random() * 50) - 20;
       const conversionCount = Math.random() > 0.8 ? Math.floor(Math.random() * 3) : 0;
@@ -293,8 +205,7 @@ export class PerformanceService {
       };
     }
 
-    // Initial values
-    return {
+        return {
       timestamp: now,
       users: Math.floor(Math.random() * 1000) + 500,
       sessions: Math.floor(Math.random() * 1500) + 800,
@@ -304,14 +215,7 @@ export class PerformanceService {
     };
   }
 
-  /**
-   * Calculate growth KPI
-   *
-   * @param current - Current value
-   * @param previous - Previous value
-   * @returns KPI data
-   */
-  public calculateKPI(current: number, previous: number): KPIData {
+    public calculateKPI(current: number, previous: number): KPIData {
     const growth = previous > 0 ? ((current - previous) / previous) * 100 : 0;
     return {
       current,
@@ -320,11 +224,7 @@ export class PerformanceService {
     };
   }
 
-  /**
-   * Measure page load time.
-   * Records immediately if the page already loaded; otherwise listens once.
-   */
-  public measurePageLoad(): void {
+    public measurePageLoad(): void {
     if (typeof window === 'undefined' || typeof window.performance === 'undefined') return;
 
     const record = () => {
@@ -344,26 +244,15 @@ export class PerformanceService {
     }, { once: true });
   }
 
-  /**
-   * Measure API response time
-   *
-   * @param startTime - Request start time
-   */
-  public measureAPIResponse(startTime: number): void {
+    public measureAPIResponse(startTime: number): void {
     const duration = Date.now() - startTime;
     this.recordMetric('apiResponseTime', duration, 'ms', 1000);
   }
 
-  /**
-   * Disconnect all observers
-   */
-  public disconnect(): void {
+    public disconnect(): void {
     this.observers.forEach((observer) => observer.disconnect());
     this.observers = [];
   }
 }
 
-/**
- * Create singleton instance
- */
 export const performanceService = new PerformanceService();

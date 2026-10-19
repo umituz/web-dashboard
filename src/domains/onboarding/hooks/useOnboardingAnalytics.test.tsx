@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { renderHook } from '@testing-library/react';
 import { useOnboardingAnalytics } from './useOnboardingAnalytics';
-import type { OnboardingAnalyticsEvent } from '../../types/config';
+import type { OnboardingAnalyticsEvent } from '../types/config';
 
 const event: OnboardingAnalyticsEvent = {
   name: 'onboarding_step_completed',

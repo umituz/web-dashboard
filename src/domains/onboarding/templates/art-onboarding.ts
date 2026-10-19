@@ -2,15 +2,6 @@ import type { OnboardingConfig } from '../types/config';
 import type { OnboardingScreen } from '../types/screens';
 import { withDefaultDemo, defaultDemoResult } from './TemplateDemoFallback';
 
-/**
- * Art category — demo-driven, 3–5 screens.
- * Show value fast: by the end of step 3 the user has produced a real artifact.
- *
- * The demo screen ships with a working palette-preview fallback so the template
- * is runnable out of the box. Replace `screens[2].demo.component` to plug in
- * the consumer's own demo.
- */
-
 const baseScreens: OnboardingScreen[] = [
   {
     id: 'welcome',
@@ -40,8 +31,7 @@ const baseScreens: OnboardingScreen[] = [
     type: 'app-demo',
     title: 'Your turn — pick a palette',
     demo: {
-      // `withDefaultDemo` below replaces this no-op with the built-in fallback.
-      component: () => null,
+            component: () => null,
       onSave: () => undefined,
     },
   },

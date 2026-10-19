@@ -1,7 +1,3 @@
-/**
- * Settings Types Export
- */
-
 export type {
   SettingsItem,
   SettingsSection,

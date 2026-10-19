@@ -1,20 +1,7 @@
-/**
- * Analytics Utilities
- *
- * Helper functions for analytics operations
- */
-
 import type { TimeSeriesData } from "../types/analytics";
 
 import type { Metric, KPIData, DateRangePreset } from "../types/analytics";
 
-/**
- * Format number with K/M/B suffixes
- *
- * @param num - Number to format
- * @param decimals - Number of decimal places (default: 1)
- * @returns Formatted string
- */
 export function formatNumber(num: number, decimals: number = 1): string {
   if (num >= 1_000_000_000) {
     return (num / 1_000_000_000).toFixed(decimals) + "B";
@@ -25,17 +12,9 @@ export function formatNumber(num: number, decimals: number = 1): string {
   if (num >= 1_000) {
     return (num / 1_000).toFixed(decimals) + "K";
   }
-  // Whole numbers stay whole ("999", not "999.0")
-  return Number.isInteger(num) ? num.toString() : num.toFixed(decimals);
+    return Number.isInteger(num) ? num.toString() : num.toFixed(decimals);
 }
 
-/**
- * Format percentage
- *
- * @param value - Value to format as percentage
- * @param decimals - Number of decimal places (default: 1)
- * @returns Formatted string with % suffix
- */
 export function formatPercentage(value: number, decimals: number = 1): string {
   return `${value.toFixed(decimals)}%`;
 }

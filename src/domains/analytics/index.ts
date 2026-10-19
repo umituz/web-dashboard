@@ -1,10 +1,3 @@
-/**
- * Analytics Domain
- *
- * Main entry point for analytics domain
- */
-
-// Components
 export {
   MetricCard,
   AnalyticsChart,
@@ -12,7 +5,6 @@ export {
   AnalyticsLayout,
 } from "./components";
 
-// Hooks
 export {
   useAnalytics,
   createStubAnalyticsApiClient,
@@ -24,7 +16,6 @@ export type {
   UseAnalyticsReturn,
 } from "./hooks";
 
-// Utils
 export {
   formatNumber,
   formatPercentage,
@@ -47,7 +38,6 @@ export {
   ANALYTICS_KEYS,
 } from "./utils";
 
-// Types
 export type {
   Metric,
   TimeSeriesData,

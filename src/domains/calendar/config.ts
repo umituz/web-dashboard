@@ -1,12 +1,5 @@
-/**
- * Calendar Configuration
- */
-
 import type { CalendarConfig } from './types/calendar.types';
 
-/**
- * Default calendar configuration
- */
 export const DEFAULT_CALENDAR_CONFIG: CalendarConfig = {
   defaultView: 'month',
   showWeekends: true,

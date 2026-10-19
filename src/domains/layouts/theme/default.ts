@@ -1,14 +1,5 @@
-/**
- * Dashboard Theme - Default Themes
- *
- * Default light and dark theme configurations
- */
-
 import type { DashboardTheme } from '../types/theme';
 
-/**
- * Default dashboard theme (light mode)
- */
 export const DEFAULT_DASHBOARD_THEME: DashboardTheme = {
   primary: "hsl(222.2 47.4% 11.2%)",
   secondary: "hsl(217.2 32.6% 17.5%)",
@@ -32,9 +23,6 @@ export const DEFAULT_DASHBOARD_THEME: DashboardTheme = {
   radius: "0.5rem",
 };
 
-/**
- * Default dashboard theme (dark mode)
- */
 export const DEFAULT_DASHBOARD_THEME_DARK: DashboardTheme = {
   primary: "hsl(217.2 91.2% 59.8%)",
   secondary: "hsl(217.2 32.6% 17.5%)",

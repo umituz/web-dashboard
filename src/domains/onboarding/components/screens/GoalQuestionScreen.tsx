@@ -1,7 +1,8 @@
 import { useCallback, useState } from 'react';
-import { OptionCard } from '../shared/OptionCard';
-import { PrimaryButton } from '../shared/PrimaryButton';
-import { QuestionWrapper } from '../shared/QuestionWrapper';
+import { OptionCard } from '@umituz/web-design-system/molecules';
+import { PrimaryButton } from '../PrimaryButton';
+import { QuestionWrapper } from '../QuestionWrapper';
+import { renderBundledIcon } from '../renderBundledIcon';
 import { useOnboardingIntl } from '../OnboardingIntl';
 import type { GoalQuestionScreenConfig } from '../../types/screens';
 
@@ -34,16 +35,18 @@ export function GoalQuestionScreen({ config, onNext, initialSelected }: GoalQues
       subtitle={multiSelect ? labels.selectAllThatApply : labels.selectOne}
     >
       <div
-        className="flex flex-col gap-2"
+        className="udb-onb-list"
         role={multiSelect ? 'group' : 'radiogroup'}
         aria-label={config.question}
       >
         {config.options.map((option) => (
           <OptionCard
             key={option.id}
-            option={option}
+            label={option.label}
+            description={option.description}
+            icon={renderBundledIcon(option.iconName)}
             selected={selected.includes(option.id)}
-            onToggle={toggle}
+            onSelect={() => toggle(option.id)}
             multiSelect={multiSelect}
           />
         ))}

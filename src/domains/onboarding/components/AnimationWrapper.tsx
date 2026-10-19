@@ -36,10 +36,6 @@ const variantsByTransition: Record<
   },
 };
 
-/**
- * Wraps children with a transition keyed on stepKey.
- * Respects `prefers-reduced-motion` by disabling transitions.
- */
 export function AnimationWrapper({
   stepKey,
   children,
