@@ -2819,6 +2819,11 @@
   font-size: var(--u-font-size-xs);
 }
 
+.udb-chartlegend__hint {
+  color: var(--u-color-muted);
+  font-size: var(--u-font-size-xs);
+}
+
 .udb-charttip {
   position: absolute;
   pointer-events: none;

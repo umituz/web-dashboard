@@ -6,7 +6,7 @@ export interface PageHeaderCrumb {
 }
 
 export interface PageHeaderProps {
-  title: ReactNode;
+  title?: ReactNode;
   subtitle?: ReactNode;
   description?: ReactNode;
   breadcrumbs?: ReactNode | readonly PageHeaderCrumb[];
@@ -32,7 +32,7 @@ export const PageHeader = ({ title, subtitle, description, breadcrumbs, actions,
     <div className={`udb-pageheader${className ? ` ${className}` : ""}`}>
       {crumbNode !== undefined && <div className="udb-pageheader__breadcrumbs">{crumbNode}</div>}
       <div className="udb-pageheader__main">
-        <h1 className="udb-pageheader__title">{title}</h1>
+        {title !== undefined && <h1 className="udb-pageheader__title">{title}</h1>}
         {(subtitle ?? description) !== undefined && (
           <p className="udb-pageheader__subtitle">{subtitle ?? description}</p>
         )}

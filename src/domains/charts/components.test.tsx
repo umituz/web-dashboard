@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { renderToString } from 'react-dom/server';
-import { BarChart, Donut, LineChart, Sparkline } from './components';
+import { BarChart, Donut, Legend, LineChart, Sparkline } from './components';
 
 describe('charts markup smoke', () => {
   it('Sparkline renders an svg path for enough data and null for less', () => {
@@ -63,5 +63,38 @@ describe('charts markup smoke', () => {
 
   it('LineChart renders nothing without points', () => {
     expect(renderToString(<LineChart points={[]} series={[]} />)).toBe('');
+  });
+
+  it('fleet aliases: LineChart accepts labels/formatValue and key-less series with data/color', () => {
+    const html = renderToString(
+      <LineChart
+        labels={['m1', 'm2']}
+        series={[{ label: 'views', data: [1, 3], color: '#123456' }]}
+        formatValue={(v) => String(v)}
+      />,
+    );
+    expect(html).toContain('#123456');
+    expect(html).toContain('views');
+    expect(html).toContain('m1');
+  });
+
+  it('fleet aliases: BarChart accepts key-less series with data/color', () => {
+    const html = renderToString(
+      <BarChart labels={['a', 'b']} series={[{ label: 'A', data: [2, 4], color: '#654321' }]} />,
+    );
+    expect(html).toContain('#654321');
+    expect(html).toContain('height:100%');
+  });
+
+  it('fleet aliases: Legend renders hint suffix and Donut accepts color', () => {
+    const html = renderToString(
+      <>
+        <Legend items={[{ label: 'A', color: '#111111', value: '12', hint: '(per month)' }]} />
+        <Donut segments={[{ label: 'x', value: 2, color: '#333333' }]} />
+      </>,
+    );
+    expect(html).toContain('udb-chartlegend__hint');
+    expect(html).toContain('(per month)');
+    expect(html).toContain('#333333');
   });
 });

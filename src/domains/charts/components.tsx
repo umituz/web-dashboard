@@ -58,6 +58,7 @@ export interface LegendItem {
   label: string;
   color: string;
   value?: string;
+  hint?: string;
 }
 
 export function Legend({ items }: { items: LegendItem[] }) {
@@ -68,6 +69,7 @@ export function Legend({ items }: { items: LegendItem[] }) {
           <span className="udb-chartlegend__dot" style={{ background: i.color }} />
           {i.label}
           {i.value && <span className="udb-chartlegend__value">{i.value}</span>}
+          {i.hint && <span className="udb-chartlegend__hint">{i.hint}</span>}
         </span>
       ))}
     </div>
@@ -139,10 +141,12 @@ export function HBars({ rows, formatValue = (n: number) => String(n) }: { rows: 
 }
 
 export interface BarSeries {
-  key: string;
+  key?: string;
   label: string;
-  values: number[];
+  values?: number[];
+  data?: number[];
   tone?: string;
+  color?: string;
 }
 
 export function BarChart({
@@ -159,8 +163,9 @@ export function BarChart({
   formatLabel?: (l: string) => string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
-  const max = Math.max(1, ...series.flatMap((s) => [...s.values]));
-  const toneOf = (s: BarSeries, i: number) => s.tone ?? PALETTE[i % PALETTE.length]!;
+  const vals = (s: BarSeries) => s.values ?? s.data ?? [];
+  const max = Math.max(1, ...series.flatMap((s) => vals(s)));
+  const toneOf = (s: BarSeries, i: number) => s.tone ?? s.color ?? PALETTE[i % PALETTE.length]!;
   return (
     <div className="udb-barchart" style={{ height }}>
       {labels.map((label, i) => (
@@ -173,10 +178,10 @@ export function BarChart({
           <div className="udb-barchart__bars">
             {series.map((s, si) => (
               <div
-                key={s.key}
+                key={s.key ?? s.label}
                 className="udb-barchart__bar"
                 style={{
-                  height: `${Math.max(2, ((s.values[i] ?? 0) / max) * 100)}%`,
+                  height: `${Math.max(2, ((vals(s)[i] ?? 0) / max) * 100)}%`,
                   background: toneOf(s, si),
                   opacity: hover === null || hover === i ? 1 : 0.4,
                 }}
@@ -187,12 +192,12 @@ export function BarChart({
             <div className="udb-barchart__tip">
               <div className="udb-barchart__tiptitle">{formatLabel(label)}</div>
               {series.map((s, si) => (
-                <div key={s.key} className="udb-barchart__tiprow">
+                <div key={s.key ?? s.label} className="udb-barchart__tiprow">
                   <span className="udb-barchart__tiplabel">
                     <span className="udb-chartlegend__dot" style={{ background: toneOf(s, si) }} />
                     {s.label}
                   </span>
-                  <b>{formatValue(s.values[i] ?? 0)}</b>
+                  <b>{formatValue(vals(s)[i] ?? 0)}</b>
                 </div>
               ))}
             </div>
@@ -207,6 +212,7 @@ export interface DonutSegment {
   label: string;
   value: number;
   tone?: string;
+  color?: string;
 }
 
 export function Donut({
@@ -250,7 +256,7 @@ export function Donut({
                 cy={size / 2}
                 r={radius}
                 fill="none"
-                stroke={seg.tone ?? PALETTE[i % PALETTE.length]!}
+                stroke={seg.tone ?? seg.color ?? PALETTE[i % PALETTE.length]!}
                 strokeWidth={active === i ? thickness + 3 : thickness}
                 strokeDasharray={`${dash} ${circumference - dash}`}
                 strokeDashoffset={-offset}
@@ -281,7 +287,7 @@ export function Donut({
             onMouseLeave={() => setActive(null)}
           >
             <span className="udb-donut__itemlabel">
-              <span className="udb-donut__dot" style={{ background: seg.tone ?? PALETTE[i % PALETTE.length]! }} />
+              <span className="udb-donut__dot" style={{ background: seg.tone ?? seg.color ?? PALETTE[i % PALETTE.length]! }} />
               {seg.label}
             </span>
             <span className="udb-donut__itemvalue">
@@ -296,10 +302,12 @@ export function Donut({
 }
 
 export interface LineSeries {
-  key: string;
+  key?: string;
   label: string;
-  values: number[];
+  values?: number[];
+  data?: number[];
   tone?: string;
+  color?: string;
   kind?: 'line' | 'bars';
   axis?: 'left' | 'right';
   dashed?: boolean;
@@ -312,22 +320,30 @@ export interface LineChartPoint {
 
 export function LineChart({
   points,
+  labels,
   series,
   height = 220,
-  formatLeft = (v: number) => String(Math.round(v)),
-  formatRight = (v: number) => String(Math.round(v)),
+  formatLeft,
+  formatRight,
+  formatValue,
   yLabelLeft,
   yLabelRight,
 }: {
-  points: LineChartPoint[];
+  points?: LineChartPoint[];
+  labels?: string[];
   series: LineSeries[];
   height?: number;
   formatLeft?: (v: number) => string;
   formatRight?: (v: number) => string;
+  formatValue?: (v: number) => string;
   yLabelLeft?: string;
   yLabelRight?: string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
+  const pts = points ?? (labels ?? []).map((label) => ({ label }));
+  const fmtLeft = formatLeft ?? formatValue ?? ((v: number) => String(Math.round(v)));
+  const fmtRight = formatRight ?? formatValue ?? ((v: number) => String(Math.round(v)));
+  const vals = (s: LineSeries) => s.values ?? s.data ?? [];
   const w = 720;
   const padLeft = 52;
   const padRight = series.some((s) => s.axis === 'right') ? 46 : 14;
@@ -335,19 +351,19 @@ export function LineChart({
   const padBottom = 24;
   const innerW = w - padLeft - padRight;
   const innerH = height - padTop - padBottom;
-  const n = points.length;
+  const n = pts.length;
 
-  const toneOf = (s: LineSeries, i: number) => s.tone ?? PALETTE[i % PALETTE.length]!;
+  const toneOf = (s: LineSeries, i: number) => s.tone ?? s.color ?? PALETTE[i % PALETTE.length]!;
 
   const leftMax = useMemo(
-    () => niceMax(Math.max(1, ...series.filter((s) => s.axis !== 'right').flatMap((s) => s.values))),
+    () => niceMax(Math.max(1, ...series.filter((s) => s.axis !== 'right').flatMap((s) => vals(s)))),
     [series],
   );
   const rightMax = useMemo(
-    () => niceMax(Math.max(1, ...series.filter((s) => s.axis === 'right').flatMap((s) => s.values))),
+    () => niceMax(Math.max(1, ...series.filter((s) => s.axis === 'right').flatMap((s) => vals(s)))),
     [series],
   );
-  const leftTicks = useMemo(() => gridTicks(Math.max(...series.filter((s) => s.axis !== 'right').flatMap((s) => s.values), 1)), [series]);
+  const leftTicks = useMemo(() => gridTicks(Math.max(...series.filter((s) => s.axis !== 'right').flatMap((s) => vals(s)), 1)), [series]);
 
   const xAt = (i: number) => padLeft + (n <= 1 ? innerW / 2 : (i / (n - 1)) * innerW);
   const yLeft = (v: number) => padTop + innerH - (v / leftMax) * innerH;
@@ -374,7 +390,7 @@ export function LineChart({
           <g key={i}>
             <line x1={padLeft} x2={w - padRight} y1={yLeft(v)} y2={yLeft(v)} className="udb-linechart__grid" />
             <text x={padLeft - 6} y={yLeft(v) + 3} textAnchor="end" className="udb-linechart__axis">
-              {formatLeft(v)}
+              {fmtLeft(v)}
             </text>
           </g>
         ))}
@@ -382,12 +398,12 @@ export function LineChart({
           <g>
             {leftTicks.map((v, i) => (
               <text key={i} x={w - padRight + 6} y={yLeft(v) + 3} textAnchor="start" className="udb-linechart__axis">
-                {formatRight((v / leftMax) * rightMax)}
+                {fmtRight((v / leftMax) * rightMax)}
               </text>
             ))}
           </g>
         )}
-        {points.map((p, i) =>
+        {pts.map((p, i) =>
           i % labelEvery === 0 ? (
             <text key={i} x={xAt(i)} y={height - 8} textAnchor="middle" className="udb-linechart__axis">
               {p.label}
@@ -399,8 +415,8 @@ export function LineChart({
           if (s.kind === 'bars') {
             const barW = Math.max(3, (innerW / Math.max(1, n - 1)) * 0.5);
             return (
-              <g key={s.key}>
-                {s.values.slice(0, n).map((v, i) => (
+              <g key={s.key ?? s.label}>
+                {vals(s).slice(0, n).map((v, i) => (
                   <rect
                     key={i}
                     x={xAt(i) - barW / 2}
@@ -415,13 +431,13 @@ export function LineChart({
               </g>
             );
           }
-          const path = s.values
+          const path = vals(s)
             .slice(0, n)
             .map((v, i) => `${i === 0 ? 'M' : 'L'}${xAt(i).toFixed(1)},${yFn(v).toFixed(1)}`)
             .join(' ');
           const areaPath = `${path} L${xAt(n - 1).toFixed(1)},${padTop + innerH} L${xAt(0).toFixed(1)},${padTop + innerH} Z`;
           return (
-            <g key={s.key}>
+            <g key={s.key ?? s.label}>
               {s.area !== false && !s.dashed && <path d={areaPath} fill={toneOf(s, si)} opacity={0.07} />}
               <path
                 d={path}
@@ -432,7 +448,7 @@ export function LineChart({
                 strokeLinecap="round"
                 strokeDasharray={s.dashed ? '4 4' : undefined}
               />
-              {s.values.slice(0, n).map((v, i) => (
+              {vals(s).slice(0, n).map((v, i) => (
                 <circle
                   key={i}
                   cx={xAt(i)}
@@ -474,14 +490,14 @@ export function LineChart({
             transform: hover > n / 2 ? 'translateX(calc(-100% - 10px))' : 'translateX(10px)',
           }}
         >
-          <div className="udb-linechart__tiptitle">{points[hover]!.label}</div>
+          <div className="udb-linechart__tiptitle">{pts[hover]!.label}</div>
           {series.map((s, si) => (
-            <div key={s.key} className="udb-linechart__tiprow">
+            <div key={s.key ?? s.label} className="udb-linechart__tiprow">
               <span>
                 <span className="udb-linechart__swatch" style={{ background: toneOf(s, si) }} />
                 {s.label}
               </span>
-              <b>{(s.axis === 'right' ? formatRight : formatLeft)(s.values[hover]!)}</b>
+              <b>{(s.axis === 'right' ? fmtRight : fmtLeft)(vals(s)[hover] ?? 0)}</b>
             </div>
           ))}
         </div>
