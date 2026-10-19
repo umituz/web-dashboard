@@ -50,8 +50,8 @@ resets: import the package stylesheet **after** your base layer.
 reads its variables, so theming has exactly one path: set the DS variables.
 Vanilla-CSS hosts define `--app-*` slots via the design system's `bridge.css`;
 Tailwind hosts override `--color-*` from their own `@theme`. Dashboard-only
-knobs (`--udb-font-size-*`, `--udb-sidebar-*`, `--udb-header-height`,
-`--udb-border-strong`) can be overridden anywhere in the cascade.
+knobs (`--udb-font-size-*`, `--udb-space-*`, `--udb-sidebar-*`,
+`--udb-header-height`, `--udb-border-strong`, `--udb-radius-pill`) can be overridden anywhere in the cascade.
 
 ## Entry points
 
@@ -211,7 +211,8 @@ npm run test:watch
    `--u-color-surface-muted` → `--color-muted`, `--u-color-danger` →
    `--color-destructive`) and dashboard knobs to their `--udb-*` names
    (`--u-font-size-*` → `--udb-font-size-*`, `--u-color-border-strong` →
-   `--udb-border-strong`, `--u-sidebar-*` → `--udb-sidebar-*`).
+   `--udb-border-strong`, `--u-sidebar-*` → `--udb-sidebar-*`, `--u-space-*` →
+   `--udb-space-*`).
 4. Dark mode: replace `data-udb-theme="dark"` with the design-system
    convention (`[data-theme="dark"]` / `.dark` + dark DS variable values).
 
