@@ -2,16 +2,6 @@ export * from './domains/layouts';
 export * from './domains/settings';
 export * from './domains/calendar';
 export {
-  AuthLayout,
-  LoginForm,
-  RegisterForm,
-  useAuth,
-  type LoginCredentials,
-  type RegisterData,
-  type User,
-} from './domains/auth';
-
-export {
   useAnalytics,
   MetricCard,
   AnalyticsChart,
