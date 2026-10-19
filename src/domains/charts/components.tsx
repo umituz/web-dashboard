@@ -82,7 +82,7 @@ export function Sparkline({
   width = 110,
   color = 'currentColor',
 }: {
-  data: number[];
+  data: readonly number[];
   height?: number;
   width?: number;
   color?: string;
@@ -143,8 +143,8 @@ export function HBars({ rows, formatValue = (n: number) => String(n) }: { rows: 
 export interface BarSeries {
   key?: string;
   label: string;
-  values?: number[];
-  data?: number[];
+  values?: readonly number[];
+  data?: readonly number[];
   tone?: string;
   color?: string;
 }
@@ -156,7 +156,7 @@ export function BarChart({
   formatValue = (v: number) => String(v),
   formatLabel = (l: string) => l,
 }: {
-  labels: string[];
+  labels: readonly string[];
   series: BarSeries[];
   height?: number;
   formatValue?: (v: number) => string;
@@ -304,8 +304,8 @@ export function Donut({
 export interface LineSeries {
   key?: string;
   label: string;
-  values?: number[];
-  data?: number[];
+  values?: readonly number[];
+  data?: readonly number[];
   tone?: string;
   color?: string;
   kind?: 'line' | 'bars';
@@ -329,8 +329,8 @@ export function LineChart({
   yLabelLeft,
   yLabelRight,
 }: {
-  points?: LineChartPoint[];
-  labels?: string[];
+  points?: readonly LineChartPoint[];
+  labels?: readonly string[];
   series: LineSeries[];
   height?: number;
   formatLeft?: (v: number) => string;
