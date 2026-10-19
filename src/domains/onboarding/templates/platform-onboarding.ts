@@ -1,0 +1,210 @@
+import type { OnboardingConfig } from '../types/config';
+import type { OnboardingScreen } from '../types/screens';
+import { withDefaultDemo, defaultDemoResult } from './TemplateDemoFallback';
+
+/**
+ * Platform category — full 14-screen flow.
+ * Use for multi-feature platforms where personalization drives retention.
+ *
+ * The app-demo screen ships with a working palette-preview fallback so the
+ * template is runnable end-to-end out of the box.
+ */
+
+const screens: OnboardingScreen[] = [
+  {
+    id: 'welcome',
+    type: 'welcome',
+    title: 'Welcome aboard',
+    subtitle: 'A few questions and we’ll tailor the entire experience.',
+    cta: 'Start',
+    heroIconName: 'Rocket',
+    highlight: '~2 minutes',
+  },
+  {
+    id: 'goals',
+    type: 'goal-question',
+    question: 'What do you want to get out of this?',
+    multiSelect: true,
+    options: [
+      { id: 'productivity', label: 'Be more productive', iconName: 'Zap' },
+      { id: 'learn', label: 'Learn new skills', iconName: 'GraduationCap' },
+      { id: 'connect', label: 'Connect with people', iconName: 'Users' },
+      { id: 'create', label: 'Create content', iconName: 'PenTool' },
+    ],
+    onChange: () => undefined,
+    cta: 'Continue',
+  },
+  {
+    id: 'pains',
+    type: 'pain-points',
+    title: 'What frustrates you about tools like this?',
+    painPoints: [
+      { id: 'complex', label: 'Too complex' },
+      { id: 'slow', label: 'Too slow' },
+      { id: 'pricey', label: 'Too expensive' },
+      { id: 'privacy', label: 'Privacy concerns' },
+    ],
+    multiSelect: true,
+    maxSelect: 3,
+    onChange: () => undefined,
+    cta: 'Continue',
+  },
+  {
+    id: 'proof',
+    type: 'social-proof',
+    title: 'Why people stay',
+    testimonials: [
+      {
+        name: 'Maya K.',
+        role: 'Designer',
+        content: 'The best $10/mo I spend. Period.',
+        rating: 5,
+      },
+      {
+        name: 'Andre P.',
+        role: 'PM',
+        content: 'I onboarded my whole team in a day.',
+        rating: 5,
+      },
+      {
+        name: 'Sara L.',
+        role: 'Founder',
+        content: 'Replaced three other tools for me.',
+        rating: 4,
+      },
+    ],
+  },
+  {
+    id: 'tinder',
+    type: 'tinder-cards',
+    title: 'A bit about you',
+    statements: [
+      { id: 'a', text: 'I prefer learning by doing.', category: 'Style' },
+      { id: 'b', text: 'I read every doc end-to-end.', category: 'Style' },
+      { id: 'c', text: 'I collaborate with others daily.', category: 'Style' },
+      { id: 'd', text: 'I work alone most of the time.', category: 'Style' },
+    ],
+    onChange: () => undefined,
+    cta: 'Continue',
+  },
+  {
+    id: 'personalized',
+    type: 'personalized-solution',
+    title: 'Built for the way you work',
+    subtitle: 'Here is what we’ll set up for you.',
+    solutions: [
+      { painPointId: 'complex', solution: 'A guided first-run experience with smart defaults.' },
+      { painPointId: 'slow', solution: 'Sub-200ms interactions, no spinner purgatory.' },
+      { painPointId: 'pricey', solution: 'A free tier that actually does the job.' },
+      { painPointId: 'privacy', solution: 'You own your data — export and delete anytime.' },
+    ],
+    selectedPainPointIds: [],
+  },
+  {
+    id: 'comparison',
+    type: 'comparison',
+    title: 'Before vs. after',
+    before: ['Tool overload', 'Generic templates', 'Steep learning curve'],
+    after: ['One workspace', 'Personalized setup', '2-minute onboarding'],
+  },
+  {
+    id: 'prefs',
+    type: 'preferences',
+    title: 'A few preferences',
+    preferences: [
+      {
+        id: 'theme',
+        label: 'Theme',
+        type: 'select',
+        defaultValue: 'system',
+        options: [
+          { id: 'system', label: 'Match system' },
+          { id: 'light', label: 'Light' },
+          { id: 'dark', label: 'Dark' },
+        ],
+      },
+      {
+        id: 'density',
+        label: 'Density',
+        type: 'select',
+        defaultValue: 'comfortable',
+        options: [
+          { id: 'compact', label: 'Compact' },
+          { id: 'comfortable', label: 'Comfortable' },
+        ],
+      },
+    ],
+    onChange: () => undefined,
+    cta: 'Continue',
+  },
+  {
+    id: 'permission-notifications',
+    type: 'permission-priming',
+    permission: 'notifications',
+    title: 'Stay in the loop',
+    description: 'Only the alerts you actually want.',
+    benefits: ['Mentions & replies', 'Weekly summary', 'Customizable quiet hours'],
+    iconName: 'Bell',
+    onRequest: async () => 'prompt',
+    cta: 'Enable notifications',
+  },
+  {
+    id: 'processing',
+    type: 'processing',
+    title: 'Setting up your workspace…',
+    steps: ['Tuning recommendations', 'Importing defaults', 'Warming caches'],
+    durationMs: 3500,
+    onComplete: () => undefined,
+  },
+  {
+    id: 'demo',
+    type: 'app-demo',
+    title: 'Quick tour — try a quick action',
+    demo: { component: () => null, onSave: () => undefined },
+  },
+  {
+    id: 'value',
+    type: 'value-delivery',
+    title: 'You’re all set',
+    result: defaultDemoResult(),
+  },
+  {
+    id: 'account',
+    type: 'account-gate',
+    title: 'Save your progress',
+    subtitle: 'Sign in to sync across devices.',
+    optional: true,
+    signInMethod: 'email',
+    skipText: 'Continue without account',
+    onSignIn: async () => ({ signedIn: true, method: 'email' }),
+  },
+  {
+    id: 'paywall',
+    type: 'paywall',
+    title: 'Unlock the full platform',
+    subtitle: 'Pricing that scales with you.',
+    price: '$14.99 / month',
+    trialDays: 14,
+    cta: 'Start 14-day trial',
+    secondaryCta: 'Stay on free',
+    features: [
+      { iconName: 'Infinity', text: 'Unlimited projects' },
+      { iconName: 'Users', text: 'Team workspaces' },
+      { iconName: 'Shield', text: 'Enterprise SSO' },
+      { iconName: 'Headphones', text: 'Priority support' },
+    ],
+    socialProof: { text: 'Joined by', count: 850000 },
+    onSecondaryCta: () => undefined,
+    onAccept: async () => ({ accepted: true, trialStarted: true }),
+  },
+];
+
+// Replace the no-op demo component with the built-in working fallback.
+const resolvedScreens = screens.map((s) => withDefaultDemo(s));
+
+export const platformOnboardingTemplate: OnboardingConfig = {
+  category: 'platform',
+  screens: resolvedScreens,
+  onSkip: () => undefined,
+  onComplete: () => undefined,
+};

@@ -1,7 +1,7 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "6.0.0",
-  "description": "Installable app skeleton for the fleet — layouts, analytics (dependency-free SVG charts), calendar, i18n via @umituz/web-localization, permissions/module registry; udb-* stylesheet on design-system tokens (auth lives in @umituz/web-auth)",
+  "version": "6.1.0",
+  "description": "Installable app skeleton for the fleet — layouts, analytics (dependency-free SVG charts), calendar, onboarding flow, i18n via @umituz/web-localization, permissions/module registry; udb-* stylesheet on design-system tokens (auth lives in @umituz/web-auth)",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -37,7 +37,9 @@
     "./calendar/utils": "./src/domains/calendar/utils/index.ts",
     "./config": "./src/config/index.ts",
     "./package.json": "./package.json",
-    "./charts": "./src/domains/charts/index.ts"
+    "./charts": "./src/domains/charts/index.ts",
+    "./onboarding": "./src/domains/onboarding/index.ts",
+    "./onboarding.css": "./src/domains/onboarding/onboarding.css"
   },
   "files": [
     "src",
@@ -55,12 +57,16 @@
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
     "react-dom": "^18.0.0 || ^19.0.0",
-    "react-router-dom": "^6.0.0 || ^7.0.0"
+    "react-router-dom": "^6.0.0 || ^7.0.0",
+    "framer-motion": "^12.0.0"
   },
   "dependencies": {
     "@umituz/web-design-system": "^4.8.1",
     "lucide-react": "^0.577.0",
-    "@umituz/web-localization": "^1.2.1"
+    "@umituz/web-localization": "^1.2.1",
+    "@radix-ui/react-progress": "^1.1.7",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
@@ -71,7 +77,10 @@
     "eslint": "^10.0.2",
     "react-router-dom": "^7.13.1",
     "typescript": "^5.9.3",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.1",
+    "@testing-library/dom": "^10.4.2",
+    "@testing-library/react": "^16.3.3",
+    "jsdom": "^29.1.1"
   },
   "keywords": [
     "dashboard",
@@ -102,7 +111,10 @@
     "sidebar",
     "header",
     "config-driven",
-    "package-driven"
+    "package-driven",
+    "onboarding",
+    "wizard",
+    "product-tour"
   ],
   "author": "umituz",
   "license": "MIT",

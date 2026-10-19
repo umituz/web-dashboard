@@ -1,0 +1,131 @@
+/*
+ * web-onboarding styles.
+ *
+ * Isolation contract (see README "Styling"):
+ *  - NO Tailwind preflight. Host applications keep their own global reset;
+ *    this stylesheet must never change styles outside `.uob-flow`.
+ *  - A scoped reset restores the preflight invariants the library's utility
+ *    classes rely on (box-sizing, border-style, form font inheritance)
+ *    inside `.uob-flow` only.
+ *  - All design tokens are namespaced `--uob-*`. Rebrand by overriding them:
+ *      .uob-flow { --uob-primary-500: 34 197 94; }
+ *    RGB triplets (e.g. "99 102 241"), not hex — they compose with
+ *    `rgb(var(--uob-primary-500) / <alpha>)` and Tailwind `<alpha-value>`.
+ *  - OnboardingFlow renders the `.uob-flow` wrapper automatically.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Design tokens (light defaults)                                      */
+/* ------------------------------------------------------------------ */
+
+.uob-flow {
+  --uob-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, sans-serif;
+
+  --uob-primary-50: 238 242 255;
+  --uob-primary-100: 224 231 255;
+  --uob-primary-500: 99 102 241;
+  --uob-primary-600: 79 70 229;
+  --uob-primary-700: 67 56 202;
+
+  --uob-surface: 255 255 255;
+  --uob-surface-muted: 249 250 251;
+  --uob-text-primary: 17 24 39;
+  --uob-text-muted: 107 114 128;
+  --uob-border: 229 231 235;
+
+  --uob-success: 16 185 129;
+  --uob-warning: 245 158 11;
+  --uob-error: 239 68 68;
+}
+
+@media (prefers-color-scheme: dark) {
+  .uob-flow {
+    --uob-surface: 17 24 39;
+    --uob-surface-muted: 31 41 55;
+    --uob-text-primary: 243 244 246;
+    --uob-text-muted: 156 163 175;
+    --uob-border: 55 65 81;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Scoped reset — restores preflight invariants inside `.uob-flow`     */
+/* only. Deliberately emitted BEFORE the utilities layer so utility    */
+/* classes always win on equal specificity.                            */
+/* ------------------------------------------------------------------ */
+
+.uob-flow,
+.uob-flow *,
+.uob-flow *::before,
+.uob-flow *::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: rgb(var(--uob-border));
+}
+
+.uob-flow h1,
+.uob-flow h2,
+.uob-flow h3,
+.uob-flow h4,
+.uob-flow h5,
+.uob-flow h6,
+.uob-flow p,
+.uob-flow figure,
+.uob-flow blockquote,
+.uob-flow pre {
+  margin: 0;
+}
+
+.uob-flow ol,
+.uob-flow ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.uob-flow button,
+.uob-flow input,
+.uob-flow optgroup,
+.uob-flow select,
+.uob-flow textarea {
+  font-family: inherit;
+  font-size: 100%;
+  font-weight: inherit;
+  line-height: inherit;
+  color: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.uob-flow button,
+.uob-flow [type='button'],
+.uob-flow [type='reset'],
+.uob-flow [type='submit'] {
+  -webkit-appearance: button;
+  background-color: transparent;
+  background-image: none;
+}
+
+.uob-flow progress {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.uob-flow img,
+.uob-flow svg,
+.uob-flow video,
+.uob-flow canvas {
+  display: block;
+  vertical-align: middle;
+}
+
+.uob-flow img,
+.uob-flow video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Utilities LAST — emitted in place, after the scoped reset. */
+@tailwind utilities;
