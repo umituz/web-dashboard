@@ -3,7 +3,7 @@
  * Config-based dashboard system
  */
 
-import type { ChartType } from '../../domains/analytics/types/analytics';
+import type { ChartType } from '../domains/analytics/types/analytics';
 
 /**
  * Analytics service types

@@ -82,6 +82,7 @@ export {
   generateTimeSlots,
   // Types
   type ContentItem,
+  DEFAULT_CALENDAR_CONFIG,
   type CalendarEvent,
   type CalendarFilter,
   type CalendarConfig,
@@ -96,7 +97,6 @@ export {
 // Config with renamed exports to avoid conflicts
 export {
   DEFAULT_DASHBOARD_CONFIG,
-  DEFAULT_CALENDAR_CONFIG,
   type AnalyticsServiceType,
   type ExportFormat as DashboardExportFormat,
   type AnalyticsConfig as DashboardAnalyticsConfig,
@@ -104,4 +104,4 @@ export {
   type ChartsConfig,
   type PerformanceConfig as DashboardPerformanceConfig,
   type DashboardConfig as DashboardConfigType,
-} from './domain/config';
+} from './config';

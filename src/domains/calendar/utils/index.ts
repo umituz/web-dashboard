@@ -125,10 +125,4 @@ export function generateTimeSlots(
 
   return slots;
 }
-
-/**
- * Re-export the default calendar config from the central config module
- * so consumers using only the calendar domain still get sensible defaults.
- */
-export { DEFAULT_CALENDAR_CONFIG } from '../../../domain/config/CalendarConfig';
 export type { CalendarConfig };

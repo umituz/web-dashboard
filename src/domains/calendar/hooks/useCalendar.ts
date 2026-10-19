@@ -14,7 +14,7 @@ import type {
   CalendarFilter,
 } from '../types/calendar.types';
 import { calendarService, applyCalendarFilter } from '../services';
-import { DEFAULT_CALENDAR_CONFIG } from '../utils';
+import { DEFAULT_CALENDAR_CONFIG } from '../config';
 import type { ICalendarService } from '../types/calendar.types';
 
 type CalendarView = 'month' | 'week' | 'day' | 'timeline';

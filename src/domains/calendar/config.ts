@@ -2,7 +2,7 @@
  * Calendar Configuration
  */
 
-import type { CalendarConfig } from '../../domains/calendar/types/calendar.types';
+import type { CalendarConfig } from './types/calendar.types';
 
 /**
  * Default calendar configuration
