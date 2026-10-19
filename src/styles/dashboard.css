@@ -3196,6 +3196,15 @@
   min-width: 0;
 }
 
+.udb-pageheader__kicker {
+  margin: 0 0 0.25rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted-foreground);
+}
+
 .udb-pageheader__title {
   margin: 0;
   font-size: 1.375rem;
