@@ -12,18 +12,6 @@ export * from './domains/layouts';
 export * from './domains/settings';
 export * from './domains/calendar';
 export {
-  OnboardingWizard,
-  useOnboarding,
-  useOnboardingStep,
-} from './domains/onboarding';
-
-export type {
-  OnboardingStep,
-  OnboardingState,
-  OnboardingConfig,
-} from './domains/onboarding';
-
-export {
   AuthLayout,
   LoginForm,
   RegisterForm,

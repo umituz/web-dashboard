@@ -23,6 +23,24 @@ export interface DashboardHeaderProps {
 }
 
 /**
+ * Host-injected profile-menu entry — the extension seam for pages the
+ * skeleton does not own (billing, referrals, anything). Rendered above
+ * Settings; `to` navigates, `onSelect` runs, both close the menu.
+ */
+export interface HeaderProfileItem {
+  /** Stable key for list rendering */
+  key: string;
+  /** Display label (already translated by the host) */
+  label: string;
+  /** Optional icon node — bring your own sizing (`udb-menu__item-icon`) */
+  icon?: React.ReactNode;
+  /** Route to navigate to */
+  to?: string;
+  /** Click handler (runs after navigation when both are set) */
+  onSelect?: () => void;
+}
+
+/**
  * Dashboard sidebar props
  */
 export interface DashboardSidebarProps {

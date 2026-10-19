@@ -1,12 +1,12 @@
 import { useState } from "react";
 import {
   Bell, X, Sun, Moon, Menu, User, Settings, LogOut,
-  ChevronDown, CreditCard
+  ChevronDown
 } from "lucide-react";
 import { Button } from "../../../primitives";
 import { useNavigate } from "react-router-dom";
 import { useT } from "../../../i18n";
-import type { DashboardHeaderProps } from "../types/layout";
+import type { DashboardHeaderProps, HeaderProfileItem } from "../types/layout";
 import type { DashboardNotification } from "../types/notification";
 import type { DashboardUser } from "../types/user";
 import { formatNotificationTime } from "../utils/dashboard";
@@ -26,8 +26,9 @@ interface DashboardHeaderPropsExtended extends DashboardHeaderProps {
   settingsRoute?: string;
   /** Profile route */
   profileRoute?: string;
-  /** Billing route */
-  billingRoute?: string;
+  /** Host-injected profile-menu entries — billing and friends live here,
+    *  not in the skeleton. */
+  extraProfileItems?: HeaderProfileItem[];
 }
 
 /**
@@ -53,7 +54,7 @@ export const DashboardHeader = ({
   onDismissNotification,
   settingsRoute = "/dashboard/settings",
   profileRoute = "/dashboard/profile",
-  billingRoute = "/dashboard/billing",
+  extraProfileItems = [],
 }: DashboardHeaderPropsExtended) => {
   const navigate = useNavigate();
   const t = useT();
@@ -200,14 +201,21 @@ export const DashboardHeader = ({
                     <User className="udb-menu__item-icon" />
                     {t('common.profile')}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => { navigate(billingRoute); setProfileOpen(false); }}
-                    className="udb-menu__item"
-                  >
-                    <CreditCard className="udb-menu__item-icon" />
-                    {t('common.billing')}
-                  </button>
+                  {extraProfileItems.map((item) => (
+                    <button
+                      key={item.key}
+                      type="button"
+                      onClick={() => {
+                        if (item.to) navigate(item.to);
+                        item.onSelect?.();
+                        setProfileOpen(false);
+                      }}
+                      className="udb-menu__item"
+                    >
+                      {item.icon}
+                      {item.label}
+                    </button>
+                  ))}
                   <button
                     type="button"
                     onClick={() => { navigate(settingsRoute); setProfileOpen(false); }}
