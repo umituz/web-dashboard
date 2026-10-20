@@ -10,6 +10,8 @@ export interface PageHeaderProps {
   title?: ReactNode;
   subtitle?: ReactNode;
   description?: ReactNode;
+  /** Small facts row (dates, counts, IDs…) under the title block. */
+  meta?: ReactNode;
   breadcrumbs?: ReactNode | readonly PageHeaderCrumb[];
   actions?: ReactNode;
   className?: string;
@@ -18,7 +20,16 @@ export interface PageHeaderProps {
 const isCrumbList = (value: ReactNode | readonly PageHeaderCrumb[]): value is readonly PageHeaderCrumb[] =>
   Array.isArray(value) && value.every((item) => typeof item === "object" && item !== null && "label" in item);
 
-export const PageHeader = ({ kicker, title, subtitle, description, breadcrumbs, actions, className }: PageHeaderProps) => {
+export const PageHeader = ({
+  kicker,
+  title,
+  subtitle,
+  description,
+  meta,
+  breadcrumbs,
+  actions,
+  className,
+}: PageHeaderProps) => {
   const crumbNode =
     breadcrumbs === undefined
       ? undefined
@@ -38,6 +49,7 @@ export const PageHeader = ({ kicker, title, subtitle, description, breadcrumbs, 
         {(subtitle ?? description) !== undefined && (
           <p className="udb-pageheader__subtitle">{subtitle ?? description}</p>
         )}
+        {meta !== undefined && <div className="udb-pageheader__meta">{meta}</div>}
       </div>
       {actions !== undefined && <div className="udb-pageheader__actions">{actions}</div>}
     </div>

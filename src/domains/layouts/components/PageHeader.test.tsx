@@ -29,4 +29,17 @@ describe('PageHeader markup smoke', () => {
     expect(html).toContain('udb-pageheader__actions');
     expect(html).toContain('New claim');
   });
+
+  it('renders meta under the title block and omits it when undefined', () => {
+    const html = renderToString(
+      <PageHeader title="Policy AC-123" meta={<span>Renews 2027-01-15</span>} />,
+    );
+    const metaAt = html.indexOf('udb-pageheader__meta');
+    expect(metaAt).toBeGreaterThan(-1);
+    expect(html.indexOf('udb-pageheader__subtitle')).toBe(-1);
+    expect(html).toContain('Renews 2027-01-15');
+
+    const bare = renderToString(<PageHeader title="Policy AC-123" />);
+    expect(bare).not.toContain('udb-pageheader__meta');
+  });
 });
