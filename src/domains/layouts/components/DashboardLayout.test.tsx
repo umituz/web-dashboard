@@ -98,4 +98,28 @@ describe("DashboardLayout (command palette)", () => {
     expect(onActivate).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("dialog")).toBeNull();
   });
+
+  it("derives navigation groups from the sidebar when includeSidebar is set", async () => {
+    renderAt("/", undefined, {
+      ...config,
+      commandPalette: {
+        includeSidebar: true,
+        groups: [{ heading: "Quick", items: [{ id: "q", label: "Quick action", onSelect: () => {} }] }],
+      },
+    });
+    fireEvent.keyDown(window, { key: "k", metaKey: true });
+    expect(await screen.findByRole("option", { name: "Quick action" })).toBeTruthy();
+    // The custom group has no "Home" — the one present is derived from the sidebar,
+    // carrying the path as its hint (accessible name "Home /").
+    const derived = screen.getByRole("option", { name: /home/i });
+    expect(derived.textContent).toContain("/");
+  });
+
+  it("omits sidebar-derived items from the palette by default", async () => {
+    renderAt("/", undefined, paletteConfig());
+    fireEvent.keyDown(window, { key: "k", metaKey: true });
+    // Only the palette's own "Home" (no path hint) — nothing derived from the sidebar.
+    const own = await screen.findByRole("option", { name: "Home" });
+    expect(own.textContent).toBe("Home");
+  });
 });

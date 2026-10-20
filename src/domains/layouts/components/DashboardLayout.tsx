@@ -1,5 +1,5 @@
 import { useState, useEffect, type ReactNode } from "react";
-import { useLocation, Outlet, Navigate } from "react-router-dom";
+import { useLocation, useNavigate, Outlet, Navigate } from "react-router-dom";
 import { useT } from "@umituz/web-localization/react";
 import { Skeleton } from "@umituz/web-design-system/atoms";
 import { CommandPalette } from "@umituz/web-design-system/organisms";
@@ -61,6 +61,7 @@ export const DashboardLayout = ({
   skipToContentLabel,
 }: DashboardLayoutProps) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const t = useT();
   const [collapsed, setCollapsed] = useState(() => readCollapsed(collapsedStorageKey));
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -131,6 +132,23 @@ export const DashboardLayout = ({
   };
 
   const currentTitle = getTitle();
+
+  // Sidebar-derived navigation groups — one nav definition feeds both chrome surfaces.
+  const paletteGroups = palette?.includeSidebar
+    ? [
+        ...palette.groups,
+        ...config.sidebarGroups.map((group) => ({
+          heading: group.title,
+          items: group.items.map((item) => ({
+            id: `nav-${item.path}`,
+            label: item.raw ? item.label : t(item.label),
+            icon: <item.icon size={16} aria-hidden="true" />,
+            hint: item.path,
+            onSelect: () => navigate(item.path),
+          })),
+        })),
+      ]
+    : undefined;
 
   const sidebarProps = {
     sidebarGroups: config.sidebarGroups,
@@ -225,7 +243,7 @@ export const DashboardLayout = ({
         <CommandPalette
           open={paletteOpen}
           onOpenChange={setPaletteOpen}
-          groups={palette.groups}
+          groups={paletteGroups ?? palette.groups}
           placeholder={palette.placeholder}
           emptyLabel={palette.emptyLabel}
           label={palette.label}

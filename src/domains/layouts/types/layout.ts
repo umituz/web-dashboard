@@ -42,6 +42,9 @@ export interface CommandPaletteConfig {
     label?: string;
     /** Bind ⌘K/Ctrl+K to open the palette (default true). */
     shortcut?: boolean;
+    /** Append the sidebar groups as navigation groups — derived from
+     *  sidebarGroups and routed internally, so apps never map their nav twice. */
+    includeSidebar?: boolean;
 }
 
 export interface DashboardSidebarProps {
