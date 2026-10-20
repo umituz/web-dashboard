@@ -5,6 +5,7 @@ import { useT } from "@umituz/web-localization/react";
 import { Button } from "@umituz/web-design-system/atoms";
 import { cn } from "@umituz/web-design-system/utils/cn";
 import { BrandLogo } from "./BrandLogo";
+import { isPathActive } from "../utils/dashboard";
 import { PenTool, Menu, ChevronLeft, ChevronDown, ChevronRight } from "lucide-react";
 import type { DashboardSidebarProps, SidebarAction } from "../types/layout";
 import type { DashboardUser } from "../types/user";
@@ -128,9 +129,7 @@ export const DashboardSidebar = ({
                 )}
 
                 {(!isGroupCollapsed || collapsed) && filteredItems.map((item) => {
-                  const active =
-                    location.pathname === item.path ||
-                    (item.end === false && location.pathname.startsWith(item.path + "/"));
+                  const active = isPathActive(location.pathname, item.path, item.end);
                   const labelText = item.raw ? item.label : t(item.label);
                   const collapsedTitle =
                     item.badge !== undefined && item.badge !== ""

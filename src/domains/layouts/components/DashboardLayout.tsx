@@ -4,6 +4,7 @@ import { useT } from "@umituz/web-localization/react";
 import { Skeleton } from "@umituz/web-design-system/atoms";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
+import { getActiveSidebarItem } from "../utils/dashboard";
 import type { DashboardLayoutConfig } from "../types/layout";
 import type { DashboardNotification } from "../types/notification";
 import type { DashboardUser } from "../types/user";
@@ -25,6 +26,10 @@ interface DashboardLayoutProps {
   collapsedStorageKey?: string;
   /** Optional page footer rendered under the outlet column. */
   footer?: ReactNode;
+  /** id of the main landmark — also the skip-link target. */
+  mainId?: string;
+  /** Skip-link label (a11y); defaults to the localized "Skip to content". */
+  skipToContentLabel?: string;
 }
 
 const readCollapsed = (key?: string): boolean => {
@@ -51,6 +56,8 @@ export const DashboardLayout = ({
   routeTransitionMs = 0,
   collapsedStorageKey,
   footer,
+  mainId = "udb-main",
+  skipToContentLabel,
 }: DashboardLayoutProps) => {
   const location = useLocation();
   const t = useT();
@@ -81,12 +88,25 @@ export const DashboardLayout = ({
     setMobileOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.classList.toggle("udb-scroll-lock", mobileOpen);
+    return () => document.documentElement.classList.remove("udb-scroll-lock");
+  }, [mobileOpen]);
+
   if (authLoading) return null;
   if (!isAuthenticated) return <Navigate to={loginRoute} replace />;
 
-  const activeItem = config.sidebarGroups
-    .flatMap((group) => group.items)
-    .find((i) => i.path === location.pathname);
+  const activeItem = getActiveSidebarItem(location.pathname, config.sidebarGroups);
 
   const getTitle = () => {
     if (activeItem) return activeItem.raw ? activeItem.label : t(activeItem.label);
@@ -109,6 +129,10 @@ export const DashboardLayout = ({
 
   return (
     <div className="udb-root udb-layout">
+      <a href={`#${mainId}`} className="udb-skip-link">
+        {skipToContentLabel ?? t("Skip to content")}
+      </a>
+
       <aside
         className={`udb-layout__sidebar ${collapsed ? "udb-layout__sidebar--collapsed" : ""}`}
       >
@@ -122,7 +146,12 @@ export const DashboardLayout = ({
       {mobileOpen && (
         <div className="udb-layout__mobile">
           <div className="udb-layout__backdrop" onClick={() => setMobileOpen(false)} />
-          <aside className="udb-layout__mobile-sidebar">
+          <aside
+            className="udb-layout__mobile-sidebar"
+            role="dialog"
+            aria-modal="true"
+            aria-label={config.brandName ? `${config.brandName} — ${t("Navigation")}` : t("Navigation")}
+          >
             <DashboardSidebar
               collapsed={false}
               setCollapsed={() => setMobileOpen(false)}
@@ -153,7 +182,7 @@ export const DashboardLayout = ({
           notificationsViewAll={config.notificationsViewAll}
         />
 
-        <main className="udb-layout__content">
+        <main id={mainId} tabIndex={-1} className="udb-layout__content">
           {loading ? (
             <div className="udb-page-skeleton">
               <Skeleton className="udb-skeleton--title" />

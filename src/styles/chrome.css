@@ -529,6 +529,35 @@
   color: var(--color-muted-foreground);
   font-size: var(--udb-font-size-sm);
 }
+
+/* — Skip link: first focusable element, visible only when focused — */
+.udb-skip-link {
+  position: fixed;
+  top: var(--udb-space-2);
+  left: var(--udb-space-2);
+  z-index: 100;
+  transform: translateY(-200%);
+  padding: var(--udb-space-2) var(--udb-space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  font-size: var(--udb-font-size-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition: transform 0.1s ease;
+}
+.udb-skip-link:focus {
+  transform: translateY(0);
+}
+/* Programmatic focus (skip target) shows no ring — the jump itself is the cue. */
+.udb-layout__content:focus {
+  outline: none;
+}
+
+/* Scroll lock applied to <html> while the mobile drawer is open. */
+.udb-scroll-lock {
+  overflow: hidden;
+}
 .udb-filter-bar {
   display: flex;
   flex-wrap: wrap;
