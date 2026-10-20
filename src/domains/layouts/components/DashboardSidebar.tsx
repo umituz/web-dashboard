@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useT } from "@umituz/web-localization/react";
 
@@ -6,7 +6,7 @@ import { Button } from "@umituz/web-design-system/atoms";
 import { cn } from "@umituz/web-design-system/utils/cn";
 import { BrandLogo } from "./BrandLogo";
 import { PenTool, Menu, ChevronLeft, ChevronDown, ChevronRight } from "lucide-react";
-import type { DashboardSidebarProps } from "../types/layout";
+import type { DashboardSidebarProps, SidebarAction } from "../types/layout";
 import type { DashboardUser } from "../types/user";
 import type { SidebarGroup } from "../types/sidebar";
 import { filterSidebarItems } from "../utils/dashboard";
@@ -15,6 +15,12 @@ interface DashboardSidebarPropsExtended extends DashboardSidebarProps {
   sidebarGroups: SidebarGroup[];
   brandName?: string;
   brandTagline?: string;
+  /** Custom brand mark — replaces the built-in logo (text block still follows brandName). */
+  brand?: ReactNode;
+  /** Generic primary action — replaces the legacy create-post button. */
+  sidebarAction?: SidebarAction;
+  /** Extra node above the collapse button in the footer (hidden while collapsed). */
+  sidebarFooter?: ReactNode;
   createPostRoute?: string;
   showCreatePost?: boolean;
   user?: DashboardUser;
@@ -26,6 +32,9 @@ export const DashboardSidebar = ({
   sidebarGroups,
   brandName = "App",
   brandTagline = "grow smarter",
+  brand,
+  sidebarAction,
+  sidebarFooter,
   createPostRoute = "/dashboard/create",
   showCreatePost = true,
   user,
@@ -41,31 +50,51 @@ export const DashboardSidebar = ({
     }));
   };
 
+  const renderAction = (label: string, icon: ReactNode, linkProps?: { to: string }) => {
+    const button = (
+      <Button
+        variant="default"
+        className={cn("udb-sidebar__create-btn", collapsed && "udb-sidebar__create-btn--collapsed")}
+        title={collapsed ? label : undefined}
+        {...(linkProps ? {} : { onClick: () => sidebarAction?.onClick?.() })}
+      >
+        {icon}
+        {!collapsed && <span className="udb-sidebar__create-label">{label}</span>}
+      </Button>
+    );
+    return linkProps ? <Link to={linkProps.to}>{button}</Link> : button;
+  };
+
   return (
     <div className={cn("udb-sidebar", collapsed && "udb-sidebar--collapsed")}>
       <div className="udb-sidebar__brand">
-        <BrandLogo size={32} />
-        {!collapsed && (
+        {brand ?? <BrandLogo size={32} />}
+        {!collapsed && brandName !== "" && (
           <div className="udb-sidebar__brand-text">
-            <span className="udb-sidebar__brand-name">{brandName}</span>
+            <span className="udb-sidebar__brand-name">{brandName || "App"}</span>
             <span className="udb-sidebar__brand-tagline">{brandTagline}</span>
           </div>
         )}
       </div>
 
-      {showCreatePost && createPostRoute && (
+      {sidebarAction ? (
         <div className="udb-sidebar__create">
-          <Link to={createPostRoute}>
-            <Button
-              variant="default"
-              className={cn("udb-sidebar__create-btn", collapsed && "udb-sidebar__create-btn--collapsed")}
-              title={collapsed ? t('sidebar.createPost') : undefined}
-            >
-              <PenTool className="udb-sidebar__create-icon" />
-              {!collapsed && <span className="udb-sidebar__create-label">{t('sidebar.createPost')}</span>}
-            </Button>
-          </Link>
+          {renderAction(
+            sidebarAction.label,
+            sidebarAction.icon ? <sidebarAction.icon className="udb-sidebar__create-icon" /> : null,
+            sidebarAction.to ? { to: sidebarAction.to } : undefined
+          )}
         </div>
+      ) : (
+        showCreatePost && createPostRoute && (
+          <div className="udb-sidebar__create">
+            {renderAction(
+              t('sidebar.createPost'),
+              <PenTool className="udb-sidebar__create-icon" />,
+              { to: createPostRoute }
+            )}
+          </div>
+        )
       )}
 
       <nav className="udb-sidebar__nav">
@@ -99,16 +128,26 @@ export const DashboardSidebar = ({
                 )}
 
                 {(!isGroupCollapsed || collapsed) && filteredItems.map((item) => {
-                  const active = location.pathname === item.path;
+                  const active =
+                    location.pathname === item.path ||
+                    (item.end === false && location.pathname.startsWith(item.path + "/"));
+                  const labelText = item.raw ? item.label : t(item.label);
+                  const collapsedTitle =
+                    item.badge !== undefined && item.badge !== ""
+                      ? `${labelText} (${item.badge})`
+                      : labelText;
                   return (
                     <Link
                       key={item.path}
                       to={item.path}
                       className={cn("udb-sidebar__item", active && "udb-sidebar__item--active")}
-                      title={collapsed ? t(item.label) : undefined}
+                      title={collapsed ? collapsedTitle : undefined}
                     >
                       <item.icon className="udb-sidebar__item-icon" />
-                      {!collapsed && <span>{t(item.label)}</span>}
+                      {!collapsed && <span>{labelText}</span>}
+                      {!collapsed && item.badge !== undefined && item.badge !== "" && (
+                        <span className="udb-sidebar__item-badge">{item.badge}</span>
+                      )}
                     </Link>
                   );
                 })}
@@ -119,6 +158,7 @@ export const DashboardSidebar = ({
       </nav>
 
       <div className="udb-sidebar__footer">
+        {sidebarFooter && <div className="udb-sidebar__footer-slot">{sidebarFooter}</div>}
         {!collapsed && (
           <p className="udb-sidebar__footer-label">
             {t('sidebar.system')}

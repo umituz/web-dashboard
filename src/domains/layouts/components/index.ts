@@ -2,6 +2,8 @@ export { DashboardLayout } from './DashboardLayout';
 export { DashboardHeader } from './DashboardHeader';
 export { DashboardSidebar } from './DashboardSidebar';
 export { BrandLogo } from './BrandLogo';
+export { FilterBar } from './FilterBar';
+export type { FilterBarProps, FilterBarSearch } from './FilterBar';
 export { PageHeader } from './PageHeader';
 export type { PageHeaderProps, PageHeaderCrumb } from './PageHeader';
 export { SectionHeader } from './SectionHeader';

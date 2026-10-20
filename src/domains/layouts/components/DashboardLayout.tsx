@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { useLocation, Outlet, Navigate } from "react-router-dom";
 import { useT } from "@umituz/web-localization/react";
 import { Skeleton } from "@umituz/web-design-system/atoms";
@@ -21,7 +21,20 @@ interface DashboardLayoutProps {
   theme?: "light" | "dark";
   onToggleTheme?: () => void;
   routeTransitionMs?: number;
+  /** Persists the sidebar collapse state under this localStorage key ('1'/'0'). */
+  collapsedStorageKey?: string;
+  /** Optional page footer rendered under the outlet column. */
+  footer?: ReactNode;
 }
+
+const readCollapsed = (key?: string): boolean => {
+  if (!key || typeof window === "undefined") return false;
+  try {
+    return window.localStorage.getItem(key) === "1";
+  } catch {
+    return false;
+  }
+};
 
 export const DashboardLayout = ({
   config,
@@ -36,12 +49,23 @@ export const DashboardLayout = ({
   theme,
   onToggleTheme,
   routeTransitionMs = 0,
+  collapsedStorageKey,
+  footer,
 }: DashboardLayoutProps) => {
   const location = useLocation();
   const t = useT();
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(() => readCollapsed(collapsedStorageKey));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loading, setLoading] = useState(routeTransitionMs > 0);
+
+  useEffect(() => {
+    if (!collapsedStorageKey || typeof window === "undefined") return;
+    try {
+      window.localStorage.setItem(collapsedStorageKey, collapsed ? "1" : "0");
+    } catch {
+      /* storage unavailable — state stays in-memory only */
+    }
+  }, [collapsed, collapsedStorageKey]);
 
   useEffect(() => {
     if (routeTransitionMs <= 0) {
@@ -65,13 +89,23 @@ export const DashboardLayout = ({
     .find((i) => i.path === location.pathname);
 
   const getTitle = () => {
-    if (activeItem) return t(activeItem.label);
+    if (activeItem) return activeItem.raw ? activeItem.label : t(activeItem.label);
     const extraTitle = config.extraTitleMap?.[location.pathname];
     if (extraTitle) return t(extraTitle);
     return config.defaultTitle ?? "Dashboard";
   };
 
   const currentTitle = getTitle();
+
+  const sidebarProps = {
+    sidebarGroups: config.sidebarGroups,
+    brandName: config.brandName,
+    brandTagline: config.brandTagline,
+    brand: config.brand,
+    sidebarAction: config.sidebarAction,
+    sidebarFooter: config.sidebarFooter,
+    user,
+  };
 
   return (
     <div className="udb-root udb-layout">
@@ -81,10 +115,7 @@ export const DashboardLayout = ({
         <DashboardSidebar
           collapsed={collapsed}
           setCollapsed={setCollapsed}
-          sidebarGroups={config.sidebarGroups}
-          brandName={config.brandName}
-          brandTagline={config.brandTagline}
-          user={user}
+          {...sidebarProps}
         />
       </aside>
 
@@ -95,10 +126,7 @@ export const DashboardLayout = ({
             <DashboardSidebar
               collapsed={false}
               setCollapsed={() => setMobileOpen(false)}
-              sidebarGroups={config.sidebarGroups}
-              brandName={config.brandName}
-              brandTagline={config.brandTagline}
-              user={user}
+              {...sidebarProps}
             />
           </aside>
         </div>
@@ -117,6 +145,12 @@ export const DashboardLayout = ({
           onLogout={onLogout}
           onMarkAllRead={onMarkAllRead}
           onDismissNotification={onDismissNotification}
+          loginRoute={loginRoute}
+          searchAction={config.searchAction}
+          headerExtra={config.headerExtra}
+          profileItems={config.profileItems}
+          showDefaultProfileItems={config.showDefaultProfileItems}
+          notificationsViewAll={config.notificationsViewAll}
         />
 
         <main className="udb-layout__content">
@@ -134,6 +168,8 @@ export const DashboardLayout = ({
             <Outlet />
           )}
         </main>
+
+        {footer && <footer className="udb-layout__footer">{footer}</footer>}
       </div>
     </div>
   );

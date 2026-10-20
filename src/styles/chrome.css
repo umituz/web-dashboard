@@ -458,6 +458,99 @@
   z-index: 50;
   animation: udb-pop 0.18s ease;
 }
+/* Radix-portal variant: positioning/animation come from the dropdown primitive. */
+.udb-menu--pop {
+  top: auto;
+  right: auto;
+  animation: none;
+}
+.udb-sidebar__item-badge {
+  margin-left: auto;
+  padding: 1px var(--udb-space-2);
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.4;
+  color: var(--udb-sidebar-accent-text);
+  background: var(--udb-sidebar-accent);
+}
+.udb-sidebar__footer-slot {
+  flex: 1;
+  min-width: 0;
+}
+.udb-sidebar--collapsed .udb-sidebar__footer-slot {
+  display: none;
+}
+.udb-header__extra {
+  display: flex;
+  align-items: center;
+  gap: var(--udb-space-2);
+}
+.udb-header__search {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--udb-space-2);
+  height: 34px;
+  padding: 0 var(--udb-space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-background);
+  color: var(--color-muted-foreground);
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+.udb-header__search:hover {
+  border-color: var(--color-primary);
+  color: var(--color-foreground);
+}
+.udb-header__search-icon {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+.udb-header__search-text {
+  font-size: var(--udb-font-size-sm);
+  white-space: nowrap;
+}
+.udb-header__search-kbd {
+  margin-left: var(--udb-space-2);
+}
+.udb-profile-btn[data-state="open"] .udb-profile-btn__chevron {
+  transform: rotate(180deg);
+}
+.udb-profile-btn__chevron {
+  transition: transform 0.15s ease;
+}
+.udb-layout__footer {
+  flex-shrink: 0;
+  padding: var(--udb-space-4);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-muted-foreground);
+  font-size: var(--udb-font-size-sm);
+}
+.udb-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--udb-space-3);
+}
+.udb-filter-bar__search {
+  min-width: 200px;
+  flex: 0 1 240px;
+}
+.udb-filter-bar__fields {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--udb-space-2);
+  flex: 1;
+}
+.udb-filter-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--udb-space-2);
+}
 @keyframes udb-pop {
   from {
     opacity: 0;
