@@ -32,6 +32,18 @@ export interface HeaderSearchAction {
     onActivate: () => void;
 }
 
+/** ⌘K command palette wired into the shell: renders the DS CommandPalette,
+ *  binds ⌘K/Ctrl+K, and (unless searchAction overrides it) makes the header
+ *  search button open the palette. */
+export interface CommandPaletteConfig {
+    groups: import("@umituz/web-design-system/organisms").CommandGroup[];
+    placeholder?: string;
+    emptyLabel?: string;
+    label?: string;
+    /** Bind ⌘K/Ctrl+K to open the palette (default true). */
+    shortcut?: boolean;
+}
+
 export interface DashboardSidebarProps {
     collapsed: boolean;
     setCollapsed: (collapsed: boolean) => void;
@@ -51,6 +63,9 @@ export interface DashboardLayoutConfig {
     /** Extra node rendered in the header actions area (app chips, clocks…). */
     headerExtra?: React.ReactNode;
     searchAction?: HeaderSearchAction;
+    /** ⌘K palette — when set, the header search opens it (an explicit
+     *  searchAction.onActivate still wins). */
+    commandPalette?: CommandPaletteConfig;
     /** Fully custom profile menu items — shown in addition to (or, with showDefaultProfileItems=false, instead of) the defaults. */
     profileItems?: HeaderProfileItem[];
     /** Hide the built-in profile/settings items (defaults to true). */

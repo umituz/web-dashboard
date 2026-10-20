@@ -2,6 +2,7 @@ import { useState, useEffect, type ReactNode } from "react";
 import { useLocation, Outlet, Navigate } from "react-router-dom";
 import { useT } from "@umituz/web-localization/react";
 import { Skeleton } from "@umituz/web-design-system/atoms";
+import { CommandPalette } from "@umituz/web-design-system/organisms";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
 import { getActiveSidebarItem } from "../utils/dashboard";
@@ -64,6 +65,8 @@ export const DashboardLayout = ({
   const [collapsed, setCollapsed] = useState(() => readCollapsed(collapsedStorageKey));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loading, setLoading] = useState(routeTransitionMs > 0);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const palette = config.commandPalette;
 
   useEffect(() => {
     if (!collapsedStorageKey || typeof window === "undefined") return;
@@ -87,6 +90,18 @@ export const DashboardLayout = ({
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
+
+  useEffect(() => {
+    if (!palette || palette.shortcut === false) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen((v) => !v);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [palette]);
 
   useEffect(() => {
     if (!mobileOpen) return;
@@ -175,7 +190,12 @@ export const DashboardLayout = ({
           onMarkAllRead={onMarkAllRead}
           onDismissNotification={onDismissNotification}
           loginRoute={loginRoute}
-          searchAction={config.searchAction}
+          searchAction={
+            palette
+              ? // The palette owns the header search unless the app gave an explicit action.
+                { placeholder: palette.placeholder, shortcut: "⌘K", ...config.searchAction, onActivate: config.searchAction?.onActivate ?? (() => setPaletteOpen(true)) }
+              : config.searchAction
+          }
           headerExtra={config.headerExtra}
           profileItems={config.profileItems}
           showDefaultProfileItems={config.showDefaultProfileItems}
@@ -200,6 +220,17 @@ export const DashboardLayout = ({
 
         {footer && <footer className="udb-layout__footer">{footer}</footer>}
       </div>
+
+      {palette && (
+        <CommandPalette
+          open={paletteOpen}
+          onOpenChange={setPaletteOpen}
+          groups={palette.groups}
+          placeholder={palette.placeholder}
+          emptyLabel={palette.emptyLabel}
+          label={palette.label}
+        />
+      )}
     </div>
   );
 };
