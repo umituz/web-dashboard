@@ -2,7 +2,8 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-const css = readFileSync(new URL("./dashboard.css", import.meta.url), "utf8");
+const entry = readFileSync(new URL("./dashboard.css", import.meta.url), "utf8");
+const css = readFileSync(new URL("./chrome.css", import.meta.url), "utf8");
 
 const defined = new Set([...css.matchAll(/(--udb-[a-z0-9-]+)\s*:/g)].map((m) => m[1]));
 const used = new Set([...css.matchAll(/var\((--udb-[a-z0-9-]+)\)/g)].map((m) => m[1]));
@@ -12,8 +13,13 @@ describe("dashboard stylesheet contract", () => {
     expect([...used].filter((v) => !defined.has(v))).toEqual([]);
   });
 
-  it("imports the design-system stylesheet", () => {
-    expect(css).toContain('@import "@umituz/web-design-system/styles.css";');
+  it("entry chains the design-system stylesheet and the chrome rules", () => {
+    expect(entry).toContain('@import "@umituz/web-design-system/styles.css";');
+    expect(entry).toContain('@import "./chrome.css";');
+  });
+
+  it("chrome carries no stylesheet imports (Tailwind hosts import it beside their own DS build)", () => {
+    expect(css.match(/@import[^;]+;/g) ?? []).toEqual([]);
   });
 
   it("carries no legacy --u-* tokens", () => {
