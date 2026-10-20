@@ -149,25 +149,58 @@ export interface BarSeries {
   color?: string;
 }
 
+export interface BarChartGoalLine {
+  value: number;
+  label?: string;
+  tone?: string;
+}
+
 export function BarChart({
   labels,
   series,
   height = 130,
   formatValue = (v: number) => String(v),
   formatLabel = (l: string) => l,
+  goalLine,
 }: {
   labels: readonly string[];
   series: BarSeries[];
   height?: number;
   formatValue?: (v: number) => string;
   formatLabel?: (l: string) => string;
+  goalLine?: BarChartGoalLine;
 }) {
   const [hover, setHover] = useState<number | null>(null);
   const vals = (s: BarSeries) => s.values ?? s.data ?? [];
-  const max = Math.max(1, ...series.flatMap((s) => vals(s)));
+  const max = Math.max(1, ...series.flatMap((s) => vals(s)), goalLine?.value ?? 0);
   const toneOf = (s: BarSeries, i: number) => s.tone ?? s.color ?? PALETTE[i % PALETTE.length]!;
+  const goalPct = goalLine !== undefined ? Math.min(100, (goalLine.value / max) * 100) : null;
   return (
     <div className="udb-barchart" style={{ height }}>
+      {goalLine !== undefined && goalPct !== null && (
+        <div
+          className="udb-barchart__goal"
+          style={{
+            bottom: `${goalPct}%`,
+            ...(goalLine.tone !== undefined ? { borderTopColor: goalLine.tone } : {}),
+          }}
+          title={goalLine.label ?? formatValue(goalLine.value)}
+          aria-hidden="true"
+        >
+          {goalLine.label !== undefined && (
+            <span
+              className="udb-barchart__goallabel"
+              style={
+                goalLine.tone !== undefined
+                  ? { color: goalLine.tone, borderColor: goalLine.tone }
+                  : undefined
+              }
+            >
+              {goalLine.label}
+            </span>
+          )}
+        </div>
+      )}
       {labels.map((label, i) => (
         <div
           key={label}

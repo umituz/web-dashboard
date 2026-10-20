@@ -1418,10 +1418,31 @@
   font-variant-numeric: tabular-nums;
 }
 .udb-barchart {
+  position: relative;
   display: flex;
   align-items: flex-end;
   gap: 3px;
   width: 100%;
+}
+.udb-barchart__goal {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 5;
+  pointer-events: none;
+  border-top: 1.5px dashed var(--udb-chart-goal, #d97706);
+}
+.udb-barchart__goallabel {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  padding: 0 4px;
+  border: 1px solid var(--udb-chart-goal, #d97706);
+  border-radius: var(--udb-radius-pill);
+  background: var(--color-card);
+  font-size: var(--udb-font-size-xs);
+  line-height: 16px;
+  color: var(--udb-chart-goal, #d97706);
 }
 .udb-barchart__col {
   position: relative;

@@ -86,6 +86,29 @@ describe('charts markup smoke', () => {
     expect(html).toContain('height:100%');
   });
 
+  it('BarChart renders a dashed goal line that counts toward max and clamps at 100%', () => {
+    const html = renderToString(
+      <BarChart
+        labels={['a', 'b']}
+        series={[{ label: 'A', values: [2, 4] }]}
+        goalLine={{ value: 4, label: 'goal 4', tone: '#111111' }}
+      />,
+    );
+    expect(html).toContain('udb-barchart__goal');
+    expect(html).toContain('bottom:100%');
+    expect(html).toContain('border-top-color:#111111');
+    expect(html).toContain('>goal 4<');
+
+    const above = renderToString(
+      <BarChart labels={['a']} series={[{ label: 'A', values: [2] }]} goalLine={{ value: 99 }} />,
+    );
+    expect(above).toContain('bottom:100%');
+    expect(above).not.toContain('udb-barchart__goallabel');
+
+    const without = renderToString(<BarChart labels={['a']} series={[{ label: 'A', values: [2] }]} />);
+    expect(without).not.toContain('udb-barchart__goal');
+  });
+
   it('fleet aliases: Legend renders hint suffix and Donut accepts color', () => {
     const html = renderToString(
       <>
