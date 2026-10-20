@@ -39,6 +39,10 @@
     "./settings/hooks": "./src/domains/settings/hooks/index.ts",
     "./settings/types": "./src/domains/settings/types/index.ts",
     "./settings/utils": "./src/domains/settings/utils/index.ts",
+    "./timing": "./src/domains/timing/index.ts",
+    "./timing/hooks": "./src/domains/timing/hooks/index.ts",
+    "./search": "./src/domains/search/index.ts",
+    "./search/utils": "./src/domains/search/searchItems.ts",
     "./styles.css": "./src/styles/dashboard.css"
   },
   "files": [
