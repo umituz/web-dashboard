@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, type ReactNode } from "react";
+import { Suspense, useState, useEffect, useRef, type ReactNode } from "react";
 import { useLocation, useNavigate, Outlet, Navigate } from "react-router";
 import { Skeleton } from "@umituz/web-design-system/atoms";
 import { CommandPalette, type CommandGroup, type CommandItem } from "@umituz/web-design-system/organisms";
@@ -26,6 +26,7 @@ interface DashboardLayoutProps {
   collapsedStorageKey?: string;
   footer?: ReactNode;
   mainId?: string;
+  contentFallback?: ReactNode;
   formatNotificationTime?: (createdAt: Date | string | number) => string;
 }
 
@@ -55,6 +56,7 @@ export const DashboardLayout = ({
   collapsedStorageKey,
   footer,
   mainId = "udb-main",
+  contentFallback,
   formatNotificationTime,
 }: DashboardLayoutProps) => {
   const location = useLocation();
@@ -261,7 +263,9 @@ export const DashboardLayout = ({
             </div>
 
           ) : (
-            <Outlet />
+            <Suspense fallback={contentFallback ?? null}>
+              <Outlet />
+            </Suspense>
           )}
         </main>
 

@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { lazy } from "react";
 import { MemoryRouter, Routes, Route } from "react-router";
 import { Home } from "lucide-react";
 import { DashboardLayout } from "./DashboardLayout";
@@ -174,5 +175,26 @@ describe("DashboardSidebar (secondaryLabel)", () => {
     const link = screen.getByRole("link", { name: /home/i });
     expect(link.textContent).not.toContain("오늘");
     window.localStorage.removeItem("udb-collapsed-test");
+  });
+});
+
+describe("DashboardLayout (contentFallback)", () => {
+  const NeverResolves = lazy(() => new Promise<{ default: React.ComponentType }>(() => {}));
+
+  it("shows the fallback while a lazy route is suspending", () => {
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route
+            path="*"
+            element={<DashboardLayout config={config} labels={labels} contentFallback={<div>loading-page</div>} />}
+          >
+            <Route path="*" element={<NeverResolves />} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+    const main = document.getElementById("udb-main");
+    expect(main?.textContent).toContain("loading-page");
   });
 });
