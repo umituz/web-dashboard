@@ -165,7 +165,7 @@ export const DashboardLayout = ({
         ...config.sidebarGroups.map((group) => ({
           heading: group.title,
           items: group.items.map((item) => ({
-            id: `nav-${item.path}`,
+            id: `nav-${item.path.replace(/[^a-zA-Z0-9_-]/g, '_')}`,
             label: item.label,
             icon: <item.icon size={16} aria-hidden="true" />,
             hint: item.path,
@@ -263,9 +263,11 @@ export const DashboardLayout = ({
             </div>
 
           ) : (
-            <Suspense fallback={contentFallback ?? null}>
-              <Outlet />
-            </Suspense>
+            <div className="udb-layout__page">
+              <Suspense fallback={contentFallback ?? null}>
+                <Outlet />
+              </Suspense>
+            </div>
           )}
         </main>
 

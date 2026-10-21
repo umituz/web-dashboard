@@ -26,6 +26,7 @@
   --udb-sidebar-border: var(--color-border);
   --udb-sidebar-accent: var(--color-muted);
   --udb-sidebar-accent-text: var(--color-foreground);
+  --udb-content-max-width: none;
 }
 
 .udb-root,
@@ -122,6 +123,11 @@
   flex: 1;
   overflow-y: auto;
   padding: var(--udb-space-4);
+}
+.udb-layout__page {
+  width: 100%;
+  margin: 0 auto;
+  max-width: var(--udb-content-max-width, none);
 }
 @media (min-width: 768px) {
   .udb-layout__sidebar {
