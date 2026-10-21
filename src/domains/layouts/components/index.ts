@@ -4,6 +4,8 @@ export { DashboardSidebar } from './DashboardSidebar';
 export { BrandLogo } from './BrandLogo';
 export { FilterBar } from './FilterBar';
 export type { FilterBarProps, FilterBarSearch } from './FilterBar';
+export { FilterSelect } from './FilterSelect';
+export type { FilterSelectProps, FilterSelectOption } from './FilterSelect';
 export { PageHeader } from './PageHeader';
 export type { PageHeaderProps, PageHeaderCrumb } from './PageHeader';
 export { SectionHeader } from './SectionHeader';
