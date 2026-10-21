@@ -1,9 +1,7 @@
 import { useMemo } from "react";
 import { cn } from "@umituz/web-design-system/utils/cn";
-import { useT } from "@umituz/web-localization/react";
 import type { ChartConfig, ChartData, TimeSeriesData } from "../types/analytics";
 import { generateChartColors } from "../utils/analytics";
-import { ANALYTICS_KEYS } from "../utils/i18nKeys";
 
 const VIEWBOX_W = 600;
 const DEFAULT_CHART_HEIGHT_PX = 300;
@@ -68,12 +66,12 @@ const polarPoint = (cx: number, cy: number, r: number, angle: number): [number, 
 
 interface AnalyticsChartProps {
   config: ChartConfig;
+  unsupportedLabel?: string;
   className?: string;
   height?: number | string;
 }
 
-export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProps) => {
-  const t = useT();
+export const AnalyticsChart = ({ config, unsupportedLabel, className, height }: AnalyticsChartProps) => {
 
   const chartHeight = height ?? config.height ?? DEFAULT_CHART_HEIGHT_PX;
   const viewBoxH = typeof chartHeight === "number" ? chartHeight : DEFAULT_CHART_HEIGHT_PX;
@@ -115,8 +113,9 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
 
   const renderUnsupported = () => (
     <div className="udb-chart__empty" role="alert">
-      {t(ANALYTICS_KEYS.chart.noData)}: {config.type}
+      {unsupportedLabel ?? config.type}
     </div>
+
   );
 
   const renderCartesian = () => {
@@ -164,7 +163,9 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
                 <text className="udb-chart__axis" x={PAD.left - 6} y={y + 4} textAnchor="end">
                   {compactFmt.format(value)}
                 </text>
+
               </g>
+
             );
           })}
 
@@ -179,6 +180,7 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
             >
               {row.label}
             </text>
+
           ) : null,
         )}
 
@@ -209,9 +211,12 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
                       fill={color}
                     >
                       <title>{`${rows[index].label} — ${key}: ${value}`}</title>
+
                     </circle>
+
                   ))}
               </g>
+
             );
           })}
 
@@ -239,13 +244,17 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
                       fill={color}
                     >
                       <title>{`${row.label} — ${key}: ${value}`}</title>
+
                     </rect>
+
                   );
                 })}
               </g>
+
             );
           })}
       </svg>
+
     );
   };
 
@@ -285,13 +294,17 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
                   strokeDashoffset={-offset}
                 >
                   <title>{`${slice.label}: ${Math.round(slice.fraction * 100)}%`}</title>
+
                 </circle>
+
               );
               offset += dash;
               return element;
             })}
           </g>
+
         </svg>
+
       );
     }
 
@@ -317,10 +330,13 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
           return (
             <path key={`${slice.label}-${index}`} d={path} fill={colors[index % colors.length]}>
               <title>{`${slice.label}: ${Math.round(slice.fraction * 100)}%`}</title>
+
             </path>
+
           );
         })}
       </svg>
+
     );
   };
 
@@ -358,10 +374,13 @@ export const AnalyticsChart = ({ config, className, height }: AnalyticsChartProp
               />
               {item.label}
             </span>
+
           ))}
         </div>
+
       )}
     </div>
+
   );
 };
 

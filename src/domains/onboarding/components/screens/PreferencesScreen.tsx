@@ -70,10 +70,13 @@ export function PreferencesScreen({ config, onNext }: PreferencesScreenProps) {
           <PreferenceRow key={item.id} item={item} value={values[item.id]} onChange={(v) => update(item.id, v)} />
         ))}
       </div>
+
       <PrimaryButton onClick={() => onNext({ values })} disabled={!canContinue}>
         {config.cta ?? labels.continueAction}
       </PrimaryButton>
+
     </QuestionWrapper>
+
   );
 }
 
@@ -90,8 +93,10 @@ function PreferenceRow({ item, value, onChange }: PreferenceRowProps) {
       <label className="udb-onb-field__label" htmlFor={fieldId}>
         {item.label}
       </label>
+
       <PreferenceControl item={item} value={value} onChange={onChange} fieldId={fieldId} />
     </div>
+
   );
 }
 
@@ -113,8 +118,10 @@ function PreferenceControl({ item, value, onChange, fieldId }: PreferenceControl
             <option key={opt.id} value={opt.id}>
               {opt.label}
             </option>
+
           ))}
         </select>
+
       );
     case 'multi-select': {
       const list = Array.isArray(value) ? value : [];
@@ -132,9 +139,11 @@ function PreferenceControl({ item, value, onChange, fieldId }: PreferenceControl
               >
                 {opt.label}
               </button>
+
             );
           })}
         </div>
+
       );
     }
     case 'toggle':
@@ -149,6 +158,7 @@ function PreferenceControl({ item, value, onChange, fieldId }: PreferenceControl
         >
           <span className="udb-onb-switch__thumb" />
         </button>
+
       );
     case 'slider': {
       const { min, max } = resolveSliderBounds(item.min, item.max);
@@ -168,10 +178,15 @@ function PreferenceControl({ item, value, onChange, fieldId }: PreferenceControl
           />
           <div className="udb-onb-slider__scale">
             <span>{min}</span>
+
             <span>{numeric}</span>
+
             <span>{max}</span>
+
           </div>
+
         </div>
+
       );
     }
     default:

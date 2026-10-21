@@ -146,6 +146,7 @@ function FlowFooterNavigation({
         <button type="button" onClick={onBack} className="udb-onb-link">
           {labels.back}
         </button>
+
       ) : (
         <span />
       )}
@@ -153,10 +154,12 @@ function FlowFooterNavigation({
         <button type="button" onClick={onSkip} className="udb-onb-link">
           {skipLabel ?? labels.skip}
         </button>
+
       ) : (
         <span />
       )}
     </div>
+
   );
 }
 
@@ -208,8 +211,6 @@ export function OnboardingFlow({
     config.onComplete?.(progress.result);
   }, [progress.isFinished, progress.result, analytics, config]);
 
-  // Abandonment: unmount without finishing AND after engaging at least one step.
-  // StrictMode dev double-mounts happen before engagement, so no spurious events.
   const abandonSnapshotRef = useRef({ engaged: false, finished: false, currentStep: 0, startedAt: new Date() });
   useEffect(() => {
     abandonSnapshotRef.current = {
@@ -286,6 +287,7 @@ export function OnboardingFlow({
                   />
                 )}
               </>
+
             }
             footer={
               <>
@@ -300,14 +302,20 @@ export function OnboardingFlow({
                 />
                 {config.footerSlot}
               </>
+
             }
           >
             <AnimationWrapper stepKey={active.id} transition={transition}>
               {renderScreen(active, progress, config, handleStepCompleted)}
             </AnimationWrapper>
+
           </ScreenContainer>
+
         </div>
+
       </OnboardingErrorBoundary>
+
     </OnboardingIntlProvider>
+
   );
 }

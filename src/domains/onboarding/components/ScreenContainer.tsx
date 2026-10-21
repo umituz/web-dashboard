@@ -12,8 +12,12 @@ export function ScreenContainer({ children, header, footer, className }: ScreenC
   return (
     <div className={cn('udb-onb-screen', className)}>
       {header && <div className="udb-onb-screen__header">{header}</div>}
+
       <main className="udb-onb-screen__main">{children}</main>
+
       {footer && <div className="udb-onb-screen__footer">{footer}</div>}
+
     </div>
+
   );
 }

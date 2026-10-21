@@ -1,9 +1,3 @@
-/**
- * FilterSelect Component (Layout)
- * @description Compact select for filter strips: options plus an "all" reset
- * entry, reporting the chosen value as a string.
- */
-
 import type { SelectHTMLAttributes } from "react";
 
 export interface FilterSelectOption {
@@ -17,7 +11,7 @@ export interface FilterSelectProps
   onChange: (value: string) => void;
   options: readonly FilterSelectOption[];
   ariaLabel: string;
-  allLabel?: string;
+  allLabel: string;
 }
 
 export const FilterSelect = ({
@@ -25,7 +19,7 @@ export const FilterSelect = ({
   onChange,
   options,
   ariaLabel,
-  allLabel = "All",
+  allLabel,
   className,
   ...props
 }: FilterSelectProps) => {
@@ -38,12 +32,15 @@ export const FilterSelect = ({
       {...props}
     >
       <option value="">{allLabel}</option>
+
       {options.map((option) => (
         <option key={option.value} value={option.value}>
           {option.label}
         </option>
+
       ))}
     </select>
+
   );
 };
 

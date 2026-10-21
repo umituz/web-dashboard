@@ -68,21 +68,28 @@ export function SwipeCard({ text, category, onSwipeLeft, onSwipeRight, className
         className="udb-onb-swipe__card"
       >
         {category && <span className="udb-onb-swipe__category">{category}</span>}
+
         <p className="udb-onb-swipe__text">{text}</p>
+
         <p className="udb-onb-swipe__hint">{labels.swipeHint}</p>
+
       </motion.div>
+
       <motion.div
         style={{ opacity: leftOpacity }}
         className="udb-onb-swipe__stamp udb-onb-swipe__stamp--no"
       >
         {labels.disagree}
       </motion.div>
+
       <motion.div
         style={{ opacity: rightOpacity }}
         className="udb-onb-swipe__stamp udb-onb-swipe__stamp--yes"
       >
         {labels.agree}
       </motion.div>
+
     </div>
+
   );
 }

@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 
-/** Ticking countdown in seconds; fires onFinish once at zero. */
 export function useCountdown(seconds: number | null, onFinish?: () => void) {
   const [remaining, setRemaining] = useState(seconds ?? 0);
   const [running, setRunning] = useState(seconds != null);
@@ -28,8 +27,6 @@ export function useCountdown(seconds: number | null, onFinish?: () => void) {
     return () => window.clearInterval(id);
   }, [running]);
 
-  // Completion fires in an effect, not inside the setRemaining updater —
-  // updaters must stay pure (StrictMode double-invokes them).
   useEffect(() => {
     if (running && remaining === 0 && !finishedRef.current) {
       finishedRef.current = true;
@@ -51,7 +48,6 @@ export function useCountdown(seconds: number | null, onFinish?: () => void) {
   };
 }
 
-/** Stopwatch for open practice (writing time, speaking response windows). */
 export function useStopwatch() {
   const [elapsed, setElapsed] = useState(0);
   const [running, setRunning] = useState(false);

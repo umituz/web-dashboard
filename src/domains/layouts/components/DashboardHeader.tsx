@@ -9,14 +9,12 @@ import {
   DropdownMenuItem, DropdownMenuSeparator
 } from "@umituz/web-design-system/organisms";
 import { useNavigate } from "react-router";
-import { useT } from "@umituz/web-localization/react";
 import type { ReactNode } from "react";
 import type {
   DashboardHeaderProps, HeaderProfileItem, HeaderSearchAction
 } from "../types/layout";
 import type { DashboardNotification } from "../types/notification";
 import type { DashboardUser } from "../types/user";
-import { formatNotificationTime } from "../utils/dashboard";
 
 interface DashboardHeaderPropsExtended extends DashboardHeaderProps {
   user?: DashboardUser;
@@ -26,24 +24,24 @@ interface DashboardHeaderPropsExtended extends DashboardHeaderProps {
   onDismissNotification?: (id: string) => void;
   settingsRoute?: string;
   profileRoute?: string;
-  /** Legacy alias of profileItems (kept for existing consumers). */
   extraProfileItems?: HeaderProfileItem[];
-  /** Fully custom profile menu items. */
   profileItems?: HeaderProfileItem[];
-  /** Hide the built-in profile/settings rows (defaults to true). */
   showDefaultProfileItems?: boolean;
   searchAction?: HeaderSearchAction;
   headerExtra?: ReactNode;
   notificationsViewAll?: { label: string; to: string };
-  /** Route the built-in logout navigates to after onLogout resolves. */
   loginRoute?: string;
 }
+
+const defaultFormatNotificationTime = (createdAt: Date | string | number): string =>
+  new Date(createdAt).toLocaleString();
 
 export const DashboardHeader = ({
   collapsed,
   setCollapsed,
   setMobileOpen,
   title,
+  labels,
   theme = "light",
   onToggleTheme,
   user,
@@ -60,9 +58,9 @@ export const DashboardHeader = ({
   headerExtra,
   notificationsViewAll,
   loginRoute = "/login",
+  formatNotificationTime = defaultFormatNotificationTime,
 }: DashboardHeaderPropsExtended) => {
   const navigate = useNavigate();
-  const t = useT();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
   const customItems = profileItems ?? extraProfileItems;
@@ -81,14 +79,17 @@ export const DashboardHeader = ({
         <Button variant="ghost" size="icon" className="udb-header__mobile-toggle" onClick={() => setMobileOpen(true)}>
           <Menu className="udb-header__toggle-icon" />
         </Button>
+
         {collapsed && (
           <Button variant="ghost" size="icon" className="udb-header__desktop-toggle" onClick={() => setCollapsed(false)}>
             <Menu className="udb-header__toggle-icon" />
           </Button>
+
         )}
         <h2 className="udb-header__title">
           {title}
         </h2>
+
       </div>
 
       <div className="udb-header__actions">
@@ -98,8 +99,11 @@ export const DashboardHeader = ({
           <button type="button" className="udb-header__search" onClick={searchAction.onActivate}>
             <Search className="udb-header__search-icon" />
             <span className="udb-header__search-text">{searchAction.placeholder}</span>
+
             {searchAction.shortcut && <Kbd className="udb-header__search-kbd">{searchAction.shortcut}</Kbd>}
+
           </button>
+
         )}
 
         {onToggleTheme && (
@@ -108,26 +112,32 @@ export const DashboardHeader = ({
             size="icon"
             onClick={onToggleTheme}
             className="udb-header__icon-btn"
-            title={theme === "dark" ? t('common.tooltips.switchLight') : t('common.tooltips.switchDark')}
-            aria-label={theme === "dark" ? t('common.tooltips.switchLight') : t('common.tooltips.switchDark')}
+            title={theme === "dark" ? labels.switchToLight : labels.switchToDark}
+            aria-label={theme === "dark" ? labels.switchToLight : labels.switchToDark}
           >
             {theme === "dark" ? <Sun className="udb-header__icon" aria-hidden="true" /> : <Moon className="udb-header__icon" aria-hidden="true" />}
           </Button>
+
         )}
 
         {(notifications.length > 0 || onMarkAllRead) && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="udb-header__icon-btn" aria-label={t('dashboard.notifications.title')}>
+              <Button variant="ghost" size="icon" className="udb-header__icon-btn" aria-label={labels.notificationsTitle}>
                 <Bell className="udb-header__icon" />
                 {unreadCount > 0 && <span className="udb-header__unread"><span className="udb-header__unread-core" /></span>}
+
               </Button>
+
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end" className="udb-menu udb-menu--pop udb-notif">
               <div className="udb-menu__header">
-                <h3 className="udb-menu__heading">{t('dashboard.notifications.title')}</h3>
+                <h3 className="udb-menu__heading">{labels.notificationsTitle}</h3>
+
                 {unreadCount > 0 && (
-                  <button type="button" onClick={onMarkAllRead} className="udb-menu__action">{t('dashboard.notifications.markAllRead')}</button>
+                  <button type="button" onClick={onMarkAllRead} className="udb-menu__action">{labels.markAllRead}</button>
+
                 )}
               </div>
 
@@ -136,28 +146,36 @@ export const DashboardHeader = ({
                   <div key={n.id} className={`udb-notif__item${!n.read ? " udb-notif__item--unread" : ""}`}>
                     <div className="udb-notif__body">
                       <p className="udb-notif__text">{n.text}</p>
+
                       <p className="udb-notif__meta">
                         <span className="udb-notif__dot" />
-                        {formatNotificationTime(n.createdAt, t)}
+                        {formatNotificationTime(n.createdAt)}
                       </p>
+
                     </div>
+
                     <button
                       type="button"
                       onClick={() => onDismissNotification?.(n.id)}
                       className="udb-notif__dismiss"
-                      aria-label={t('dashboard.notifications.dismiss')}
+                      aria-label={labels.dismissNotification}
                     >
                       <X className="udb-notif__dismiss-icon" />
                     </button>
+
                   </div>
+
                 ))}
                 {notifications.length === 0 && (
                   <div className="udb-notif__empty">
                     <div className="udb-notif__empty-icon">
                       <Bell className="udb-notif__empty-bell" />
                     </div>
-                    <p className="udb-notif__empty-text">{t('dashboard.notifications.none')}</p>
+
+                    <p className="udb-notif__empty-text">{labels.noNotifications}</p>
+
                   </div>
+
                 )}
               </div>
 
@@ -165,9 +183,12 @@ export const DashboardHeader = ({
                 <DropdownMenuItem className="udb-menu__item udb-notif__view-all" onSelect={() => navigate(notificationsViewAll.to)}>
                   {notificationsViewAll.label}
                 </DropdownMenuItem>
+
               )}
             </DropdownMenuContent>
+
           </DropdownMenu>
+
         )}
 
         {(user || customItems.length > 0 || showDefaultProfileItems) && (
@@ -176,25 +197,31 @@ export const DashboardHeader = ({
 
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button type="button" className="udb-profile-btn" aria-label={t("common.profile")}>
+                <button type="button" className="udb-profile-btn" aria-label={labels.profile}>
                   <Avatar name={user?.name} size="sm" className="udb-avatar">
                     {user?.avatar && <AvatarImage src={user.avatar} alt="" />}
                   </Avatar>
+
                   <ChevronDown className="udb-profile-btn__chevron" />
                 </button>
+
               </DropdownMenuTrigger>
+
               <DropdownMenuContent align="end" className="udb-menu udb-menu--pop udb-profile-menu">
                 <div className="udb-profile-menu__id">
-                  <p className="udb-profile-menu__name">{user?.name || t("common.roles.user")}</p>
+                  <p className="udb-profile-menu__name">{user?.name || labels.guestName}</p>
+
                   <p className="udb-profile-menu__email">{user?.email}</p>
+
                 </div>
 
                 <div className="udb-profile-menu__items">
                   {showDefaultProfileItems && (
                     <DropdownMenuItem className="udb-menu__item" onSelect={() => navigate(profileRoute)}>
                       <User className="udb-menu__item-icon" />
-                      {t('common.profile')}
+                      {labels.profile}
                     </DropdownMenuItem>
+
                   )}
                   {customItems.map((item) => (
                     <DropdownMenuItem
@@ -208,12 +235,14 @@ export const DashboardHeader = ({
                       {item.icon}
                       {item.label}
                     </DropdownMenuItem>
+
                   ))}
                   {showDefaultProfileItems && (
                     <DropdownMenuItem className="udb-menu__item" onSelect={() => navigate(settingsRoute)}>
                       <Settings className="udb-menu__item-icon" />
-                      {t('common.settings')}
+                      {labels.settings}
                     </DropdownMenuItem>
+
                   )}
                 </div>
 
@@ -222,15 +251,22 @@ export const DashboardHeader = ({
                     <DropdownMenuSeparator className="udb-profile-menu__separator" />
                     <DropdownMenuItem className="udb-menu__item udb-menu__item--danger" onSelect={() => void handleLogout()}>
                       <LogOut className="udb-menu__item-icon" />
-                      {t('common.logout')}
+                      {labels.logout}
                     </DropdownMenuItem>
+
                   </>
+
                 )}
               </DropdownMenuContent>
+
             </DropdownMenu>
+
           </>
+
         )}
       </div>
+
     </header>
+
   );
 };

@@ -20,9 +20,14 @@ export function QuestionWrapper({ title, subtitle, children, className }: Questi
     >
       <header className="udb-onb-question__head">
         <h2 className="udb-onb-title">{title}</h2>
+
         {subtitle && <p className="udb-onb-lead">{subtitle}</p>}
+
       </header>
+
       <div className="udb-onb-question__body">{children}</div>
+
     </motion.div>
+
   );
 }

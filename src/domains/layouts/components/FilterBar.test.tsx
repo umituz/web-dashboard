@@ -8,9 +8,12 @@ describe("FilterBar", () => {
       <FilterBar
         search={{ value: "", onChange: () => {}, placeholder: "Find…" }}
         actions={<button type="button">Sort</button>}
+
       >
         <span>a chip</span>
+
       </FilterBar>
+
     );
     expect(html).toContain("udb-filter-bar");
     expect(html).toContain("udb-filter-bar__search");

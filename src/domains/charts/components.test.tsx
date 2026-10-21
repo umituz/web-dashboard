@@ -115,6 +115,7 @@ describe('charts markup smoke', () => {
         <Legend items={[{ label: 'A', color: '#111111', value: '12', hint: '(per month)' }]} />
         <Donut segments={[{ label: 'x', value: 2, color: '#333333' }]} />
       </>,
+
     );
     expect(html).toContain('udb-chartlegend__hint');
     expect(html).toContain('(per month)');

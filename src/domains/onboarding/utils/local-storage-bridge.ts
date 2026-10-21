@@ -39,7 +39,7 @@ export function saveOnboardingProgress(
     window.localStorage.setItem(buildKey(key), serialized);
     return true;
   } catch (error) {
-     
+
     console.error('[web-onboarding] failed to persist progress', error);
     return false;
   }

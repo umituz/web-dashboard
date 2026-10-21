@@ -55,8 +55,7 @@ describe('useCountdown', () => {
 
   it('pause halts the tick and start resumes it', () => {
     const { result } = renderHook(() => useCountdown(5));
-    // state change and time travel must be separate acts — the interval
-    // effect only re-registers after the pause() commit
+
     act(() => {
       result.current.pause();
     });

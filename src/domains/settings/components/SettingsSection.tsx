@@ -30,6 +30,7 @@ export const SettingsSection = ({
         <h3 className="udb-settings-nav__title">
           {section.title}
         </h3>
+
       )}
 
       <div className="udb-settings-nav__items">
@@ -49,13 +50,12 @@ export const SettingsSection = ({
               {!collapsed && (
                 <>
                   <span className="udb-settings-nav__item-label">{item.label}</span>
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <span
-                      className="udb-settings-nav__badge"
-                      aria-label={`${item.badge} notifications`}
-                    >
-                      {item.badge > 99 ? "99+" : item.badge}
+
+                  {item.badge !== undefined && item.badge !== "" && item.badge !== 0 && (
+                    <span className="udb-settings-nav__badge">
+                      {item.badge}
                     </span>
+
                   )}
                   {item.path && (
                     <ChevronRight
@@ -64,8 +64,10 @@ export const SettingsSection = ({
                     />
                   )}
                 </>
+
               )}
             </>
+
           );
 
           const itemClassName = cn(
@@ -85,6 +87,7 @@ export const SettingsSection = ({
               >
                 {itemContent}
               </Link>
+
             );
           }
 
@@ -99,9 +102,12 @@ export const SettingsSection = ({
             >
               {itemContent}
             </button>
+
           );
         })}
       </div>
+
     </div>
+
   );
 };

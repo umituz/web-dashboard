@@ -14,6 +14,7 @@ const MODULES: DashboardModule[] = [
     order: 1,
     permission: "dashboard.view",
     element: <div>dashboard</div>,
+
   },
   {
     path: "/sales",
@@ -23,6 +24,7 @@ const MODULES: DashboardModule[] = [
     order: 2,
     permission: "sales.view",
     element: <div>sales</div>,
+
   },
   {
     path: "/sales/:id",
@@ -32,6 +34,7 @@ const MODULES: DashboardModule[] = [
     inNav: false,
     permission: "sales.view",
     element: <div>sales detail</div>,
+
   },
   {
     path: "/reports",
@@ -40,6 +43,7 @@ const MODULES: DashboardModule[] = [
     navGroup: "nav.insight",
     order: 1,
     element: <div>reports</div>,
+
   },
 ];
 

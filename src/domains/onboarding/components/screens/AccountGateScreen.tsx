@@ -48,11 +48,14 @@ export function AccountGateScreen({ config, onNext }: AccountGateScreenProps) {
   return (
     <div className="udb-onb-stage">
       {config.title && <h2 className="udb-onb-title udb-onb-title--display">{config.title}</h2>}
+
       {config.subtitle && <p className="udb-onb-lead">{config.subtitle}</p>}
+
       {error && (
         <p role="alert" className="udb-onb-error">
           {error}
         </p>
+
       )}
       <div className="udb-onb-question__body">
         {config.signInMethod && hasOnSignIn(config) && (
@@ -62,6 +65,7 @@ export function AccountGateScreen({ config, onNext }: AccountGateScreenProps) {
           >
             {methodLabel(config.signInMethod, labels)}
           </PrimaryButton>
+
         )}
         {accountGateAllowsSkip(config) && (
           <button
@@ -72,8 +76,11 @@ export function AccountGateScreen({ config, onNext }: AccountGateScreenProps) {
           >
             {config.skipText ?? labels.skipForNow}
           </button>
+
         )}
       </div>
+
     </div>
+
   );
 }

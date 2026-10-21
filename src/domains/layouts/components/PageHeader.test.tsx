@@ -24,7 +24,9 @@ describe('PageHeader markup smoke', () => {
       <PageHeader
         title="Claims"
         breadcrumbs={<a href="/policies">Policies</a>}
+
         actions={<button type="button">New claim</button>}
+
       />,
     );
     expect(html).toContain('udb-pageheader__breadcrumbs');
@@ -40,6 +42,7 @@ describe('PageHeader markup smoke', () => {
           breadcrumbs={[{ label: 'Policies', to: '/policies' }, { label: 'Claim 92' }]}
         />
       </MemoryRouter>,
+
     );
     expect(container.querySelectorAll("a[href='/policies']")).toHaveLength(1);
     expect(container.querySelector('.udb-pageheader__crumb a')?.textContent).toBe('Policies');

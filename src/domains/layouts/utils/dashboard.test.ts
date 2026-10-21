@@ -56,9 +56,9 @@ describe("getPageTitle", () => {
         ],
       },
     ];
-    // An exact item always wins over prefix parents…
+
     expect(getPageTitle("/app/courses/lesson-1", nested)).toBe("Lesson");
-    // …on deeper routes the longest prefix parent wins.
+
     expect(getPageTitle("/app/courses/lesson-1/summary", nested)).toBe("Courses");
     expect(getActiveSidebarItem("/nowhere", nested)).toBeNull();
   });

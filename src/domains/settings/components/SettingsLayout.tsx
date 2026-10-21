@@ -3,15 +3,17 @@ import { Outlet, useLocation, useNavigate } from "react-router";
 import { Skeleton, Button } from "@umituz/web-design-system/atoms";
 import { ChevronLeft, Menu } from "lucide-react";
 import { SettingsSection } from "./SettingsSection";
-import type { SettingsConfig } from "../types/settings";
+import type { SettingsConfig, SettingsLayoutLabels } from "../types/settings";
 
 interface SettingsLayoutProps {
   config: SettingsConfig;
+  labels: SettingsLayoutLabels;
   routeTransitionMs?: number;
 }
 
 export const SettingsLayout = ({
   config,
+  labels,
   routeTransitionMs = 0,
 }: SettingsLayoutProps) => {
   const location = useLocation();
@@ -41,13 +43,14 @@ export const SettingsLayout = ({
         <h2 className="udb-settings__sidebar-title">
           {config.brandName}
         </h2>
+
       )}
       <Button
         variant="ghost"
         size="icon"
         onClick={onMenuClick}
         className="udb-settings__sidebar-toggle"
-        aria-label={showMenuButton ? "Open sidebar" : "Toggle sidebar"}
+        aria-label={showMenuButton ? labels.openSidebar : labels.toggleSidebar}
       >
         {showMenuButton ? (
           <Menu className="udb-settings__toggle-icon" />
@@ -57,7 +60,9 @@ export const SettingsLayout = ({
           <ChevronLeft className="udb-settings__toggle-icon" />
         )}
       </Button>
+
     </div>
+
   );
 
   return (
@@ -75,6 +80,7 @@ export const SettingsLayout = ({
             />
           ))}
         </nav>
+
       </aside>
 
       {mobileOpen && (
@@ -96,8 +102,11 @@ export const SettingsLayout = ({
                 />
               ))}
             </nav>
+
           </aside>
+
         </div>
+
       )}
 
       <div className="udb-settings__main">
@@ -107,14 +116,17 @@ export const SettingsLayout = ({
               variant="ghost"
               size="icon"
               onClick={() => setMobileOpen(true)}
-              aria-label="Open mobile menu"
+              aria-label={labels.openMobileMenu}
             >
               <Menu className="udb-settings__toggle-icon-lg" />
             </Button>
+
             <h2 className="udb-settings__mobile-title">
               {config.brandName}
             </h2>
+
           </div>
+
         </header>
 
         <main className="udb-settings__content">
@@ -126,13 +138,18 @@ export const SettingsLayout = ({
                   <Skeleton key={i} className="udb-settings__skeleton-row" />
                 ))}
               </div>
+
             </div>
+
           ) : (
             <Outlet />
           )}
         </main>
+
       </div>
+
     </div>
+
   );
 };
 

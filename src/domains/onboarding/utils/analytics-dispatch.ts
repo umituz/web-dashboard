@@ -34,7 +34,7 @@ function dispatchToCustomTracker(
   customTracker: ((e: OnboardingAnalyticsEvent) => void) | undefined,
 ): void {
   if (typeof customTracker !== 'function') {
-     
+
     console.warn(
       '[web-onboarding] analytics provider is "custom" but no customTracker was provided; event dropped:',
       event.name,
@@ -57,7 +57,7 @@ export function dispatchAnalyticsEvent(
     if (!provider) return;
     dispatchToProvider(event, provider);
   } catch (error) {
-     
+
     console.error('[web-onboarding] analytics dispatch failed; event dropped:', event.name, error);
   }
 }

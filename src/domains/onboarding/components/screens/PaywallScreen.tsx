@@ -51,8 +51,11 @@ export function PaywallScreen({ config, onNext, analytics }: PaywallScreenProps)
     <div className="udb-onb-proof">
       <div className="udb-onb-question__head udb-onb-question__head--center">
         <h2 className="udb-onb-title udb-onb-title--display">{config.title}</h2>
+
         <p className="udb-onb-lead">{config.subtitle}</p>
+
       </div>
+
       <motion.div
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -60,6 +63,7 @@ export function PaywallScreen({ config, onNext, analytics }: PaywallScreenProps)
         className="udb-onb-price"
       >
         <div className="udb-onb-price__amount">{config.price}</div>
+
         <div className="udb-onb-price__terms">
           {config.trialPrice !== undefined
             ? formatLabel(labels.trialIntroPattern, {
@@ -68,7 +72,9 @@ export function PaywallScreen({ config, onNext, analytics }: PaywallScreenProps)
               })
             : formatLabel(labels.trialDaysPattern, { count: config.trialDays })}
         </div>
+
       </motion.div>
+
       <ul className="udb-onb-list">
         {config.features.map((feature, i) => (
           <li
@@ -79,25 +85,32 @@ export function PaywallScreen({ config, onNext, analytics }: PaywallScreenProps)
               <span className="udb-onb-feature__icon">
                 {renderBundledIcon(feature.iconName, 'udb-onb-icon')}
               </span>
+
             )}
             <span>{feature.text}</span>
+
           </li>
+
         ))}
       </ul>
+
       {config.socialProof && (
         <p className="udb-onb-note">
           {config.socialProof.text} ({formatCountWithLocale(config.socialProof.count, locale)}+ users)
         </p>
+
       )}
       {error && (
         <p role="alert" className="udb-onb-error">
           {error}
         </p>
+
       )}
       <div className="udb-onb-question__body">
         <PrimaryButton onClick={handleAccept} loading={busy}>
           {config.cta}
         </PrimaryButton>
+
         {config.secondaryCta && (
           <button
             type="button"
@@ -111,12 +124,16 @@ export function PaywallScreen({ config, onNext, analytics }: PaywallScreenProps)
           >
             {config.secondaryCta}
           </button>
+
         )}
       </div>
+
       <p className="udb-onb-note">
         <ShieldCheck className="udb-onb-icon--xs" />
         {labels.cancelAnytimeNote}
       </p>
+
     </div>
+
   );
 }

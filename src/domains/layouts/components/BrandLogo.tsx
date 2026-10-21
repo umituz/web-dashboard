@@ -66,5 +66,6 @@ export const BrandLogo = ({ className, size = 32 }: BrandLogoProps) => {
         fill="var(--color-secondary)"
       />
     </svg>
+
   );
 };

@@ -16,4 +16,3 @@ export {
   type RoleKey,
   type RoleInfo,
 } from "./types";
-export { PERMISSIONS_KEYS } from "./utils/i18nKeys";

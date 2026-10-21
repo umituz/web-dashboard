@@ -100,6 +100,7 @@ export type AnalyticsPeriod = '7d' | '30d' | '90d' | '1y' | (string & {});
 
 export interface MetricCardProps {
     metric: Metric;
+    lastPeriodLabel?: string;
     size?: "sm" | "md" | "lg";
     showTrend?: boolean;
     showIcon?: boolean;
@@ -119,8 +120,18 @@ export interface AnalyticsCardProps {
     children?: React.ReactNode;
 }
 
+export interface AnalyticsLayoutLabels {
+    title: string;
+    periodSelector: string;
+    periods: Record<AnalyticsPeriod, string>;
+    refresh: string;
+    export: string;
+    loading: string;
+}
+
 export interface AnalyticsLayoutProps {
     config?: AnalyticsConfig;
+    labels: AnalyticsLayoutLabels;
     title?: string;
     description?: string;
     metrics?: Metric[];

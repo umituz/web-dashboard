@@ -18,15 +18,22 @@ export function WelcomeScreen({ config, onNext, isLoading }: WelcomeScreenProps)
         <div className="udb-onb-hero udb-onb-hero--xl" aria-hidden="true">
           {renderBundledIcon(config.heroIconName, 'udb-onb-icon--xl')}
         </div>
+
       )}
       <div className="udb-onb-welcome__group">
         {config.title && <h1 className="udb-onb-welcome__title">{config.title}</h1>}
+
         {config.subtitle && <p className="udb-onb-welcome__subtitle">{config.subtitle}</p>}
+
         {config.highlight && <p className="udb-onb-welcome__highlight">{config.highlight}</p>}
+
       </div>
+
       <PrimaryButton onClick={config.onCta ?? onNext} loading={isLoading}>
         {config.cta ?? labels.continueAction}
       </PrimaryButton>
+
     </div>
+
   );
 }

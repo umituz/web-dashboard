@@ -45,7 +45,7 @@ describe('icon-name-resolves (§24.4)', () => {
     expect(resolveIconByName('Infinity')).toBeTruthy();
   });
 
-  it('resolves every icon used by the bundled templates — including the video set', () => {
+  it('resolves the curated icon set — including the video set', () => {
         const templateIcons = [
       'Activity', 'Apple', 'Award', 'Ban', 'Bell', 'BookOpen', 'Camera', 'Check',
       'CheckCircle2', 'Download', 'Dumbbell', 'GraduationCap', 'Headphones',

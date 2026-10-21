@@ -29,13 +29,17 @@ export const PermissionMatrixScreen = ({
             <th key={permission} className="udb-table__th udb-table__th--code">
               {permission}
             </th>
+
           ))}
         </tr>
+
       </thead>
+
       <tbody>
         {roles.map((role) => (
           <tr key={role.key} className="udb-table__row">
             <td className="udb-table__td udb-table__td--strong">{role.label}</td>
+
             {permissions.map((permission) => {
               const granted = hasPermission(matrix, role.key, permission);
               const cell = granted ? (
@@ -57,17 +61,23 @@ export const PermissionMatrixScreen = ({
                     >
                       {cell}
                     </button>
+
                   ) : (
                     cell
                   )}
                 </td>
+
               );
             })}
           </tr>
+
         ))}
       </tbody>
+
     </table>
+
   </div>
+
 );
 
 export default PermissionMatrixScreen;

@@ -16,6 +16,7 @@ export const buildRoutes = (modules: readonly DashboardModule[]): RouteConfig[] 
       <RequirePermission permission={module.permission}>
         {module.element}
       </RequirePermission>
+
     ) : (
       module.element
     ),

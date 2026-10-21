@@ -16,7 +16,9 @@ export function PersonalizedSolutionScreen({ config, onNext }: PersonalizedSolut
   return (
     <div className="udb-onb-proof">
       {config.title && <h2 className="udb-onb-title">{config.title}</h2>}
+
       {config.subtitle && <p className="udb-onb-lead">{config.subtitle}</p>}
+
       <ul className="udb-onb-solutions">
         {visible.map((solution, i) => (
           <motion.li
@@ -29,12 +31,19 @@ export function PersonalizedSolutionScreen({ config, onNext }: PersonalizedSolut
             <CheckCircle2 className="udb-onb-icon udb-onb-solution__icon" aria-hidden="true" />
             <div className="udb-onb-solution__body">
               <p>{solution.solution}</p>
+
               {solution.statistic && <p className="udb-onb-solution__stat">{solution.statistic}</p>}
+
             </div>
+
           </motion.li>
+
         ))}
       </ul>
+
       <PrimaryButton onClick={onNext}>{config.cta ?? labels.continueAction}</PrimaryButton>
+
     </div>
+
   );
 }

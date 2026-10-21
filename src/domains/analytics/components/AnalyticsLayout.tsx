@@ -1,22 +1,16 @@
 import { useMemo } from "react";
 import { RefreshCw, Download, Calendar, Loader2 } from "lucide-react";
-import { useT } from "@umituz/web-localization/react";
 import { cn } from "@umituz/web-design-system/utils/cn";
 import { Button } from "@umituz/web-design-system/atoms";
 import type { AnalyticsLayoutProps, AnalyticsPeriod } from "../types/analytics";
 import { AnalyticsCard } from "./AnalyticsCard";
 import { MetricCard } from "./MetricCard";
-import { ANALYTICS_KEYS } from "../utils/i18nKeys";
 
-const PERIOD_LABEL: Record<AnalyticsPeriod, string> = {
-  '7d': ANALYTICS_KEYS.common.last7Days,
-  '30d': ANALYTICS_KEYS.common.last30Days,
-  '90d': ANALYTICS_KEYS.common.last90Days,
-  '1y': ANALYTICS_KEYS.common.lastYear,
-};
+const DEFAULT_PERIODS: AnalyticsPeriod[] = ["7d", "30d", "90d", "1y"];
 
 export const AnalyticsLayout = ({
   config,
+  labels,
   title,
   description,
   metrics,
@@ -32,8 +26,6 @@ export const AnalyticsLayout = ({
   onExport,
   children,
 }: AnalyticsLayoutProps) => {
-  const t = useT();
-
   const visibleMetrics = useMemo(() => metrics ?? [], [metrics]);
 
   const showRefreshAction = showRefresh && Boolean(onRefresh);
@@ -43,16 +35,11 @@ export const AnalyticsLayout = ({
     <div className="udb-analytics">
       <div className="udb-analytics__header">
         <div className="udb-analytics__heading">
-          {(title || config?.brandName) && (
-            <h1 className="udb-analytics__title">
-              {title ??
-                (config?.brandName
-                  ? `${config.brandName} ${t(ANALYTICS_KEYS.layout.title)}`
-                  : t(ANALYTICS_KEYS.layout.title))}
-            </h1>
-          )}
+          <h1 className="udb-analytics__title">{title ?? labels.title}</h1>
+
           {description && (
             <p className="udb-analytics__description">{description}</p>
+
           )}
         </div>
 
@@ -60,20 +47,24 @@ export const AnalyticsLayout = ({
           {showDateRange && onPeriodChange && period && (
             <label className="udb-period-select">
               <Calendar className="udb-period-select__icon" aria-hidden="true" />
-              <span className="udb-sr-only">{t(ANALYTICS_KEYS.common.periodSelector)}</span>
+              <span className="udb-sr-only">{labels.periodSelector}</span>
+
               <select
                 className="udb-period-select__select"
                 value={period}
                 onChange={(e) => onPeriodChange(e.target.value as AnalyticsPeriod)}
-                aria-label={t(ANALYTICS_KEYS.common.periodSelector)}
+                aria-label={labels.periodSelector}
               >
-                {(config?.availablePeriods ?? Object.keys(PERIOD_LABEL) as AnalyticsPeriod[]).map((p) => (
+                {(config?.availablePeriods ?? DEFAULT_PERIODS).map((p) => (
                   <option key={p} value={p}>
-                    {t(PERIOD_LABEL[p] ?? p)}
+                    {labels.periods[p] ?? p}
                   </option>
+
                 ))}
               </select>
+
             </label>
+
           )}
 
           {showRefreshAction && (
@@ -82,13 +73,14 @@ export const AnalyticsLayout = ({
               size="sm"
               onClick={onRefresh}
               disabled={loading}
-              aria-label={t(ANALYTICS_KEYS.common.refresh)}
+              aria-label={labels.refresh}
             >
               <RefreshCw
                 className={cn("udb-analytics__action-icon", loading && "udb-spin")}
                 aria-hidden="true"
               />
             </Button>
+
           )}
 
           {showExportAction && (
@@ -97,15 +89,18 @@ export const AnalyticsLayout = ({
               size="sm"
               onClick={onExport}
               disabled={loading}
-              aria-label={t(ANALYTICS_KEYS.common.export)}
+              aria-label={labels.export}
             >
               <Download className="udb-analytics__action-icon" aria-hidden="true" />
-              <span>{t(ANALYTICS_KEYS.common.export)}</span>
+              <span>{labels.export}</span>
+
             </Button>
+
           )}
 
           {headerContent}
         </div>
+
       </div>
 
       {loading && (
@@ -115,8 +110,10 @@ export const AnalyticsLayout = ({
           aria-live="polite"
         >
           <Loader2 className="udb-spin udb-analytics__loading-spinner" aria-hidden="true" />
-          <span className="udb-sr-only">{t(ANALYTICS_KEYS.common.loading)}</span>
+          <span className="udb-sr-only">{labels.loading}</span>
+
         </div>
+
       )}
 
       {!loading && visibleMetrics.length > 0 && (
@@ -130,6 +127,7 @@ export const AnalyticsLayout = ({
             <MetricCard key={metric.id} metric={metric} />
           ))}
         </div>
+
       )}
 
       {!loading && charts && charts.length > 0 && (
@@ -143,10 +141,12 @@ export const AnalyticsLayout = ({
             />
           ))}
         </div>
+
       )}
 
       {!loading && children}
     </div>
+
   );
 };
 

@@ -35,7 +35,9 @@ export const AnalyticsCard = ({
         <div className="udb-analytics-card__status" role="status">
           <Loader2 className="udb-spin udb-analytics-card__spinner" aria-hidden="true" />
         </div>
+
       </Card>
+
     );
   }
 
@@ -45,8 +47,11 @@ export const AnalyticsCard = ({
         <div className="udb-analytics-card__status udb-analytics-card__status--error" role="alert">
           <AlertCircle className="udb-analytics-card__error-icon" aria-hidden="true" />
           <p className="udb-analytics-card__error-text">{error}</p>
+
         </div>
+
       </Card>
+
     );
   }
 
@@ -55,8 +60,11 @@ export const AnalyticsCard = ({
       {(title || description) && (
         <CardHeader>
           {title && <CardTitle>{title}</CardTitle>}
+
           {description && <CardDescription>{description}</CardDescription>}
+
         </CardHeader>
+
       )}
       <CardContent>
         {chart && <AnalyticsChart config={chart} />}
@@ -66,10 +74,13 @@ export const AnalyticsCard = ({
               <MetricCard key={metric.id} metric={metric} size="sm" />
             ))}
           </div>
+
         )}
         {children}
       </CardContent>
+
     </Card>
+
   );
 };
 

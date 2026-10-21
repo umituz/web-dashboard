@@ -13,12 +13,16 @@ export function ComparisonScreen({ config, onNext }: ComparisonScreenProps) {
   return (
     <div className="udb-onb-proof">
       {config.title && <h2 className="udb-onb-title">{config.title}</h2>}
+
       <div className="udb-onb-compare">
         <ComparisonColumn heading={labels.withoutUs} items={config.before} tone="negative" />
         <ComparisonColumn heading={labels.withUs} items={config.after} tone="positive" />
       </div>
+
       <PrimaryButton onClick={onNext}>{config.cta ?? labels.continueAction}</PrimaryButton>
+
     </div>
+
   );
 }
 
@@ -33,6 +37,7 @@ function ComparisonColumn({ heading, items, tone }: ComparisonColumnProps) {
   return (
     <div className={`udb-onb-compare__col udb-onb-compare__col--${tone === 'positive' ? 'pos' : 'neg'}`}>
       <h3 className="udb-onb-compare__heading">{heading}</h3>
+
       <ul className="udb-onb-list">
         {items.map((item) => (
           <li key={item} className="udb-onb-compare__item">
@@ -41,9 +46,13 @@ function ComparisonColumn({ heading, items, tone }: ComparisonColumnProps) {
               aria-hidden="true"
             />
             <span>{item}</span>
+
           </li>
+
         ))}
       </ul>
+
     </div>
+
   );
 }

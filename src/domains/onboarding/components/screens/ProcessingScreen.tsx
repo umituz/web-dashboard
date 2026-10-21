@@ -26,6 +26,7 @@ export function ProcessingScreen({ config, onComplete }: ProcessingScreenProps) 
   return (
     <div className="udb-onb-stage">
       {config.title && <h2 className="udb-onb-title">{config.title}</h2>}
+
       <ul className="udb-onb-steps" aria-live="polite">
         {config.steps.map((step, i) => {
           const isDone = i < currentStep;
@@ -41,8 +42,11 @@ export function ProcessingScreen({ config, onComplete }: ProcessingScreenProps) 
             >
               <span className="udb-onb-step__badge">
                 {isDone ? <Check className="udb-onb-icon--sm" /> : <span>{i + 1}</span>}
+
               </span>
+
               <span>{step}</span>
+
               <AnimatePresence>
                 {isActive && (
                   <motion.span
@@ -54,10 +58,14 @@ export function ProcessingScreen({ config, onComplete }: ProcessingScreenProps) 
                   />
                 )}
               </AnimatePresence>
+
             </li>
+
           );
         })}
       </ul>
+
     </div>
+
   );
 }

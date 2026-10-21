@@ -2,22 +2,19 @@ import { useState, useCallback, useEffect } from "react";
 import type { DashboardNotification } from "../types/notification";
 
 export interface UsePageTitleOptions {
-  /** Appended as `title · suffix` (e.g. the product name). */
   suffix?: string;
-  /** Used when the route passes no title (e.g. the home route). */
   fallback?: string;
+  separator?: string;
 }
 
-/** Document title per route — `usePageTitle("Search", { suffix: "Lingora" })`
- *  → "Search · Lingora". Restores nothing on unmount (the next route sets it). */
 export function usePageTitle(title?: string, options: UsePageTitleOptions = {}) {
-  const { suffix, fallback } = options;
+  const { suffix, fallback, separator = "·" } = options;
 
   useEffect(() => {
-    if (title && suffix) document.title = `${title} · ${suffix}`;
+    if (title && suffix) document.title = [title, suffix].join(` ${separator} `);
     else if (title) document.title = title;
     else if (fallback) document.title = fallback;
-  }, [title, suffix, fallback]);
+  }, [title, suffix, fallback, separator]);
 }
 
 export function useNotifications(initialNotifications: DashboardNotification[] = []) {

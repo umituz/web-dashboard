@@ -1,18 +1,25 @@
-export function formatNotificationTime(
+import { formatPattern } from "../../../internal/formatPattern";
+
+export interface RelativeTimeLabels {
+  justNow: string;
+  minutesAgo: string;
+  hoursAgo: string;
+  daysAgo: string;
+}
+
+export function formatRelativeTime(
   createdAt: Date | string | number,
-  t: (key: string, params?: Record<string, unknown>) => string
+  labels: RelativeTimeLabels,
 ): string {
   const date = new Date(createdAt);
   const secs = Math.floor((Date.now() - date.getTime()) / 1000);
 
-  if (secs < 60) return t("dashboard.activityFeed.times.justNow");
-  if (secs < 3600) return t("dashboard.activityFeed.times.minutesAgo", { val: Math.floor(secs / 60) });
-  if (secs < 86400) return t("dashboard.activityFeed.times.hoursAgo", { val: Math.floor(secs / 3600) });
-  return t("dashboard.activityFeed.times.daysAgo", { val: Math.floor(secs / 86400) });
+  if (secs < 60) return labels.justNow;
+  if (secs < 3600) return formatPattern(labels.minutesAgo, { count: Math.floor(secs / 60) });
+  if (secs < 86400) return formatPattern(labels.hoursAgo, { count: Math.floor(secs / 3600) });
+  return formatPattern(labels.daysAgo, { count: Math.floor(secs / 86400) });
 }
 
-/** Exact match by default; `end: false` also matches the path's children
- *  (`/app/courses` stays active on `/app/courses/lesson-1`). */
 export function isPathActive(currentPath: string, targetPath: string, end = true): boolean {
   return currentPath === targetPath || (!end && currentPath.startsWith(targetPath + "/"));
 }
@@ -23,9 +30,6 @@ export interface TitledPath {
   end?: boolean;
 }
 
-/** Most specific active item: an exact match always wins, otherwise the
- *  longest `end: false` prefix parent (`/app/courses` beats `/app` on
- *  `/app/courses/lesson-1`). */
 export function getActiveSidebarItem<T extends TitledPath>(
   pathname: string,
   sidebarGroups: Array<{ items: T[] }>

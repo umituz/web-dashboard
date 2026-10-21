@@ -25,11 +25,4 @@ describe("FilterSelect", () => {
     expect(html).toContain("Closed");
     expect(chosen).toEqual([]);
   });
-
-  it("defaults the reset entry label to All", () => {
-    const html = renderToString(
-      <FilterSelect value="" options={options} ariaLabel="Filter" onChange={() => {}} />,
-    );
-    expect(html).toContain(">All</option>");
-  });
 });

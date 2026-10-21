@@ -1,14 +1,49 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { OnboardingFlow } from './OnboardingFlow';
-import {
-  artOnboardingTemplate,
-  healthOnboardingTemplate,
-  platformOnboardingTemplate,
-  videoOnboardingTemplate,
-} from '../templates';
 import { defaultStorageKey } from '../utils/default-storage-key';
-import type { OnboardingConfig, OnboardingScreen } from '../types';
+import type { OnboardingConfig, OnboardingScreen, OnboardingLabels } from '../types';
+
+const labels: OnboardingLabels = {
+  progressLabel: 'Onboarding progress',
+  continueAction: 'Continue',
+  back: 'Back',
+  skip: 'Skip',
+  loading: 'Loading…',
+  stepOfPattern: 'Step {current} of {total}',
+  countOfPattern: '{current} of {total}',
+  selectAllThatApply: 'Select all that apply',
+  selectOne: 'Select one',
+  pickUpToPattern: 'Pick up to {max}',
+  pickTheOne: 'Pick the one that bothers you most',
+  tailorExperience: 'Tailor the experience to your needs',
+  agree: 'Agree',
+  disagree: 'Disagree',
+  swipeHint: 'Swipe right if you agree, left if you don’t. Or use the arrow keys.',
+  allDone: 'All done — that was easy.',
+  withoutUs: 'Without us',
+  withUs: 'With us',
+  previous: 'Previous',
+  nextAction: 'Next',
+  continueWithResult: 'Continue with my result',
+  allowAccess: 'Allow access',
+  permissionRequestFailed: 'Permission request failed',
+  continueWithEmail: 'Continue with email',
+  continueWithGoogle: 'Continue with Google',
+  continueWithApple: 'Continue with Apple',
+  continueWithGitHub: 'Continue with GitHub',
+  skipForNow: 'Skip for now',
+  signInFailed: 'Sign-in failed',
+  couldNotStartTrial: 'Could not start trial',
+  trialDaysPattern: '{count}-day free trial',
+  trialIntroPattern: '{price} for the first {days} days',
+  cancelAnytimeNote: 'Cancel anytime. No hidden fees.',
+  share: 'Share',
+  copied: 'Copied!',
+  somethingWentWrong: 'Something went wrong',
+  unexpectedError: 'An unexpected error occurred during onboarding.',
+  tryAgain: 'Try again',
+};
 
 const paywall: OnboardingScreen = {
   id: 'pay',
@@ -42,6 +77,7 @@ const welcome: OnboardingScreen = {
 const minimalConfig = (overrides: Partial<OnboardingConfig> = {}): OnboardingConfig => ({
   category: 'health',
   screens: [welcome, accountGate, paywall],
+  labels,
   ...overrides,
 });
 
@@ -193,10 +229,13 @@ describe('OnboardingFlow — validation & error boundary', () => {
       renderError: (err: Error, retry: () => void) => (
         <div>
           <p>Custom handler: {err.message}</p>
+
           <button type="button" onClick={retry}>
             Retry anyway
           </button>
+
         </div>
+
       ),
     });
     fireEvent.click(screen.getByRole('button', { name: 'Get started' }));
@@ -226,10 +265,10 @@ describe('OnboardingFlow — persistence', () => {
 });
 
 describe('OnboardingFlow — labels & locale', () => {
-  it('overrides default labels via config.labels', () => {
+  it('renders the supplied labels verbatim', () => {
     renderFlow(
       minimalConfig({
-        labels: { back: 'Geri', skip: 'Atla' },
+        labels: { ...labels, back: 'Geri', skip: 'Atla' },
         onSkip: () => undefined,
       }),
     );
@@ -437,23 +476,5 @@ describe('processing screen — auto-advance', () => {
     } finally {
       vi.useRealTimers();
     }
-  });
-});
-
-describe('templates — mount regression (§19)', () => {
-  const cases: Array<[string, OnboardingConfig]> = [
-    ['health', healthOnboardingTemplate],
-    ['art', artOnboardingTemplate],
-    ['video', videoOnboardingTemplate],
-    ['platform', platformOnboardingTemplate],
-  ];
-
-  it.each(cases)('%s template renders its first screen without crashing', (name, template) => {
-    expect(() =>
-      render(<OnboardingFlow config={{ ...template, storageKey: `tpl:${name}` }} ephemeral />),
-    ).not.toThrow();
-    expect(
-      screen.getByText(new RegExp(`Step 1 of ${template.screens.length}`)),
-    ).toBeTruthy();
   });
 });

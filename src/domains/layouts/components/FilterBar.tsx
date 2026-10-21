@@ -1,8 +1,3 @@
-/**
- * FilterBar Component (Layout)
- * @description Horizontal filter strip: search box + chip row + trailing actions
- */
-
 import type { ReactNode } from "react";
 import { SearchBox } from "@umituz/web-design-system/molecules";
 import { cn } from "@umituz/web-design-system/utils/cn";
@@ -16,10 +11,8 @@ export interface FilterBarSearch {
 
 export interface FilterBarProps extends BaseProps {
   search?: FilterBarSearch;
-  /** Chip row / selects — anything that filters the page content. */
-  children?: ReactNode;
-  /** Trailing controls (sort, primary buttons…). */
-  actions?: ReactNode;
+    children?: ReactNode;
+    actions?: ReactNode;
 }
 
 export const FilterBar = ({ search, children, actions, className, ...props }: FilterBarProps) => {
@@ -34,8 +27,11 @@ export const FilterBar = ({ search, children, actions, className, ...props }: Fi
         />
       )}
       {children && <div className="udb-filter-bar__fields">{children}</div>}
+
       {actions && <div className="udb-filter-bar__actions">{actions}</div>}
+
     </div>
+
   );
 };
 

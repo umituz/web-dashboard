@@ -16,6 +16,7 @@ export function AppDemoScreen({ config, onNext }: AppDemoScreenProps) {
   return (
     <div className="udb-onb-proof">
       {config.title && <h2 className="udb-onb-title">{config.title}</h2>}
+
       <div className="udb-onb-demo">
         <Demo
           {...((config.demo.props ?? {}) as Record<string, unknown>)}
@@ -25,9 +26,12 @@ export function AppDemoScreen({ config, onNext }: AppDemoScreenProps) {
           }}
         />
       </div>
+
       <PrimaryButton onClick={() => onNext({ result })} disabled={result === null}>
         {config.cta ?? labels.continueWithResult}
       </PrimaryButton>
+
     </div>
+
   );
 }

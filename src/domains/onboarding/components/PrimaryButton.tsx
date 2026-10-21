@@ -31,10 +31,13 @@ export function PrimaryButton({
         <>
           <Spinner size="sm" />
           <span>{labels.loading}</span>
+
         </>
+
       ) : (
         children
       )}
     </Button>
+
   );
 }

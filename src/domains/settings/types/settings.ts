@@ -9,7 +9,7 @@ export interface SettingsItem {
     onClick?: () => void;
     enabled?: boolean;
     permission?: string;
-    badge?: number;
+    badge?: string | number;
 }
 
 export interface SettingsSection {
@@ -36,4 +36,10 @@ export interface SettingsSectionProps {
     currentPath?: string;
     onNavigate?: (path: string) => void;
     collapsed?: boolean;
+}
+
+export interface SettingsLayoutLabels {
+  openSidebar: string;
+  toggleSidebar: string;
+  openMobileMenu: string;
 }

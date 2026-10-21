@@ -113,8 +113,7 @@ export function useAnalytics(options: UseAnalyticsOptions): UseAnalyticsReturn {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       } catch (err) {
-        // Surface through the same error state as fetch failures and re-throw
-        // so callers that trigger the export programmatically can react.
+
         setError(toErrorMessage(err, 'Failed to export analytics'));
         throw toError(err, 'Failed to export analytics');
       }
@@ -149,11 +148,6 @@ export function useAnalytics(options: UseAnalyticsOptions): UseAnalyticsReturn {
   );
 }
 
-/**
- * Convenience factory: returns a stub client that throws. Useful
- * in Storybook / tests; the consumer must wire a real client
- * before the hook is useful in production.
- */
 export const createStubAnalyticsApiClient = (
   overrides?: Partial<AnalyticsApiClient>,
 ): AnalyticsApiClient => {

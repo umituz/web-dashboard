@@ -3,7 +3,26 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router";
 import { Home } from "lucide-react";
 import { DashboardLayout } from "./DashboardLayout";
-import type { DashboardLayoutConfig } from "../types/layout";
+import type { DashboardLayoutConfig, DashboardLayoutLabels } from "../types/layout";
+
+const labels: DashboardLayoutLabels = {
+  skipToContent: "Skip to content",
+  navigation: "Navigation",
+  searchResults: "Search results",
+  header: {
+    switchToLight: "Switch to light",
+    switchToDark: "Switch to dark",
+    notificationsTitle: "Notifications",
+    markAllRead: "Mark all read",
+    dismissNotification: "Dismiss",
+    noNotifications: "No notifications",
+    profile: "Profile",
+    settings: "Settings",
+    logout: "Log out",
+    guestName: "Guest",
+  },
+  sidebar: { system: "System" },
+};
 
 const config: DashboardLayoutConfig = {
   sidebarGroups: [
@@ -16,15 +35,16 @@ const config: DashboardLayoutConfig = {
   defaultTitle: "Workspace",
 };
 
-function renderAt(path: string, mainId?: string, configOverride?: DashboardLayoutConfig) {
+function renderAt(path: string, overrides: { config?: DashboardLayoutConfig; mainId?: string } = {}) {
+  const { config: cfg = config, mainId } = overrides;
   return render(
     <MemoryRouter initialEntries={[path]}>
       <Routes>
         <Route
           path="*"
           element={
-            <DashboardLayout config={configOverride ?? config} mainId={mainId}>
-              {/* children are ignored — the layout renders an Outlet */}
+            <DashboardLayout config={cfg} labels={labels} mainId={mainId}>
+              {}
             </DashboardLayout>
           }
         >
@@ -44,7 +64,7 @@ describe("DashboardLayout (shell a11y)", () => {
   });
 
   it("honours a custom mainId on both the link and the landmark", () => {
-    renderAt("/", "main-content");
+    renderAt("/", { mainId: "main-content" });
     expect(screen.getByRole("link", { name: /skip to content/i }).getAttribute("href")).toBe("#main-content");
     expect(document.getElementById("main-content")).not.toBeNull();
   });
@@ -67,14 +87,14 @@ describe("DashboardLayout (command palette)", () => {
   });
 
   it("renders the palette's search button in the header and opens it on click", async () => {
-    renderAt("/", undefined, paletteConfig());
+    renderAt("/", { config: paletteConfig() });
     fireEvent.click(screen.getByRole("button", { name: /search commands/i }));
     expect(await screen.findByRole("dialog")).toBeTruthy();
     expect(await screen.findByRole("option", { name: "Home" })).toBeTruthy();
   });
 
   it("toggles the palette with ⌘K / Ctrl+K", async () => {
-    renderAt("/", undefined, paletteConfig());
+    renderAt("/", { config: paletteConfig() });
     expect(screen.queryByRole("dialog")).toBeNull();
     fireEvent.keyDown(window, { key: "k", metaKey: true });
     expect(await screen.findByRole("dialog")).toBeTruthy();
@@ -83,42 +103,40 @@ describe("DashboardLayout (command palette)", () => {
   });
 
   it("does not bind the shortcut when shortcut: false", () => {
-    renderAt("/", undefined, {
-      ...config,
-      commandPalette: { groups: [], shortcut: false },
-    });
+    renderAt("/", { config: { ...config, commandPalette: { groups: [], shortcut: false } } });
     fireEvent.keyDown(window, { key: "k", ctrlKey: true });
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
   it("keeps an explicit searchAction.onActivate over the palette takeover", () => {
     const onActivate = vi.fn();
-    renderAt("/", undefined, paletteConfig({ searchAction: { placeholder: "Go search", onActivate } }));
+    renderAt("/", { config: paletteConfig({ searchAction: { placeholder: "Go search", onActivate } }) });
     fireEvent.click(screen.getByRole("button", { name: /go search/i }));
     expect(onActivate).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole("dialog")).toBeNull();
   });
 
   it("derives navigation groups from the sidebar when includeSidebar is set", async () => {
-    renderAt("/", undefined, {
-      ...config,
-      commandPalette: {
-        includeSidebar: true,
-        groups: [{ heading: "Quick", items: [{ id: "q", label: "Quick action", onSelect: () => {} }] }],
+    renderAt("/", {
+      config: {
+        ...config,
+        commandPalette: {
+          includeSidebar: true,
+          groups: [{ heading: "Quick", items: [{ id: "q", label: "Quick action", onSelect: () => {} }] }],
+        },
       },
     });
     fireEvent.keyDown(window, { key: "k", metaKey: true });
     expect(await screen.findByRole("option", { name: "Quick action" })).toBeTruthy();
-    // The custom group has no "Home" — the one present is derived from the sidebar,
-    // carrying the path as its hint (accessible name "Home /").
+
     const derived = screen.getByRole("option", { name: /home/i });
     expect(derived.textContent).toContain("/");
   });
 
   it("omits sidebar-derived items from the palette by default", async () => {
-    renderAt("/", undefined, paletteConfig());
+    renderAt("/", { config: paletteConfig() });
     fireEvent.keyDown(window, { key: "k", metaKey: true });
-    // Only the palette's own "Home" (no path hint) — nothing derived from the sidebar.
+
     const own = await screen.findByRole("option", { name: "Home" });
     expect(own.textContent).toBe("Home");
   });

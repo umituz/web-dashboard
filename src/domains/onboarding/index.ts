@@ -5,7 +5,6 @@ export {
   OnboardingIntlProvider,
   OnboardingIntlContext,
   useOnboardingIntl,
-  defaultOnboardingLabels,
   formatLabel,
 } from './components/OnboardingIntl';
 export type { OnboardingIntl, OnboardingIntlProviderProps } from './components/OnboardingIntl';
@@ -53,17 +52,6 @@ export type {
   UsePermissionPrimingReturn,
   UseOnboardingAnalyticsReturn,
 } from './hooks';
-
-export {
-  healthOnboardingTemplate,
-  artOnboardingTemplate,
-  videoOnboardingTemplate,
-  platformOnboardingTemplate,
-  withDefaultDemo,
-  defaultDemoResult,
-  TemplateDemoFallback,
-} from './templates';
-export type { TemplateDemoResult } from './templates';
 
 export {
   computeProgressFraction,

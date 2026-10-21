@@ -6,16 +6,21 @@ export function ChartTip({ tip }: { tip: TipState }) {
   return (
     <div className="udb-charttip" style={{ left: tip.x, top: tip.y }}>
       <div className="udb-charttip__title">{tip.title}</div>
+
       {tip.rows.map((r, i) => (
         <div key={i} className="udb-charttip__row">
           <span className="udb-charttip__label">
             {r.color && <span className="udb-chartlegend__dot" style={{ background: r.color }} />}
             {r.label}
           </span>
+
           <b>{r.value}</b>
+
         </div>
+
       ))}
     </div>
+
   );
 }
 
@@ -37,20 +42,28 @@ export function ChartCard({ title, subtitle, legend, actions, children, tip, hos
       <div className="udb-chartcard__head">
         <div className="udb-chartcard__heading">
           <div className="udb-chartcard__title">{title}</div>
+
           {subtitle && <div className="udb-chartcard__sub">{subtitle}</div>}
+
         </div>
+
         <div className="udb-chartcard__tools">
           {legend}
           {actions}
         </div>
+
       </div>
+
       <div className="udb-chartcard__body" style={bare ? { padding: 0 } : undefined}>
         <div ref={hostRef} className="udb-chartcard__plot" onMouseLeave={onMouseLeave}>
           {children}
           {tip && <ChartTip tip={tip} />}
         </div>
+
       </div>
+
     </div>
+
   );
 }
 
@@ -69,10 +82,14 @@ export function Legend({ items }: { items: LegendItem[] }) {
           <span className="udb-chartlegend__dot" style={{ background: i.color }} />
           {i.label}
           {i.value && <span className="udb-chartlegend__value">{i.value}</span>}
+
           {i.hint && <span className="udb-chartlegend__hint">{i.hint}</span>}
+
         </span>
+
       ))}
     </div>
+
   );
 }
 
@@ -102,11 +119,14 @@ export function Sparkline({
           <stop offset="0%" stopColor={color} stopOpacity="0.28" />
           <stop offset="100%" stopColor={color} stopOpacity="0" />
         </linearGradient>
+
       </defs>
+
       <path d={area} fill={`url(#sp${id})`} />
       <path d={line} fill="none" stroke={color} strokeWidth="1.6" strokeLinejoin="round" strokeLinecap="round" />
       <circle cx={pts.at(-1)![0]} cy={pts.at(-1)![1]} r="2.4" fill={color} />
     </svg>
+
   );
 }
 
@@ -125,18 +145,25 @@ export function HBars({ rows, formatValue = (n: number) => String(n) }: { rows: 
         <div key={i} className="udb-hbars__row">
           <div className="udb-hbars__label">
             <div className="udb-hbars__name">{r.label}</div>
+
             {r.sub && <div className="udb-hbars__sub">{r.sub}</div>}
+
           </div>
+
           <div className="udb-hbars__track">
             <div
               className="udb-hbars__fill"
               style={{ width: `${(r.value / max) * 100}%`, ...(r.tone ? { background: r.tone } : {}) }}
             />
           </div>
+
           <span className="udb-hbars__value">{formatValue(r.value)}</span>
+
         </div>
+
       ))}
     </div>
+
   );
 }
 
@@ -198,8 +225,10 @@ export function BarChart({
             >
               {goalLine.label}
             </span>
+
           )}
         </div>
+
       )}
       {labels.map((label, i) => (
         <div
@@ -221,23 +250,31 @@ export function BarChart({
               />
             ))}
           </div>
+
           {hover === i && (
             <div className="udb-barchart__tip">
               <div className="udb-barchart__tiptitle">{formatLabel(label)}</div>
+
               {series.map((s, si) => (
                 <div key={s.key ?? s.label} className="udb-barchart__tiprow">
                   <span className="udb-barchart__tiplabel">
                     <span className="udb-chartlegend__dot" style={{ background: toneOf(s, si) }} />
                     {s.label}
                   </span>
+
                   <b>{formatValue(vals(s)[i] ?? 0)}</b>
+
                 </div>
+
               ))}
             </div>
+
           )}
         </div>
+
       ))}
     </div>
+
   );
 }
 
@@ -304,13 +341,18 @@ export function Donut({
             return el;
           })}
         </svg>
+
         <div className="udb-donut__center">
           <span className="udb-donut__value">
             {active !== null ? formatValue(segments[active]!.value) : centerValue}
           </span>
+
           <span className="udb-donut__label">{active !== null ? segments[active]!.label : centerLabel}</span>
+
         </div>
+
       </div>
+
       <div className="udb-donut__list">
         {segments.map((seg, i) => (
           <div
@@ -323,14 +365,20 @@ export function Donut({
               <span className="udb-donut__dot" style={{ background: seg.tone ?? seg.color ?? PALETTE[i % PALETTE.length]! }} />
               {seg.label}
             </span>
+
             <span className="udb-donut__itemvalue">
               {formatValue(seg.value)}
               <span className="udb-donut__pct">{Math.round((seg.value / total) * 100)}%</span>
+
             </span>
+
           </div>
+
         ))}
       </div>
+
     </div>
+
   );
 }
 
@@ -425,7 +473,9 @@ export function LineChart({
             <text x={padLeft - 6} y={yLeft(v) + 3} textAnchor="end" className="udb-linechart__axis">
               {fmtLeft(v)}
             </text>
+
           </g>
+
         ))}
         {series.some((s) => s.axis === 'right') && (
           <g>
@@ -433,14 +483,17 @@ export function LineChart({
               <text key={i} x={w - padRight + 6} y={yLeft(v) + 3} textAnchor="start" className="udb-linechart__axis">
                 {fmtRight((v / leftMax) * rightMax)}
               </text>
+
             ))}
           </g>
+
         )}
         {pts.map((p, i) =>
           i % labelEvery === 0 ? (
             <text key={i} x={xAt(i)} y={height - 8} textAnchor="middle" className="udb-linechart__axis">
               {p.label}
             </text>
+
           ) : null,
         )}
         {series.map((s, si) => {
@@ -462,6 +515,7 @@ export function LineChart({
                   />
                 ))}
               </g>
+
             );
           }
           const path = vals(s)
@@ -493,6 +547,7 @@ export function LineChart({
                 />
               ))}
             </g>
+
           );
         })}
         {hover !== null && (
@@ -508,13 +563,16 @@ export function LineChart({
           <text x={4} y={10} className="udb-linechart__axis">
             {yLabelLeft}
           </text>
+
         )}
         {yLabelRight && (
           <text x={w - 4} y={10} textAnchor="end" className="udb-linechart__axis">
             {yLabelRight}
           </text>
+
         )}
       </svg>
+
       {hover !== null && (
         <div
           className="udb-linechart__tip"
@@ -524,20 +582,27 @@ export function LineChart({
           }}
         >
           <div className="udb-linechart__tiptitle">{pts[hover]!.label}</div>
+
           {series.map((s, si) => (
             <div key={s.key ?? s.label} className="udb-linechart__tiprow">
               <span>
                 <span className="udb-linechart__swatch" style={{ background: toneOf(s, si) }} />
                 {s.label}
               </span>
+
               <b>{(s.axis === 'right' ? fmtRight : fmtLeft)(vals(s)[hover] ?? 0)}</b>
+
             </div>
+
           ))}
         </div>
+
       )}
       <div className="udb-linechart__legendhost">
         <Legend items={series.map((s, si) => ({ label: s.label, color: toneOf(s, si) }))} />
       </div>
+
     </div>
+
   );
 }

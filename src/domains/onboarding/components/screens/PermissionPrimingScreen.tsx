@@ -72,27 +72,37 @@ export function PermissionPrimingScreen({ config, onNext, analytics }: Permissio
         <div className="udb-onb-hero udb-onb-hero--lg" aria-hidden="true">
           {renderBundledIcon(iconName, 'udb-onb-icon--lg')}
         </div>
+
       )}
       <div className="udb-onb-question__head">
         <h2 className="udb-onb-title">{config.title}</h2>
+
         <p className="udb-onb-lead">{config.description}</p>
+
       </div>
+
       <ul className="udb-onb-list">
         {config.benefits.map((benefit) => (
           <li key={benefit} className="udb-onb-benefit">
             <span className="udb-onb-benefit__dot" />
             <span>{benefit}</span>
+
           </li>
+
         ))}
       </ul>
+
       {error && (
         <p role="alert" className="udb-onb-error">
           {error}
         </p>
+
       )}
       <PrimaryButton onClick={handleRequest} loading={isRequesting}>
         {isPermissionGranted(status) ? labels.continueAction : config.cta ?? labels.allowAccess}
       </PrimaryButton>
+
     </div>
+
   );
 }

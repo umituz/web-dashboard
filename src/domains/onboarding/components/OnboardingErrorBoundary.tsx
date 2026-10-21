@@ -42,6 +42,7 @@ export class OnboardingErrorBoundary extends Component<
 
     if (!error) {
       return <Fragment key={attempt}>{this.props.children}</Fragment>;
+
     }
 
     if (this.props.renderError) return this.props.renderError(error, this.retry);
@@ -52,10 +53,15 @@ export class OnboardingErrorBoundary extends Component<
         <div className="udb-onb-errorpage__icon" aria-hidden="true">
           <AlertTriangle className="udb-onb-icon--lg" />
         </div>
+
         <h2 className="udb-onb-title">{labels.somethingWentWrong}</h2>
+
         <p className="udb-onb-lead">{error.message || labels.unexpectedError}</p>
+
         <PrimaryButton onClick={this.retry}>{labels.tryAgain}</PrimaryButton>
+
       </div>
+
     );
   }
 }

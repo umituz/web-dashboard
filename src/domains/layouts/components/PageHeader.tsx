@@ -11,8 +11,7 @@ export interface PageHeaderProps {
   title?: ReactNode;
   subtitle?: ReactNode;
   description?: ReactNode;
-  /** Small facts row (dates, counts, IDs…) under the title block. */
-  meta?: ReactNode;
+    meta?: ReactNode;
   breadcrumbs?: ReactNode | readonly PageHeaderCrumb[];
   actions?: ReactNode;
   className?: string;
@@ -38,21 +37,31 @@ export const PageHeader = ({
         ? breadcrumbs.map((crumb, index) => (
             <span key={`${crumb.label}-${index}`} className="udb-pageheader__crumb">
               {crumb.to !== undefined ? <Link to={crumb.to}>{crumb.label}</Link> : crumb.label}
+
             </span>
+
           ))
         : breadcrumbs;
   return (
     <div className={`udb-pageheader${className ? ` ${className}` : ""}`}>
       {crumbNode !== undefined && <div className="udb-pageheader__breadcrumbs">{crumbNode}</div>}
+
       <div className="udb-pageheader__main">
         {kicker !== undefined && <p className="udb-pageheader__kicker">{kicker}</p>}
+
         {title !== undefined && <h1 className="udb-pageheader__title">{title}</h1>}
+
         {(subtitle ?? description) !== undefined && (
           <p className="udb-pageheader__subtitle">{subtitle ?? description}</p>
+
         )}
         {meta !== undefined && <div className="udb-pageheader__meta">{meta}</div>}
+
       </div>
+
       {actions !== undefined && <div className="udb-pageheader__actions">{actions}</div>}
+
     </div>
+
   );
 };

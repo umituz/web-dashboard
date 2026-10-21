@@ -1,7 +1,7 @@
 {
   "name": "@umituz/web-dashboard",
   "version": "6.11.0",
-  "description": "Installable app skeleton for the fleet — layouts, analytics (dependency-free SVG charts), calendar, onboarding flow, i18n via @umituz/web-localization, permissions/module registry; udb-* stylesheet on design-system tokens",
+  "description": "Installable app skeleton for the fleet — layouts, analytics (dependency-free SVG charts), calendar, onboarding flow permissions/module registry; udb-* stylesheet on design-system tokens",
   "type": "module",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
@@ -70,7 +70,6 @@
     }
   },
   "dependencies": {
-    "@umituz/web-localization": "^1.2.1",
     "lucide-react": "^0.577.0"
   },
   "devDependencies": {

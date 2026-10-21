@@ -1,6 +1,4 @@
 import { DataTable, type Column } from "@umituz/web-design-system/organisms";
-import { useT } from "@umituz/web-localization/react";
-import { SETTINGS_ADMIN_KEYS } from "../utils/i18nKeys";
 import type { RoleKey, RoleInfo } from "../../permissions/types";
 
 export interface ManagedUser {
@@ -11,39 +9,48 @@ export interface ManagedUser {
   status?: string;
 }
 
+export interface UserManagementTableLabels {
+  nameColumn: string;
+  emailColumn: string;
+  roleColumn: string;
+  empty: string;
+}
+
 export interface UserManagementTableProps {
   users: ManagedUser[];
   roles: RoleInfo[];
+  labels: UserManagementTableLabels;
   onRoleChange?: (userId: string, role: RoleKey) => void;
 }
 
 export const UserManagementTable = ({
   users,
   roles,
+  labels,
   onRoleChange,
 }: UserManagementTableProps) => {
-  const t = useT();
-
   const columns: Column<ManagedUser>[] = [
-    { id: "name", header: t("settings.users.columns.name"), accessor: "name" },
-    { id: "email", header: t("settings.users.columns.email"), accessor: "email" },
+    { id: "name", header: labels.nameColumn, accessor: "name" },
+    { id: "email", header: labels.emailColumn, accessor: "email" },
     {
       id: "role",
-      header: t("settings.users.columns.role"),
+      header: labels.roleColumn,
       accessor: (user) =>
         onRoleChange ? (
           <select
             className="udb-period-select__select"
             value={user.role}
-            aria-label={t("settings.users.columns.role")}
+            aria-label={labels.roleColumn}
             onChange={(e) => onRoleChange(user.id, e.target.value as RoleKey)}
           >
             {roles.map((role) => (
               <option key={role.key} value={role.key}>
                 {role.label}
               </option>
+
             ))}
           </select>
+
         ) : (
           roles.find((role) => role.key === user.role)?.label ?? user.role
         ),
@@ -54,7 +61,7 @@ export const UserManagementTable = ({
     <DataTable
       data={users}
       columns={columns}
-      emptyState={{ title: t(SETTINGS_ADMIN_KEYS.users.empty) }}
+      emptyState={{ title: labels.empty }}
     />
   );
 };

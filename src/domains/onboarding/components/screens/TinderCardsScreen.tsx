@@ -46,16 +46,20 @@ export function TinderCardsScreen({ config, onNext }: TinderCardsScreenProps) {
     return (
       <div className="udb-onb-stage">
         <p className="udb-onb-lead">{labels.allDone}</p>
+
         <PrimaryButton onClick={() => onNext({ liked: likedRef.current })}>
           {config.cta ?? labels.continueAction}
         </PrimaryButton>
+
       </div>
+
     );
   }
 
   return (
     <div className="udb-onb-proof">
       {config.title && <h2 className="udb-onb-title">{config.title}</h2>}
+
       <div className="udb-onb-proof__stage">
         <AnimatePresence mode="wait">
           <motion.div
@@ -73,19 +77,27 @@ export function TinderCardsScreen({ config, onNext }: TinderCardsScreenProps) {
               onSwipeRight={onSwipeRight}
             />
           </motion.div>
+
         </AnimatePresence>
+
       </div>
+
       <div className="udb-onb-proof__nav">
         <button type="button" onClick={onSwipeLeft} className="udb-onb-choice udb-onb-choice--no">
           {labels.disagree}
         </button>
+
         <button type="button" onClick={onSwipeRight} className="udb-onb-choice udb-onb-choice--yes">
           {labels.agree}
         </button>
+
       </div>
+
       <p className="udb-onb-note" aria-live="polite">
         {formatLabel(labels.countOfPattern, { current: index + 1, total })}
       </p>
+
     </div>
+
   );
 }

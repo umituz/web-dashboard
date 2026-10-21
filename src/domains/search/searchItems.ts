@@ -6,9 +6,6 @@ export interface SearchHit {
   to: string;
 }
 
-/** Case-insensitive substring scoring across a haystack of fields.
- *  Title matches weigh 3×; every additional field hit adds 1. Empty
- *  queries return no hits. Results are sorted by descending score. */
 export function searchItems<T extends object>(
   items: readonly T[],
   query: string,

@@ -29,7 +29,7 @@ describe('searchItems', () => {
   });
 
   it('ranks title matches above body-only matches', () => {
-    // "present" is in c1's title and c3's blurb — title wins.
+
     const hits = searchItems(COURSES, 'present', toHit);
     expect(hits[0]?.id).toBe('c1');
     expect(hits).toHaveLength(2);

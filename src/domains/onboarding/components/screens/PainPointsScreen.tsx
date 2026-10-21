@@ -57,9 +57,12 @@ export function PainPointsScreen({ config, onNext, initialSelected }: PainPoints
           />
         ))}
       </div>
+
       <PrimaryButton onClick={() => onNext({ selected })} disabled={selected.length === 0}>
         {config.cta ?? labels.continueAction}
       </PrimaryButton>
+
     </QuestionWrapper>
+
   );
 }

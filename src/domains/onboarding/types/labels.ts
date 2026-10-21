@@ -1,4 +1,5 @@
 export interface OnboardingLabels {
+    progressLabel: string;
     continueAction: string;
     back: string;
     skip: string;

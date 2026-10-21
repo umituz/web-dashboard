@@ -40,7 +40,7 @@ export interface OnboardingConfig {
   demo?: DemoConfig;
   paywall?: PaywallScreenConfig;
   analytics?: AnalyticsConfig;
-    labels?: Partial<OnboardingLabels>;
+    labels: OnboardingLabels;
     locale?: string;
     headerSlot?: ReactNode;
     footerSlot?: ReactNode;

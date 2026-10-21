@@ -81,10 +81,6 @@ export const createInMemoryCalendarDatabase = (): ICalendarDatabase => {
   };
 };
 
-/**
- * Apply a CalendarFilter to a list of items.
- * Single source of truth for filtering, shared between hook and service.
- */
 const applyCalendarFilter = (items: ContentItem[], filter?: CalendarFilter): ContentItem[] => {
   if (!filter) return items;
 
@@ -123,12 +119,6 @@ const applyCalendarFilter = (items: ContentItem[], filter?: CalendarFilter): Con
   });
 };
 
-/**
- * Calendar Service Implementation
- *
- * Provides CRUD operations for calendar content items
- * Uses database interface for backend abstraction
- */
 export class CalendarService implements ICalendarService {
   private database: ICalendarDatabase;
 
@@ -136,17 +126,11 @@ export class CalendarService implements ICalendarService {
     this.database = database;
   }
 
-  /**
-   * Set database implementation (for testing or custom backends)
-   */
-  setDatabase(database: ICalendarDatabase): void {
+    setDatabase(database: ICalendarDatabase): void {
     this.database = database;
   }
 
-  /**
-   * Get all content items for a user, with optional filter
-   */
-  async getContentItems(userId: string, filter?: CalendarFilter): Promise<ContentItem[]> {
+    async getContentItems(userId: string, filter?: CalendarFilter): Promise<ContentItem[]> {
     const items = await this.database.getItems(userId);
     return applyCalendarFilter(items, filter);
   }
@@ -174,13 +158,6 @@ export class CalendarService implements ICalendarService {
   }
 }
 
-/**
- * Default singleton instance (in-memory — swap the backend via
- * `setDatabase` or construct your own `CalendarService`).
- */
 export const calendarService = new CalendarService();
 
-/**
- * Exported for testing/extension.
- */
 export { applyCalendarFilter };

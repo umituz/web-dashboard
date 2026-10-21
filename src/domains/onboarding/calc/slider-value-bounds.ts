@@ -22,7 +22,7 @@ export function clampValueToBounds(
   preferenceId: string,
 ): number {
   if (!areSliderBoundsValid(min, max)) {
-         
+
     console.error(
       `[web-onboarding] preference "${preferenceId}" has min > max (${min} > ${max}); returning value as-is.`,
     );

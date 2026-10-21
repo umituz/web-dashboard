@@ -1,17 +1,17 @@
 import { useState, useEffect, useRef, type ReactNode } from "react";
 import { useLocation, useNavigate, Outlet, Navigate } from "react-router";
-import { useT } from "@umituz/web-localization/react";
 import { Skeleton } from "@umituz/web-design-system/atoms";
 import { CommandPalette, type CommandGroup, type CommandItem } from "@umituz/web-design-system/organisms";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
 import { getActiveSidebarItem } from "../utils/dashboard";
-import type { DashboardLayoutConfig } from "../types/layout";
+import type { DashboardLayoutConfig, DashboardLayoutLabels } from "../types/layout";
 import type { DashboardNotification } from "../types/notification";
 import type { DashboardUser } from "../types/user";
 
 interface DashboardLayoutProps {
   config: DashboardLayoutConfig;
+  labels: DashboardLayoutLabels;
   user?: DashboardUser;
   authLoading?: boolean;
   isAuthenticated?: boolean;
@@ -23,14 +23,10 @@ interface DashboardLayoutProps {
   theme?: "light" | "dark";
   onToggleTheme?: () => void;
   routeTransitionMs?: number;
-  /** Persists the sidebar collapse state under this localStorage key ('1'/'0'). */
   collapsedStorageKey?: string;
-  /** Optional page footer rendered under the outlet column. */
   footer?: ReactNode;
-  /** id of the main landmark — also the skip-link target. */
   mainId?: string;
-  /** Skip-link label (a11y); defaults to the localized "Skip to content". */
-  skipToContentLabel?: string;
+  formatNotificationTime?: (createdAt: Date | string | number) => string;
 }
 
 const readCollapsed = (key?: string): boolean => {
@@ -44,6 +40,7 @@ const readCollapsed = (key?: string): boolean => {
 
 export const DashboardLayout = ({
   config,
+  labels,
   user,
   authLoading = false,
   isAuthenticated = true,
@@ -58,11 +55,10 @@ export const DashboardLayout = ({
   collapsedStorageKey,
   footer,
   mainId = "udb-main",
-  skipToContentLabel,
+  formatNotificationTime,
 }: DashboardLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const t = useT();
   const [collapsed, setCollapsed] = useState(() => readCollapsed(collapsedStorageKey));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loading, setLoading] = useState(routeTransitionMs > 0);
@@ -78,7 +74,6 @@ export const DashboardLayout = ({
     try {
       window.localStorage.setItem(collapsedStorageKey, collapsed ? "1" : "0");
     } catch {
-      /* storage unavailable — state stays in-memory only */
     }
   }, [collapsed, collapsedStorageKey]);
 
@@ -153,22 +148,15 @@ export const DashboardLayout = ({
 
   const activeItem = getActiveSidebarItem(location.pathname, config.sidebarGroups);
 
-  const getTitle = () => {
-    if (activeItem) return activeItem.raw ? activeItem.label : t(activeItem.label);
-    const extraTitle = config.extraTitleMap?.[location.pathname];
-    if (extraTitle) return t(extraTitle);
-    return config.defaultTitle ?? "Dashboard";
-  };
-
-  const currentTitle = getTitle();
+  const currentTitle =
+    (activeItem?.label ?? config.extraTitleMap?.[location.pathname] ?? config.defaultTitle) || "";
 
   const searchGroup: CommandGroup | null =
     paletteSearch && searchItems.length > 0
-      ? { heading: palette?.searchResultsHeading ?? t("Search results"), items: searchItems }
+      ? { heading: palette?.searchResultsHeading ?? labels.searchResults, items: searchItems }
       : null;
   const basePaletteGroups = searchGroup ? [searchGroup, ...(palette?.groups ?? [])] : (palette?.groups ?? []);
 
-  // Sidebar-derived navigation groups — one nav definition feeds both chrome surfaces.
   const paletteGroups = palette?.includeSidebar
     ? [
         ...basePaletteGroups,
@@ -176,7 +164,7 @@ export const DashboardLayout = ({
           heading: group.title,
           items: group.items.map((item) => ({
             id: `nav-${item.path}`,
-            label: item.raw ? item.label : t(item.label),
+            label: item.label,
             icon: <item.icon size={16} aria-hidden="true" />,
             hint: item.path,
             onSelect: () => navigate(item.path),
@@ -193,12 +181,13 @@ export const DashboardLayout = ({
     sidebarAction: config.sidebarAction,
     sidebarFooter: config.sidebarFooter,
     user,
+    labels: config.sidebarLabels ?? labels.sidebar,
   };
 
   return (
     <div className="udb-root udb-layout">
       <a href={`#${mainId}`} className="udb-skip-link">
-        {skipToContentLabel ?? t("Skip to content")}
+        {labels.skipToContent}
       </a>
 
       <aside
@@ -218,7 +207,7 @@ export const DashboardLayout = ({
             className="udb-layout__mobile-sidebar"
             role="dialog"
             aria-modal="true"
-            aria-label={config.brandName ? `${config.brandName} — ${t("Navigation")}` : t("Navigation")}
+            aria-label={config.brandName ? `${config.brandName} — ${labels.navigation}` : labels.navigation}
           >
             <DashboardSidebar
               collapsed={false}
@@ -226,7 +215,9 @@ export const DashboardLayout = ({
               {...sidebarProps}
             />
           </aside>
+
         </div>
+
       )}
 
       <div className="udb-layout__main">
@@ -235,6 +226,7 @@ export const DashboardLayout = ({
           setCollapsed={setCollapsed}
           setMobileOpen={setMobileOpen}
           title={currentTitle}
+          labels={labels.header}
           theme={theme}
           onToggleTheme={onToggleTheme}
           user={user}
@@ -243,10 +235,10 @@ export const DashboardLayout = ({
           onMarkAllRead={onMarkAllRead}
           onDismissNotification={onDismissNotification}
           loginRoute={loginRoute}
+          formatNotificationTime={formatNotificationTime}
           searchAction={
             palette
-              ? // The palette owns the header search unless the app gave an explicit action.
-                { placeholder: palette.placeholder, shortcut: "⌘K", ...config.searchAction, onActivate: config.searchAction?.onActivate ?? (() => setPaletteOpen(true)) }
+              ? { placeholder: palette.placeholder, shortcut: "⌘K", ...config.searchAction, onActivate: config.searchAction?.onActivate ?? (() => setPaletteOpen(true)) }
               : config.searchAction
           }
           headerExtra={config.headerExtra}
@@ -264,14 +256,17 @@ export const DashboardLayout = ({
                   <Skeleton key={i} className="udb-skeleton--card" />
                 ))}
               </div>
+
               <Skeleton className="udb-skeleton--section" />
             </div>
+
           ) : (
             <Outlet />
           )}
         </main>
 
         {footer && <footer className="udb-layout__footer">{footer}</footer>}
+
       </div>
 
       {palette && (
@@ -286,6 +281,7 @@ export const DashboardLayout = ({
         />
       )}
     </div>
+
   );
 };
 

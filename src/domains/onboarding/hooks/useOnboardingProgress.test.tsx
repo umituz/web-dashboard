@@ -48,7 +48,7 @@ describe('useOnboardingProgress — state machine (§1.1, §1.2)', () => {
     act(() => result.current.prev());
     expect(result.current.currentStep).toBe(1);
     act(() => result.current.prev());
-    act(() => result.current.prev()); // below zero — must clamp
+    act(() => result.current.prev());
     expect(result.current.currentStep).toBe(0);
   });
 
@@ -72,7 +72,7 @@ describe('useOnboardingProgress — state machine (§1.1, §1.2)', () => {
       useOnboardingProgress({ screens: makeScreens(2), ephemeral: true }),
     );
     act(() => result.current.next());
-    act(() => result.current.next()); // last screen -> finish
+    act(() => result.current.next());
     expect(result.current.isFinished).toBe(true);
     expect(result.current.completedSteps).toEqual(['s0', 's1']);
   });
@@ -87,7 +87,7 @@ describe('useOnboardingProgress — state machine (§1.1, §1.2)', () => {
     expect(result.current.currentStep).toBe(0);
     expect(result.current.completedSteps).toEqual([]);
     expect(result.current.collected).toEqual({});
-    // The stale checkpoint is gone; the persist effect re-saves a fresh one.
+
     const stored = JSON.parse(localStorage.getItem('k') ?? 'null');
     expect(stored).not.toBeNull();
     expect(stored.currentStep).toBe(0);
@@ -129,8 +129,7 @@ describe('useOnboardingProgress — persistence (§1.4, §1.5, §1.6)', () => {
   });
 
   it('rehydration past the end of a shortened flow starts fresh', () => {
-    // Progress stored for 4 screens; the app now ships 2. currentStep=3 is
-    // out of bounds and must not be restored.
+
     localStorage.setItem(
       'short',
       JSON.stringify({

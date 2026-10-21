@@ -51,19 +51,28 @@ export function ValueDeliveryScreen<TResult = unknown>({
       <div className="udb-onb-hero udb-onb-hero--lg" aria-hidden="true">
         <Sparkles className="udb-onb-icon--lg" />
       </div>
+
       <h2 className="udb-onb-title udb-onb-title--display">{config.title}</h2>
+
       <div className="udb-onb-result">
         <pre className="udb-onb-result__pre">{JSON.stringify(config.result, null, 2)}</pre>
+
       </div>
+
       {config.shareConfig && (
         <div className="udb-onb-share">
           <Button variant="outline" size="sm" onClick={handleShare}>
             {copied ? labels.copied : labels.share}
           </Button>
+
           <span>{config.shareConfig.text}</span>
+
         </div>
+
       )}
       <PrimaryButton onClick={onNext}>{config.cta ?? labels.continueAction}</PrimaryButton>
+
     </div>
+
   );
 }

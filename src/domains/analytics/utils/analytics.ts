@@ -19,15 +19,6 @@ export function formatPercentage(value: number, decimals: number = 1): string {
   return `${value.toFixed(decimals)}%`;
 }
 
-/**
- * Format currency
- *
- * @param value - Value to format
- * @param currency - Currency code (default: USD)
- * @param decimals - Number of decimal places (default: 0)
- * @param locale - BCP 47 locale (default: en-US)
- * @returns Formatted currency string
- */
 export function formatCurrency(
   value: number,
   currency: string = "USD",
@@ -42,37 +33,17 @@ export function formatCurrency(
   }).format(value);
 }
 
-/**
- * Calculate growth rate
- *
- * @param current - Current value
- * @param previous - Previous value
- * @returns Growth rate percentage
- */
 export function calculateGrowth(current: number, previous: number): number {
   if (previous === 0) return current > 0 ? 100 : 0;
   return ((current - previous) / previous) * 100;
 }
 
-/**
- * Get trend direction from growth
- *
- * @param growth - Growth rate
- * @returns Trend direction
- */
 export function getTrend(growth: number): "up" | "down" | "stable" {
   if (growth > 0.1) return "up";
   if (growth < -0.1) return "down";
   return "stable";
 }
 
-/**
- * Create KPI data object
- *
- * @param current - Current value
- * @param previous - Previous value
- * @returns KPI data object
- */
 export function createKPI(current: number, previous: number): KPIData {
   const growth = calculateGrowth(current, previous);
   return {
@@ -82,16 +53,6 @@ export function createKPI(current: number, previous: number): KPIData {
   };
 }
 
-/**
- * Create metric object
- *
- * @param id - Metric ID
- * @param name - Metric name
- * @param value - Current value
- * @param previousValue - Previous value
- * @param unit - Optional unit
- * @returns Metric object
- */
 export function createMetric(
   id: string,
   name: string,
@@ -110,12 +71,6 @@ export function createMetric(
   };
 }
 
-/**
- * Format metric value based on unit
- *
- * @param metric - Metric object
- * @returns Formatted value string
- */
 export function formatMetricValue(metric: Metric): string {
   const { value, unit } = metric;
 
@@ -135,37 +90,16 @@ export function formatMetricValue(metric: Metric): string {
   }
 }
 
-/**
- * Calculate conversion rate
- *
- * @param converted - Number of conversions
- * @param total - Total number of users
- * @returns Conversion rate percentage
- */
 export function calculateConversionRate(converted: number, total: number): number {
   if (total === 0) return 0;
   return (converted / total) * 100;
 }
 
-/**
- * Calculate drop-off rate
- *
- * @param current - Current step count
- * @param previous - Previous step count
- * @returns Drop-off rate percentage
- */
 export function calculateDropOffRate(current: number, previous: number): number {
   if (previous === 0) return 0;
   return ((previous - current) / previous) * 100;
 }
 
-/**
- * Generate date range preset
- *
- * @param label - Preset label
- * @param days - Number of days
- * @returns Date range preset with resolved `from`/`to` ISO dates
- */
 export function createDateRangePreset(label: string, days: number): DateRangePreset {
   const to = new Date();
   const from = new Date();
@@ -180,11 +114,6 @@ export function createDateRangePreset(label: string, days: number): DateRangePre
   };
 }
 
-/**
- * Get common date range presets
- *
- * @returns Array of date range presets
- */
 export function getDateRangePresets(): DateRangePreset[] {
   return [
     createDateRangePreset("Last 7 Days", 7),
@@ -195,13 +124,6 @@ export function getDateRangePresets(): DateRangePreset[] {
   ];
 }
 
-/**
- * Aggregate data by time period
- *
- * @param data - Array of data points with date field
- * @param period - Aggregation period (day, week, month)
- * @returns Aggregated data
- */
 export function aggregateByPeriod(
   data: Array<{ date: string; [key: string]: number | string }>,
   period: "day" | "week" | "month" = "day"
@@ -219,7 +141,7 @@ export function aggregateByPeriod(
       weekStart.setDate(date.getDate() - date.getDay());
       key = weekStart.toISOString().split("T")[0];
     } else {
-      // month
+
       key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
     }
 
@@ -249,13 +171,6 @@ export function aggregateByPeriod(
   });
 }
 
-/**
- * Calculate moving average
- *
- * @param data - Array of numbers
- * @param window - Window size
- * @returns Array of moving averages
- */
 export function calculateMovingAverage(data: number[], window: number): number[] {
   if (window < 1) {
     throw new RangeError(`calculateMovingAverage: window must be >= 1, received ${window}`);
@@ -273,13 +188,6 @@ export function calculateMovingAverage(data: number[], window: number): number[]
   return result;
 }
 
-/**
- * Detect outliers in data
- *
- * @param data - Array of numbers
- * @param threshold - Standard deviation threshold (default: 2)
- * @returns Array of outlier indices
- */
 export function detectOutliers(data: number[], threshold: number = 2): number[] {
   if (data.length === 0) return [];
 
@@ -293,37 +201,16 @@ export function detectOutliers(data: number[], threshold: number = 2): number[] 
     .map(({ index }) => index);
 }
 
-/**
- * Round to decimal places
- *
- * @param num - Number to round
- * @param decimals - Decimal places (default: 2)
- * @returns Rounded number
- */
 export function roundTo(num: number, decimals: number = 2): number {
   const multiplier = Math.pow(10, decimals);
   return Math.round(num * multiplier) / multiplier;
 }
 
-/**
- * Generate random color
- *
- * @param index - Color index
- * @param alpha - Alpha value (0-1)
- * @returns HSL color string
- */
 export function generateColor(index: number, alpha: number = 1): string {
-  const hue = (index * 137.508) % 360; // Golden angle approximation
+  const hue = (index * 137.508) % 360;
   return `hsla(${hue}, 70%, 50%, ${alpha})`;
 }
 
-/**
- * Generate chart colors
- *
- * @param count - Number of colors
- * @param alpha - Alpha value (0-1)
- * @returns Array of color strings
- */
 export function generateChartColors(count: number, alpha: number = 1): string[] {
   return Array.from({ length: count }, (_, i) => generateColor(i, alpha));
 }

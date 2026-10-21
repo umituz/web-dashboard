@@ -25,6 +25,7 @@ export function SocialProofScreen({ config, onNext }: SocialProofScreenProps) {
   return (
     <div className="udb-onb-proof">
       {config.title && <h2 className="udb-onb-title">{config.title}</h2>}
+
       <div className="udb-onb-proof__stage">
         <AnimatePresence mode="wait">
           <motion.blockquote
@@ -44,16 +45,24 @@ export function SocialProofScreen({ config, onNext }: SocialProofScreenProps) {
                   />
                 ))}
               </div>
+
             )}
             <p className="udb-onb-quote__content">“{current.content}”</p>
+
             <footer className="udb-onb-quote__footer">
               {current.avatar && <img src={current.avatar} alt="" className="udb-onb-quote__avatar" />}
               <cite className="udb-onb-quote__cite">{current.name}</cite>
+
               <span className="udb-onb-quote__role">{current.role}</span>
+
             </footer>
+
           </motion.blockquote>
+
         </AnimatePresence>
+
       </div>
+
       <div className="udb-onb-proof__bar">
         <div className="udb-onb-dots" role="tablist" aria-label="Testimonials">
           {config.testimonials.map((t, i) => (
@@ -68,20 +77,28 @@ export function SocialProofScreen({ config, onNext }: SocialProofScreenProps) {
             />
           ))}
         </div>
+
         <div className="udb-onb-proof__nav">
           {total > 1 && (
             <>
               <Button variant="outline" size="sm" onClick={() => go(-1)}>
                 {labels.previous}
               </Button>
+
               <Button variant="outline" size="sm" onClick={() => go(1)}>
                 {labels.nextAction}
               </Button>
+
             </>
+
           )}
         </div>
+
       </div>
+
       <PrimaryButton onClick={onNext}>{config.cta ?? labels.continueAction}</PrimaryButton>
+
     </div>
+
   );
 }

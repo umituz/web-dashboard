@@ -1,21 +1,18 @@
 import {
   MetricCard as DSMetricCard,
 } from "@umituz/web-design-system/organisms";
-import { useT } from "@umituz/web-localization/react";
 import type { MetricCardProps } from "../types/analytics";
 import { formatMetricValue, calculateGrowth, getTrend } from "../utils/analytics";
-import { ANALYTICS_KEYS } from "../utils/i18nKeys";
 
 export const MetricCard = ({
   metric,
   size = "md",
   showTrend = true,
   showIcon = true,
+  lastPeriodLabel = "",
   className,
   onClick,
 }: MetricCardProps) => {
-  const t = useT();
-
   const hasPrevious = metric.previousValue !== undefined;
   const growth = hasPrevious ? calculateGrowth(metric.value, metric.previousValue as number) : null;
   const trend = growth !== null ? getTrend(growth) : "stable";
@@ -32,7 +29,7 @@ export const MetricCard = ({
         showTrend && growth !== null && trend !== "stable"
           ? {
               value: growth,
-              label: t(ANALYTICS_KEYS.common.lastPeriod),
+              label: lastPeriodLabel,
             }
           : undefined
       }

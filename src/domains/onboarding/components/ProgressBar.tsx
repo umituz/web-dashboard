@@ -23,10 +23,14 @@ export function ProgressBar({ current, total, className, showLabel = false }: Pr
           <span aria-live="polite">
             {formatLabel(labels.stepOfPattern, { current: safeCurrent, total: safeTotal })}
           </span>
+
           <span aria-hidden="true">{percentage}%</span>
+
         </div>
+
       )}
-      <Progress value={percentage} label="Onboarding progress" />
+      <Progress value={percentage} label={labels.progressLabel} />
     </div>
+
   );
 }

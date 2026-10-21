@@ -49,6 +49,7 @@ export function AnimationWrapper({
       <div key={stepKey} className={className}>
         {children}
       </div>
+
     );
   }
   const variants = variantsByTransition[effective];
@@ -64,6 +65,8 @@ export function AnimationWrapper({
       >
         {children}
       </motion.div>
+
     </AnimatePresence>
+
   );
 }
