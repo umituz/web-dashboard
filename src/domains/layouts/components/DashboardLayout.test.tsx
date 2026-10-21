@@ -136,3 +136,43 @@ describe("DashboardLayout (command palette)", () => {
     expect(await screen.findByRole("dialog")).toBeTruthy();
   });
 });
+
+describe("DashboardSidebar (secondaryLabel)", () => {
+  const secondaryConfig: DashboardLayoutConfig = {
+    sidebarGroups: [
+      {
+        title: "Main",
+        items: [{ path: "/", label: "Home", icon: Home, end: false, secondaryLabel: "오늘" }],
+      },
+    ],
+    brandName: "Test",
+    defaultTitle: "Workspace",
+  };
+
+  it("renders the secondary label next to the item label", () => {
+    renderAt("/", { config: secondaryConfig });
+    const link = screen.getByRole("link", { name: /home/i });
+    expect(link.textContent).toContain("오늘");
+  });
+
+  it("hides the secondary label when the sidebar is collapsed", () => {
+    window.localStorage.setItem("udb-collapsed-test", "1");
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route
+            path="*"
+            element={
+              <DashboardLayout config={secondaryConfig} labels={labels} collapsedStorageKey="udb-collapsed-test" />
+            }
+          >
+            <Route path="*" element={<div>outlet-content</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+    const link = screen.getByRole("link", { name: /home/i });
+    expect(link.textContent).not.toContain("오늘");
+    window.localStorage.removeItem("udb-collapsed-test");
+  });
+});

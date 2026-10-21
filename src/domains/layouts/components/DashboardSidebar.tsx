@@ -136,6 +136,10 @@ export const DashboardSidebar = ({
                       <item.icon className="udb-sidebar__item-icon" />
                       {!collapsed && <span>{item.label}</span>}
 
+                      {!collapsed && item.secondaryLabel && (
+                        <span className="udb-sidebar__item-secondary">{item.secondaryLabel}</span>
+                      )}
+
                       {!collapsed && item.badge !== undefined && item.badge !== "" && (
                         <span className="udb-sidebar__item-badge">{item.badge}</span>
 

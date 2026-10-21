@@ -7,6 +7,7 @@ export interface SidebarItem {
     requiredApp?: 'mobile' | 'web';
     enabled?: boolean;
     badge?: string | number;
+    secondaryLabel?: string;
     end?: boolean;
 }
 
