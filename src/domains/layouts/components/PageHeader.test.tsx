@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { renderToString } from 'react-dom/server';
+import { render } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import { PageHeader } from './PageHeader';
 
 describe('PageHeader markup smoke', () => {
@@ -28,6 +30,19 @@ describe('PageHeader markup smoke', () => {
     expect(html).toContain('udb-pageheader__breadcrumbs');
     expect(html).toContain('udb-pageheader__actions');
     expect(html).toContain('New claim');
+  });
+
+  it('renders crumb lists as in-app links', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <PageHeader
+          title="Claim 92"
+          breadcrumbs={[{ label: 'Policies', to: '/policies' }, { label: 'Claim 92' }]}
+        />
+      </MemoryRouter>,
+    );
+    expect(container.querySelectorAll("a[href='/policies']")).toHaveLength(1);
+    expect(container.querySelector('.udb-pageheader__crumb a')?.textContent).toBe('Policies');
   });
 
   it('renders meta under the title block and omits it when undefined', () => {

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router";
 import { Skeleton, Button } from "@umituz/web-design-system/atoms";
 import { ChevronLeft, Menu } from "lucide-react";
 import { SettingsSection } from "./SettingsSection";

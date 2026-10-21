@@ -45,6 +45,11 @@ export interface CommandPaletteConfig {
     /** Append the sidebar groups as navigation groups — derived from
      *  sidebarGroups and routed internally, so apps never map their nav twice. */
     includeSidebar?: boolean;
+    /** Async search — typed queries are debounced and the results render as a
+     *  dedicated group above the static ones (items carry their own onSelect). */
+    search?: (q: string) => Promise<import("@umituz/web-design-system/organisms").CommandItem[]>;
+    /** Heading for the async search result group. */
+    searchResultsHeading?: string;
 }
 
 export interface DashboardSidebarProps {

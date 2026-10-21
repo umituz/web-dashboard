@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Link } from "react-router";
 
 export interface PageHeaderCrumb {
   label: string;
@@ -36,7 +37,7 @@ export const PageHeader = ({
       : isCrumbList(breadcrumbs)
         ? breadcrumbs.map((crumb, index) => (
             <span key={`${crumb.label}-${index}`} className="udb-pageheader__crumb">
-              {crumb.to !== undefined ? <a href={crumb.to}>{crumb.label}</a> : crumb.label}
+              {crumb.to !== undefined ? <Link to={crumb.to}>{crumb.label}</Link> : crumb.label}
             </span>
           ))
         : breadcrumbs;

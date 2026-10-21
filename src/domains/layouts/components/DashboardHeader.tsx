@@ -8,7 +8,7 @@ import {
   DropdownMenu, DropdownMenuTrigger, DropdownMenuContent,
   DropdownMenuItem, DropdownMenuSeparator
 } from "@umituz/web-design-system/organisms";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useT } from "@umituz/web-localization/react";
 import type { ReactNode } from "react";
 import type {

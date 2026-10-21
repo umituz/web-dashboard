@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { ChevronRight } from "lucide-react";
 import { cn } from "@umituz/web-design-system/utils/cn";
 import type { SettingsSection as SettingsSectionType } from "../types/settings";

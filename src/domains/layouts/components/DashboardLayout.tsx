@@ -1,8 +1,8 @@
-import { useState, useEffect, type ReactNode } from "react";
-import { useLocation, useNavigate, Outlet, Navigate } from "react-router-dom";
+import { useState, useEffect, useRef, type ReactNode } from "react";
+import { useLocation, useNavigate, Outlet, Navigate } from "react-router";
 import { useT } from "@umituz/web-localization/react";
 import { Skeleton } from "@umituz/web-design-system/atoms";
-import { CommandPalette } from "@umituz/web-design-system/organisms";
+import { CommandPalette, type CommandGroup, type CommandItem } from "@umituz/web-design-system/organisms";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
 import { getActiveSidebarItem } from "../utils/dashboard";
@@ -67,7 +67,11 @@ export const DashboardLayout = ({
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loading, setLoading] = useState(routeTransitionMs > 0);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [searchItems, setSearchItems] = useState<CommandItem[]>([]);
+  const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchSeq = useRef(0);
   const palette = config.commandPalette;
+  const paletteSearch = palette?.search;
 
   useEffect(() => {
     if (!collapsedStorageKey || typeof window === "undefined") return;
@@ -113,6 +117,31 @@ export const DashboardLayout = ({
     return () => window.removeEventListener("keydown", onKeyDown);
   }, [mobileOpen]);
 
+  useEffect(
+    () => () => {
+      if (searchTimer.current) clearTimeout(searchTimer.current);
+    },
+    []
+  );
+
+  const handlePaletteQuery = (q: string) => {
+    if (searchTimer.current) clearTimeout(searchTimer.current);
+    const seq = ++searchSeq.current;
+    if (!paletteSearch || q.trim() === "") {
+      setSearchItems([]);
+      return;
+    }
+    searchTimer.current = setTimeout(() => {
+      paletteSearch(q)
+        .then((items) => {
+          if (seq === searchSeq.current) setSearchItems(items);
+        })
+        .catch(() => {
+          if (seq === searchSeq.current) setSearchItems([]);
+        });
+    }, 180);
+  };
+
   useEffect(() => {
     if (typeof document === "undefined") return;
     document.documentElement.classList.toggle("udb-scroll-lock", mobileOpen);
@@ -133,10 +162,16 @@ export const DashboardLayout = ({
 
   const currentTitle = getTitle();
 
+  const searchGroup: CommandGroup | null =
+    paletteSearch && searchItems.length > 0
+      ? { heading: palette?.searchResultsHeading ?? t("Search results"), items: searchItems }
+      : null;
+  const basePaletteGroups = searchGroup ? [searchGroup, ...(palette?.groups ?? [])] : (palette?.groups ?? []);
+
   // Sidebar-derived navigation groups — one nav definition feeds both chrome surfaces.
   const paletteGroups = palette?.includeSidebar
     ? [
-        ...palette.groups,
+        ...basePaletteGroups,
         ...config.sidebarGroups.map((group) => ({
           heading: group.title,
           items: group.items.map((item) => ({
@@ -243,10 +278,11 @@ export const DashboardLayout = ({
         <CommandPalette
           open={paletteOpen}
           onOpenChange={setPaletteOpen}
-          groups={paletteGroups ?? palette.groups}
+          groups={paletteGroups ?? basePaletteGroups}
           placeholder={palette.placeholder}
           emptyLabel={palette.emptyLabel}
           label={palette.label}
+          onQueryChange={paletteSearch ? handlePaletteQuery : undefined}
         />
       )}
     </div>

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { MemoryRouter, Routes, Route } from "react-router-dom";
+import { MemoryRouter, Routes, Route } from "react-router";
 import { Home } from "lucide-react";
 import { DashboardLayout } from "./DashboardLayout";
 import type { DashboardLayoutConfig } from "../types/layout";
