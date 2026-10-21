@@ -3,26 +3,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { MemoryRouter, Routes, Route } from "react-router";
 import { Home } from "lucide-react";
 import { DashboardLayout } from "./DashboardLayout";
-import type { DashboardLayoutConfig, DashboardLayoutLabels } from "../types/layout";
+import { defaultLayoutLabels } from "./labels";
+import type { DashboardLayoutConfig } from "../types/layout";
 
-const labels: DashboardLayoutLabels = {
-  skipToContent: "Skip to content",
-  navigation: "Navigation",
-  searchResults: "Search results",
-  header: {
-    switchToLight: "Switch to light",
-    switchToDark: "Switch to dark",
-    notificationsTitle: "Notifications",
-    markAllRead: "Mark all read",
-    dismissNotification: "Dismiss",
-    noNotifications: "No notifications",
-    profile: "Profile",
-    settings: "Settings",
-    logout: "Log out",
-    guestName: "Guest",
-  },
-  sidebar: { system: "System" },
-};
+const labels = defaultLayoutLabels;
 
 const config: DashboardLayoutConfig = {
   sidebarGroups: [
@@ -139,5 +123,16 @@ describe("DashboardLayout (command palette)", () => {
 
     const own = await screen.findByRole("option", { name: "Home" });
     expect(own.textContent).toBe("Home");
+  });
+
+  it("supports a search-only palette without static groups (7.1)", async () => {
+    renderAt("/", {
+      config: {
+        ...config,
+        commandPalette: { includeSidebar: false, search: async () => [] },
+      },
+    });
+    fireEvent.keyDown(window, { key: "k", metaKey: true });
+    expect(await screen.findByRole("dialog")).toBeTruthy();
   });
 });
