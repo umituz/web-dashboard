@@ -174,6 +174,8 @@ export interface BarSeries {
   data?: readonly number[];
   tone?: string;
   color?: string;
+  /** Per-bar color override (index-aligned with labels); undefined falls back to the series tone. */
+  accents?: readonly (string | undefined)[];
 }
 
 export interface BarChartGoalLine {
@@ -201,6 +203,7 @@ export function BarChart({
   const vals = (s: BarSeries) => s.values ?? s.data ?? [];
   const max = Math.max(1, ...series.flatMap((s) => vals(s)), goalLine?.value ?? 0);
   const toneOf = (s: BarSeries, i: number) => s.tone ?? s.color ?? PALETTE[i % PALETTE.length]!;
+  const accentOf = (s: BarSeries, si: number, i: number) => s.accents?.[i] ?? toneOf(s, si);
   const goalPct = goalLine !== undefined ? Math.min(100, (goalLine.value / max) * 100) : null;
   return (
     <div className="udb-barchart" style={{ height }}>
@@ -244,7 +247,7 @@ export function BarChart({
                 className="udb-barchart__bar"
                 style={{
                   height: `${Math.max(2, ((vals(s)[i] ?? 0) / max) * 100)}%`,
-                  background: toneOf(s, si),
+                  background: accentOf(s, si, i),
                   opacity: hover === null || hover === i ? 1 : 0.4,
                 }}
               />
@@ -258,7 +261,7 @@ export function BarChart({
               {series.map((s, si) => (
                 <div key={s.key ?? s.label} className="udb-barchart__tiprow">
                   <span className="udb-barchart__tiplabel">
-                    <span className="udb-chartlegend__dot" style={{ background: toneOf(s, si) }} />
+                    <span className="udb-chartlegend__dot" style={{ background: accentOf(s, si, i) }} />
                     {s.label}
                   </span>
 
