@@ -465,6 +465,7 @@
   animation: udb-pop 0.18s ease;
 }
 .udb-menu--pop {
+  position: static;
   top: auto;
   right: auto;
   animation: none;
