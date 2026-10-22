@@ -1,6 +1,6 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "7.9.0",
+  "version": "7.10.0",
   "description": "Installable app skeleton for the fleet — layouts, analytics (dependency-free SVG charts), calendar, onboarding flow permissions/module registry; udb-* stylesheet on design-system tokens",
   "type": "module",
   "main": "./src/index.ts",
@@ -31,6 +31,8 @@
     "./layouts/types": "./src/domains/layouts/types/index.ts",
     "./layouts/utils": "./src/domains/layouts/utils/index.ts",
     "./modules": "./src/domains/modules/index.ts",
+    "./notifications": "./src/domains/notifications/index.ts",
+    "./notifications/components": "./src/domains/notifications/components/index.ts",
     "./onboarding": "./src/domains/onboarding/index.ts",
     "./organization": "./src/domains/organization/index.ts",
     "./organization/components": "./src/domains/organization/components/index.ts",

@@ -1,8 +1,8 @@
 # @umituz/web-dashboard
 
 Installable app skeleton for SaaS dashboards: layouts, analytics, a content
-calendar, a product onboarding flow, a permissions/module registry, and an
-organization/membership module. Every
+calendar, a product onboarding flow, a permissions/module registry, an
+organization/membership module, and a notifications module. Every
 domain is an independent entry point — import only what your app uses. UI
 atoms and design tokens come from [@umituz/web-design-system](https://github.com/umituz/web-design-system);
 translations from [@umituz/web-localization](https://github.com/umituz/web-localization).
@@ -46,6 +46,7 @@ hosts set dark values on the DS variables under `[data-theme="dark"]` /
 @umituz/web-dashboard/styles.css    # component stylesheet (udb-* BEM, incl. udb-onb-*)
 @umituz/web-dashboard/permissions   # PermissionMatrix, hasPermission, guards
 @umituz/web-dashboard/organization  # OrganizationProvider, members + invitations, seats, switcher
+@umituz/web-dashboard/notifications # NotificationsProvider, bell + center, page skeleton
 @umituz/web-dashboard/modules       # DashboardModule, buildRoutes, buildNav
 @umituz/web-dashboard/layouts       # DashboardLayout, DashboardSidebar, DashboardHeader
 @umituz/web-dashboard/settings      # SettingsLayout, admin skeletons (users, matrix, audit)
@@ -146,6 +147,30 @@ class MyDatabase implements ICalendarDatabase { /* ... */ }
 const service = new CalendarService(new MyDatabase());
 // or demo/test:
 const demo = new CalendarService(createInMemoryCalendarDatabase());
+```
+
+### Notifications
+
+Feed state is provider-owned; the host owns persistence. Records carry
+`{ id, type, title?, body?, read?, at | createdAt, severity?, link? }` —
+either timestamp column is accepted and `critical` severity normalizes to
+`danger`. Reads and dismisses apply optimistically while the callbacks persist.
+
+```tsx
+import { NotificationsProvider } from "@umituz/web-dashboard/notifications";
+import { NotificationCenter, NotificationsPage } from "@umituz/web-dashboard/notifications/components";
+
+<NotificationsProvider
+  notifications={feed}                    // fresh array re-seeds the copy
+  loaded={!loading}
+  onMarkAllRead={() => api.post("/api/notifications/mark-read")}
+  onMarkRead={(id) => api.post(`/api/notifications/${id}/read`)}
+>
+  <NotificationCenter viewAllTo="/notifications" />  {/* bell + badge, popover or drawer */}
+</NotificationsProvider>
+
+// Route body — segments derive from typeMeta counts; "Unread (n)" is built in:
+<NotificationsPage typeMeta={TYPE_META} attentionLabel="Needs attention" />
 ```
 
 ### Analytics
