@@ -1275,6 +1275,21 @@
   font-size: var(--udb-font-size-sm);
   color: var(--color-muted-foreground);
 }
+.udb-org-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--udb-space-4);
+}
+.udb-org-form__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--udb-space-3) var(--udb-space-4);
+}
+.udb-org-form__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--udb-space-2);
+}
 .udb-matrix__group-row th {
   font-size: var(--udb-font-size-xs);
   font-weight: var(--font-weight-bold);
