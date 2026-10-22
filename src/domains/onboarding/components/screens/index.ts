@@ -2,6 +2,8 @@ export { WelcomeScreen } from './WelcomeScreen';
 export type { WelcomeScreenProps } from './WelcomeScreen';
 export { GoalQuestionScreen } from './GoalQuestionScreen';
 export type { GoalQuestionScreenProps } from './GoalQuestionScreen';
+export { OrganizationDetailsScreen } from './OrganizationDetailsScreen';
+export type { OrganizationDetailsScreenProps } from './OrganizationDetailsScreen';
 export { PainPointsScreen } from './PainPointsScreen';
 export type { PainPointsScreenProps } from './PainPointsScreen';
 export { SocialProofScreen } from './SocialProofScreen';

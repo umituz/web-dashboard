@@ -1,4 +1,5 @@
 import { DataTable, type Column } from "@umituz/web-design-system/organisms";
+import { StatusBadge, type StatusVocab } from "@umituz/web-design-system/organisms";
 import type { RoleKey, RoleInfo } from "../../permissions/types";
 
 export interface ManagedUser {
@@ -7,6 +8,8 @@ export interface ManagedUser {
   email: string;
   role: RoleKey;
   status?: string;
+  /** Owner rows are shielded from removal/role changes when `isRowLocked` is not overridden. */
+  isOwner?: boolean;
 }
 
 export interface UserManagementTableLabels {
@@ -14,6 +17,9 @@ export interface UserManagementTableLabels {
   emailColumn: string;
   roleColumn: string;
   empty: string;
+  statusColumn?: string;
+  removeColumn?: string;
+  removeLabel?: string;
 }
 
 export interface UserManagementTableProps {
@@ -21,6 +27,12 @@ export interface UserManagementTableProps {
   roles: RoleInfo[];
   labels: UserManagementTableLabels;
   onRoleChange?: (userId: string, role: RoleKey) => void;
+  /** Renders a status column with badges when provided. */
+  statusVocab?: StatusVocab;
+  /** Renders a remove action column when provided; guarded rows stay hidden. */
+  onRemove?: (userId: string) => void;
+  /** Rows that must never be removed or role-changed; defaults to owner rows. */
+  isRowLocked?: (user: ManagedUser) => boolean;
 }
 
 export const UserManagementTable = ({
@@ -28,6 +40,9 @@ export const UserManagementTable = ({
   roles,
   labels,
   onRoleChange,
+  statusVocab,
+  onRemove,
+  isRowLocked = (user) => Boolean(user.isOwner),
 }: UserManagementTableProps) => {
   const columns: Column<ManagedUser>[] = [
     { id: "name", header: labels.nameColumn, accessor: "name" },
@@ -36,7 +51,7 @@ export const UserManagementTable = ({
       id: "role",
       header: labels.roleColumn,
       accessor: (user) =>
-        onRoleChange ? (
+        onRoleChange && !(isRowLocked?.(user) ?? false) ? (
           <select
             className="udb-period-select__select"
             value={user.role}
@@ -56,6 +71,33 @@ export const UserManagementTable = ({
         ),
     },
   ];
+
+  if (statusVocab) {
+    columns.push({
+      id: "status",
+      header: labels.statusColumn ?? "Status",
+      accessor: (user) =>
+        user.status ? <StatusBadge vocab={statusVocab} value={user.status} /> : null,
+    });
+  }
+
+  if (onRemove) {
+    columns.push({
+      id: "remove",
+      header: labels.removeColumn ?? "",
+      align: "right",
+      accessor: (user) =>
+        isRowLocked?.(user) ?? false ? null : (
+          <button
+            type="button"
+            className="udb-link-button"
+            onClick={() => onRemove(user.id)}
+          >
+            {labels.removeLabel ?? "Remove"}
+          </button>
+        ),
+    });
+  }
 
   return (
     <DataTable

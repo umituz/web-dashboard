@@ -1,4 +1,10 @@
-export type { OnboardingScreen, OnboardingScreenType, OnboardingOption } from './screens';
+export type {
+  OnboardingScreen,
+  OnboardingScreenType,
+  OnboardingOption,
+  OrganizationDetailsData,
+  OrganizationDetailsScreenConfig,
+} from './screens';
 export type {
   OnboardingConfig,
   OnboardingCategory,

@@ -7,6 +7,7 @@ import type { ValidationOutcome } from './flow-structure-check';
 const RECOGNIZED_SCREEN_TYPES: ReadonlySet<OnboardingScreenType> = new Set<OnboardingScreenType>([
   'welcome',
   'goal-question',
+  'organization-details',
   'pain-points',
   'social-proof',
   'tinder-cards',

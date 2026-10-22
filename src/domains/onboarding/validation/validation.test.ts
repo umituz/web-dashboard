@@ -81,8 +81,14 @@ describe('screen-config-check (§23.2)', () => {
     expect(checkScreenConfig(welcome('ok'))).toEqual({ ok: true });
   });
 
+  it('accepts the organization-details screen', () => {
+    expect(
+      checkScreenConfig({ id: 'org', type: 'organization-details', title: 'T' }),
+    ).toEqual({ ok: true });
+  });
+
   it('knows every screen type the orchestrator can render', () => {
-    expect(getRecognizedScreenTypes().size).toBe(14);
+    expect(getRecognizedScreenTypes().size).toBe(15);
   });
 });
 

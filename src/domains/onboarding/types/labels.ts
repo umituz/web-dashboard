@@ -47,4 +47,8 @@ export interface OnboardingLabels {
     somethingWentWrong: string;
   unexpectedError: string;
   tryAgain: string;
+
+    organizationTitle?: string;
+  organizationNameLabel?: string;
+  teamSizeLabel?: string;
 }

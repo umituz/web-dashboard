@@ -12,6 +12,7 @@ export type { OnboardingIntl, OnboardingIntlProviderProps } from './components/O
 export {
   WelcomeScreen,
   GoalQuestionScreen,
+  OrganizationDetailsScreen,
   PainPointsScreen,
   SocialProofScreen,
   TinderCardsScreen,
@@ -138,4 +139,6 @@ export type {
   AnalyticsProvider,
   OnboardingAnalyticsEvent,
   OnboardingResult,
+  OrganizationDetailsData,
+  OrganizationDetailsScreenConfig,
 } from './types';

@@ -1,7 +1,8 @@
 # @umituz/web-dashboard
 
 Installable app skeleton for SaaS dashboards: layouts, analytics, a content
-calendar, a product onboarding flow, and a permissions/module registry. Every
+calendar, a product onboarding flow, a permissions/module registry, and an
+organization/membership module. Every
 domain is an independent entry point — import only what your app uses. UI
 atoms and design tokens come from [@umituz/web-design-system](https://github.com/umituz/web-design-system);
 translations from [@umituz/web-localization](https://github.com/umituz/web-localization).
@@ -44,10 +45,11 @@ hosts set dark values on the DS variables under `[data-theme="dark"]` /
 ```bash
 @umituz/web-dashboard/styles.css    # component stylesheet (udb-* BEM, incl. udb-onb-*)
 @umituz/web-dashboard/permissions   # PermissionMatrix, hasPermission, guards
+@umituz/web-dashboard/organization  # OrganizationProvider, members panel, invites, switcher
 @umituz/web-dashboard/modules       # DashboardModule, buildRoutes, buildNav
 @umituz/web-dashboard/layouts       # DashboardLayout, DashboardSidebar, DashboardHeader
 @umituz/web-dashboard/settings      # SettingsLayout, admin skeletons (users, matrix, audit)
-@umituz/web-dashboard/onboarding    # OnboardingFlow + 14 screens, persistence, analytics
+@umituz/web-dashboard/onboarding    # OnboardingFlow + 15 screens, persistence, analytics
 @umituz/web-dashboard/analytics     # AnalyticsLayout, SVG AnalyticsChart, services
 @umituz/web-dashboard/calendar      # useCalendar, CalendarService (injected DB)
 @umituz/web-dashboard/config        # dashboard config helpers

@@ -13,6 +13,7 @@ import { checkFlowStructure } from '../validation/flow-structure-check';
 import {
   WelcomeScreen,
   GoalQuestionScreen,
+  OrganizationDetailsScreen,
   PainPointsScreen,
   SocialProofScreen,
   TinderCardsScreen,
@@ -67,6 +68,14 @@ function renderScreen(
           initialSelected={
             (progress.collected[screen.id] as { selected?: string[] } | undefined)?.selected
           }
+        />
+      );
+    case 'organization-details':
+      return (
+        <OrganizationDetailsScreen
+          config={screen}
+          onNext={(data) => onStepCompleted(data)}
+          initial={progress.collected[screen.id] as { name: string; teamSize?: string } | undefined}
         />
       );
     case 'social-proof':

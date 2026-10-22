@@ -133,6 +133,17 @@ export type ValueDeliveryScreenConfig<TResult = unknown> = BaseScreen<
 
 export type SignInMethod = 'email' | 'google' | 'apple' | 'github';
 
+export interface OrganizationDetailsData {
+  name: string;
+  teamSize?: string;
+}
+
+export type OrganizationDetailsScreenConfig = BaseScreen<'organization-details', OrganizationDetailsData> & {
+  namePlaceholder?: string;
+  /** Omit to skip the team-size question; otherwise ids map to host labels. */
+  teamSizeOptions?: ReadonlyArray<OnboardingOption>;
+};
+
 export type AccountGateScreenConfig = BaseScreen<'account-gate', { signedIn: boolean; method?: SignInMethod }> & {
   optional: boolean;
   signInMethod?: SignInMethod;
@@ -167,6 +178,7 @@ export type PaywallScreenConfig = BaseScreen<
 export type OnboardingScreen =
   | WelcomeScreenConfig
   | GoalQuestionScreenConfig
+  | OrganizationDetailsScreenConfig
   | PainPointsScreenConfig
   | SocialProofScreenConfig
   | TinderCardsScreenConfig
