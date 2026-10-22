@@ -1,8 +1,18 @@
 import { Check, Minus } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@umituz/web-design-system/organisms";
 import { cn } from "@umituz/web-design-system/utils/cn";
 import { hasPermission } from "../../permissions/hasPermission";
 import type {
   Permission,
+  PermissionEntry,
+  PermissionGroup,
   PermissionMatrix,
   RoleInfo,
 } from "../../permissions/types";
@@ -10,45 +20,72 @@ import type {
 export interface PermissionMatrixScreenProps {
   matrix: PermissionMatrix;
   roles: RoleInfo[];
-  permissions: Permission[];
+  groups?: PermissionGroup[];
+  permissions?: (Permission | PermissionEntry)[];
   onToggle?: (role: string, permission: Permission, granted: boolean) => void;
 }
+
+const toEntry = (
+  column: Permission | PermissionEntry,
+): { key: Permission; label: string } =>
+  typeof column === "string"
+    ? { key: column, label: column }
+    : { key: column.key, label: column.label ?? column.key };
 
 export const PermissionMatrixScreen = ({
   matrix,
   roles,
+  groups,
   permissions,
   onToggle,
-}: PermissionMatrixScreenProps) => (
-  <div className="udb-table__wrap">
-    <table className="udb-table">
-      <thead>
-        <tr>
-          <th className="udb-table__th" />
-          {permissions.map((permission) => (
-            <th key={permission} className="udb-table__th udb-table__th--code">
-              {permission}
-            </th>
+}: PermissionMatrixScreenProps) => {
+  const columns = groups
+    ? groups.flatMap((group) => group.permissions.map(toEntry))
+    : (permissions ?? []).map(toEntry);
+  const hasGroups = Boolean(groups && groups.length > 0);
 
+  return (
+    <Table className="udb-matrix">
+      <TableHeader>
+        {hasGroups && (
+          <TableRow className="udb-matrix__group-row">
+            <TableHead className="udb-matrix__corner" />
+            {groups!.map((group, index) => (
+              <TableHead
+                key={group.key ?? group.label ?? index}
+                colSpan={group.permissions.length}
+                scope="colgroup"
+                className="udb-matrix__group"
+              >
+                {group.label ?? ""}
+              </TableHead>
+            ))}
+          </TableRow>
+        )}
+        <TableRow>
+          <TableHead />
+          {columns.map((column) => (
+            <TableHead key={column.key} className="udb-matrix__col">
+              {column.label}
+            </TableHead>
           ))}
-        </tr>
+        </TableRow>
+      </TableHeader>
 
-      </thead>
-
-      <tbody>
+      <TableBody>
         {roles.map((role) => (
-          <tr key={role.key} className="udb-table__row">
-            <td className="udb-table__td udb-table__td--strong">{role.label}</td>
+          <TableRow key={role.key}>
+            <TableCell className="udb-matrix__role">{role.label}</TableCell>
 
-            {permissions.map((permission) => {
-              const granted = hasPermission(matrix, role.key, permission);
+            {columns.map((column) => {
+              const granted = hasPermission(matrix, role.key, column.key);
               const cell = granted ? (
                 <Check className="udb-matrix__check" aria-hidden="true" />
               ) : (
                 <Minus className="udb-matrix__deny" aria-hidden="true" />
               );
               return (
-                <td key={permission} className="udb-table__td udb-table__td--center">
+                <TableCell key={column.key} className="udb-matrix__cell-td">
                   {onToggle ? (
                     <button
                       type="button"
@@ -57,27 +94,22 @@ export const PermissionMatrixScreen = ({
                         granted && "udb-matrix__cell--on",
                       )}
                       aria-pressed={granted}
-                      onClick={() => onToggle(role.key, permission, granted)}
+                      aria-label={`${role.label} — ${column.label}`}
+                      onClick={() => onToggle(role.key, column.key, granted)}
                     >
                       {cell}
                     </button>
-
                   ) : (
                     cell
                   )}
-                </td>
-
+                </TableCell>
               );
             })}
-          </tr>
-
+          </TableRow>
         ))}
-      </tbody>
-
-    </table>
-
-  </div>
-
-);
+      </TableBody>
+    </Table>
+  );
+};
 
 export default PermissionMatrixScreen;

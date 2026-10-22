@@ -1,6 +1,6 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "7.5.0",
+  "version": "7.6.0",
   "description": "Installable app skeleton for the fleet — layouts, analytics (dependency-free SVG charts), calendar, onboarding flow permissions/module registry; udb-* stylesheet on design-system tokens",
   "type": "module",
   "main": "./src/index.ts",
@@ -80,7 +80,7 @@
     "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.57.2",
     "@typescript-eslint/parser": "^8.57.2",
-    "@umituz/web-design-system": "^4.21.0",
+    "@umituz/web-design-system": "^4.29.4",
     "eslint": "^10.0.2",
     "framer-motion": "^12.23.12",
     "jsdom": "^29.1.1",

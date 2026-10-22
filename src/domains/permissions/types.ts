@@ -13,3 +13,20 @@ export interface RoleInfo {
   label: string;
   description?: string;
 }
+
+export interface PermissionOverrides {
+  grant?: readonly Permission[];
+  revoke?: readonly Permission[];
+}
+
+export interface PermissionEntry {
+  key: Permission;
+  label?: string;
+}
+
+export interface PermissionGroup {
+  key?: string;
+  label?: string;
+  permissions: readonly (Permission | PermissionEntry)[];
+}
+
