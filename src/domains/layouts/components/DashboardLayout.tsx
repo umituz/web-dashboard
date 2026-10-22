@@ -155,7 +155,10 @@ export const DashboardLayout = ({
 
   const searchGroup: CommandGroup | null =
     paletteSearch && searchItems.length > 0
-      ? { heading: palette?.searchResultsHeading ?? labels.searchResults, items: searchItems }
+      ? {
+          heading: palette?.searchResultsHeading ?? labels.searchResults,
+          items: searchItems.map((item) => ({ ...item, prefiltered: true })),
+        }
       : null;
   const basePaletteGroups = searchGroup ? [searchGroup, ...(palette?.groups ?? [])] : (palette?.groups ?? []);
 
