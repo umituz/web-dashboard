@@ -1728,6 +1728,10 @@
   stroke: var(--color-border);
   stroke-width: 1;
 }
+.udb-linechart__band {
+  fill: var(--color-primary);
+  opacity: 0.08;
+}
 .udb-linechart__crosshair {
   stroke: var(--udb-border-strong);
   stroke-width: 1;

@@ -403,6 +403,7 @@ export function LineChart({
   points,
   labels,
   series,
+  band,
   height = 220,
   formatLeft,
   formatRight,
@@ -413,6 +414,7 @@ export function LineChart({
   points?: readonly LineChartPoint[];
   labels?: readonly string[];
   series: LineSeries[];
+  band?: { from: number; to: number };
   height?: number;
   formatLeft?: (v: number) => string;
   formatRight?: (v: number) => string;
@@ -437,14 +439,14 @@ export function LineChart({
   const toneOf = (s: LineSeries, i: number) => s.tone ?? s.color ?? PALETTE[i % PALETTE.length]!;
 
   const leftMax = useMemo(
-    () => niceMax(Math.max(1, ...series.filter((s) => s.axis !== 'right').flatMap((s) => vals(s)))),
-    [series],
+    () => niceMax(Math.max(1, ...series.filter((s) => s.axis !== 'right').flatMap((s) => vals(s)), ...(band ? [band.from, band.to] : []))),
+    [series, band],
   );
   const rightMax = useMemo(
     () => niceMax(Math.max(1, ...series.filter((s) => s.axis === 'right').flatMap((s) => vals(s)))),
     [series],
   );
-  const leftTicks = useMemo(() => gridTicks(Math.max(...series.filter((s) => s.axis !== 'right').flatMap((s) => vals(s)), 1)), [series]);
+  const leftTicks = useMemo(() => gridTicks(Math.max(...series.filter((s) => s.axis !== 'right').flatMap((s) => vals(s)), ...(band ? [band.from, band.to] : []), 1)), [series, band]);
 
   const xAt = (i: number) => padLeft + (n <= 1 ? innerW / 2 : (i / (n - 1)) * innerW);
   const yLeft = (v: number) => padTop + innerH - (v / leftMax) * innerH;
@@ -477,6 +479,16 @@ export function LineChart({
           </g>
 
         ))}
+        {band && (
+          <rect
+            x={padLeft}
+            y={yLeft(band.to)}
+            width={innerW}
+            height={Math.max(0, yLeft(band.from) - yLeft(band.to))}
+            rx={2}
+            className="udb-linechart__band"
+          />
+        )}
         {series.some((s) => s.axis === 'right') && (
           <g>
             {leftTicks.map((v, i) => (
