@@ -1388,11 +1388,78 @@
   color: var(--color-muted-foreground);
   font-weight: var(--font-weight-normal);
 }
+.udb-members__head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--udb-space-2);
+}
+.udb-members__seats {
+  font-size: var(--udb-font-size-sm);
+  color: var(--color-muted-foreground);
+  white-space: nowrap;
+}
 .udb-members__invite {
   padding: var(--udb-space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   background: var(--color-muted);
+}
+.udb-members__invitations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--udb-space-2);
+}
+.udb-members__invitations-title {
+  margin: 0;
+  font-size: var(--udb-font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-muted-foreground);
+}
+.udb-members__invitation-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--udb-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.udb-members__invitation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--udb-space-3);
+  padding: var(--udb-space-2) var(--udb-space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+.udb-members__invitation-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--udb-space-1);
+}
+.udb-members__invitation-email {
+  font-size: var(--udb-font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+.udb-members__invitation-role {
+  font-size: var(--udb-font-size-xs);
+  color: var(--color-muted-foreground);
+}
+.udb-members__invitation-side {
+  display: flex;
+  align-items: center;
+  gap: var(--udb-space-3);
+}
+.udb-members__invitation-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--udb-space-2);
+}
+.udb-row-actions {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--udb-space-2);
 }
 .udb-invite {
   display: flex;
@@ -1424,6 +1491,9 @@
 }
 .udb-link-button:hover {
   text-decoration: underline;
+}
+.udb-link-button--muted {
+  color: var(--color-muted-foreground);
 }
 .udb-matrix__group-row th {
   font-size: var(--udb-font-size-xs);

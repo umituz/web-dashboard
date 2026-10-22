@@ -45,7 +45,7 @@ hosts set dark values on the DS variables under `[data-theme="dark"]` /
 ```bash
 @umituz/web-dashboard/styles.css    # component stylesheet (udb-* BEM, incl. udb-onb-*)
 @umituz/web-dashboard/permissions   # PermissionMatrix, hasPermission, guards
-@umituz/web-dashboard/organization  # OrganizationProvider, members panel, invites, switcher
+@umituz/web-dashboard/organization  # OrganizationProvider, members + invitations, seats, switcher
 @umituz/web-dashboard/modules       # DashboardModule, buildRoutes, buildNav
 @umituz/web-dashboard/layouts       # DashboardLayout, DashboardSidebar, DashboardHeader
 @umituz/web-dashboard/settings      # SettingsLayout, admin skeletons (users, matrix, audit)

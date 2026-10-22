@@ -3,7 +3,7 @@ export type {
   OrganizationProviderProps,
   OrganizationContextValue,
 } from "./OrganizationContext";
-export { initialsOf, memberStatusVocab } from "./vocab";
+export { initialsOf, memberStatusVocab, invitationStatusVocab } from "./vocab";
 export {
   InviteForm,
   OrganizationCard,
@@ -18,12 +18,14 @@ export type {
   OrganizationMembersPanelLabels,
   OrganizationMembersPanelProps,
   OrganizationSwitcherProps,
+  PersonalWorkspace,
 } from "./components";
 export type {
+  InvitationStatus,
   OrganizationPermissionBridge,
   OrganizationRecord,
   OrgInviteInput,
+  OrgInvitation,
   OrgMember,
-  MemberRoleSource,
   MemberStatus,
 } from "./types";

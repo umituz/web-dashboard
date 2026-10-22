@@ -1,6 +1,6 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "7.8.0",
+  "version": "7.9.0",
   "description": "Installable app skeleton for the fleet — layouts, analytics (dependency-free SVG charts), calendar, onboarding flow permissions/module registry; udb-* stylesheet on design-system tokens",
   "type": "module",
   "main": "./src/index.ts",

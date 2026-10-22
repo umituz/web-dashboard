@@ -1,5 +1,5 @@
 import { statusVocab, type StatusVocab } from "@umituz/web-design-system/organisms";
-import type { MemberStatus } from "./types";
+import type { InvitationStatus, MemberStatus } from "./types";
 
 /**
  * Up to two leading initials from a display name ("Northwind Labs" -> "NL",
@@ -36,4 +36,35 @@ export const memberStatusVocab = (
   statusVocab(
     { ...DEFAULT_MEMBER_STATUS_LABELS, ...labelOverrides },
     MEMBER_STATUS_TONES,
+  );
+
+const DEFAULT_INVITATION_STATUS_LABELS: Record<InvitationStatus, string> = {
+  pending: "Pending",
+  accepted: "Accepted",
+  revoked: "Revoked",
+  expired: "Expired",
+  declined: "Declined",
+};
+
+const INVITATION_STATUS_TONES: Record<
+  InvitationStatus,
+  "info" | "success" | "neutral" | "warning"
+> = {
+  pending: "info",
+  accepted: "success",
+  revoked: "neutral",
+  expired: "warning",
+  declined: "neutral",
+};
+
+/**
+ * Status vocab for invitation rows — label overrides merge over the
+ * industry lifecycle defaults (pending/accepted/revoked/expired/declined).
+ */
+export const invitationStatusVocab = (
+  labelOverrides?: Partial<Record<InvitationStatus, string>>,
+): StatusVocab =>
+  statusVocab(
+    { ...DEFAULT_INVITATION_STATUS_LABELS, ...labelOverrides },
+    INVITATION_STATUS_TONES,
   );

@@ -1,4 +1,4 @@
-import type { PermissionMatrix, RoleKey, RoleInfo } from "../permissions/types";
+import type { PermissionMatrix, RoleKey } from "../permissions/types";
 
 /**
  * Organization record — the tenant entity a signed-in user belongs to.
@@ -22,9 +22,34 @@ export interface OrganizationRecord {
 export type MemberStatus = "invited" | "active" | "suspended";
 
 /**
+ * Invitation lifecycle — the industry state machine
+ * (pending -> accepted | revoked | expired | declined). Invitations are
+ * first-class records, separate from memberships: they key on email, carry
+ * an expiry, and can be revoked or resent while pending.
+ */
+export type InvitationStatus = "pending" | "accepted" | "revoked" | "expired" | "declined";
+
+/**
+ * An outstanding (or settled) invitation. The host owns the backend record
+ * (token, redemption route); the panel renders and emits revoke/resend.
+ */
+export interface OrgInvitation {
+  id: string;
+  email: string;
+  name?: string;
+  role: RoleKey;
+  status: InvitationStatus;
+  invitedBy?: string;
+  invitedAt?: string;
+  expiresAt?: string;
+}
+
+/**
  * A member row as the organization module consumes it. `role` is a RoleKey
  * resolved against the host's RoleInfo list; owners carry `isOwner` so UIs
- * can protect the last owner from removal/role changes.
+ * can protect the last owner from removal/role changes. By convention `id`
+ * is the member's user id — pre-acceptance people belong in `OrgInvitation`,
+ * not here.
  */
 export interface OrgMember {
   id: string;
@@ -42,9 +67,6 @@ export interface OrgInviteInput {
   email: string;
   role: RoleKey;
 }
-
-/** Roles the host exposes for membership management (labelled RoleKey list). */
-export type MemberRoleSource = readonly RoleInfo[];
 
 /** Permission bridge — ties membership role to a 7.6.0 permission matrix. */
 export interface OrganizationPermissionBridge {

@@ -8,4 +8,4 @@ export type {
   OrganizationMembersPanelProps,
 } from "./OrganizationMembersPanel";
 export { OrganizationSwitcher } from "./OrganizationSwitcher";
-export type { OrganizationSwitcherProps } from "./OrganizationSwitcher";
+export type { OrganizationSwitcherProps, PersonalWorkspace } from "./OrganizationSwitcher";
