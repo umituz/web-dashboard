@@ -191,7 +191,7 @@ describe("DashboardSidebar (secondaryLabel)", () => {
         </Routes>
       </MemoryRouter>
     );
-    const toggle = document.querySelector("button.udb-sidebar__footer-btn");
+    const toggle = document.querySelector<HTMLButtonElement>("button.udb-sidebar__footer-btn");
     toggle?.click();
     expect(onCollapsedChange).toHaveBeenCalledWith(true);
   });
