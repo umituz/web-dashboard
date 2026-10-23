@@ -23,21 +23,13 @@ interface DashboardLayoutProps {
   theme?: "light" | "dark";
   onToggleTheme?: () => void;
   routeTransitionMs?: number;
-  collapsedStorageKey?: string;
+  collapsed?: boolean;
+  onCollapsedChange?: (collapsed: boolean) => void;
   footer?: ReactNode;
   mainId?: string;
   contentFallback?: ReactNode;
   formatNotificationTime?: (createdAt: Date | string | number) => string;
 }
-
-const readCollapsed = (key?: string): boolean => {
-  if (!key || typeof window === "undefined") return false;
-  try {
-    return window.localStorage.getItem(key) === "1";
-  } catch {
-    return false;
-  }
-};
 
 export const DashboardLayout = ({
   config,
@@ -53,7 +45,8 @@ export const DashboardLayout = ({
   theme,
   onToggleTheme,
   routeTransitionMs = 0,
-  collapsedStorageKey,
+  collapsed: collapsedProp,
+  onCollapsedChange,
   footer,
   mainId = "udb-main",
   contentFallback,
@@ -61,7 +54,12 @@ export const DashboardLayout = ({
 }: DashboardLayoutProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(() => readCollapsed(collapsedStorageKey));
+  const [internalCollapsed, setInternalCollapsed] = useState(false);
+  const collapsed = collapsedProp ?? internalCollapsed;
+  const setCollapsed = (next: boolean) => {
+    setInternalCollapsed(next);
+    onCollapsedChange?.(next);
+  };
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loading, setLoading] = useState(routeTransitionMs > 0);
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -70,14 +68,6 @@ export const DashboardLayout = ({
   const searchSeq = useRef(0);
   const palette = config.commandPalette;
   const paletteSearch = palette?.search;
-
-  useEffect(() => {
-    if (!collapsedStorageKey || typeof window === "undefined") return;
-    try {
-      window.localStorage.setItem(collapsedStorageKey, collapsed ? "1" : "0");
-    } catch {
-    }
-  }, [collapsed, collapsedStorageKey]);
 
   useEffect(() => {
     if (routeTransitionMs <= 0) {

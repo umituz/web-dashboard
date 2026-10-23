@@ -157,14 +157,13 @@ describe("DashboardSidebar (secondaryLabel)", () => {
   });
 
   it("hides the secondary label when the sidebar is collapsed", () => {
-    window.localStorage.setItem("udb-collapsed-test", "1");
     render(
       <MemoryRouter initialEntries={["/"]}>
         <Routes>
           <Route
             path="*"
             element={
-              <DashboardLayout config={secondaryConfig} labels={labels} collapsedStorageKey="udb-collapsed-test" />
+              <DashboardLayout config={secondaryConfig} labels={labels} collapsed />
             }
           >
             <Route path="*" element={<div>outlet-content</div>} />
@@ -174,7 +173,27 @@ describe("DashboardSidebar (secondaryLabel)", () => {
     );
     const link = screen.getByRole("link", { name: /home/i });
     expect(link.textContent).not.toContain("오늘");
-    window.localStorage.removeItem("udb-collapsed-test");
+  });
+
+  it("reports toggle events through onCollapsedChange", () => {
+    const onCollapsedChange = vi.fn();
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route
+            path="*"
+            element={
+              <DashboardLayout config={secondaryConfig} labels={labels} onCollapsedChange={onCollapsedChange} />
+            }
+          >
+            <Route path="*" element={<div>outlet-content</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+    const toggle = document.querySelector("button.udb-sidebar__footer-btn");
+    toggle?.click();
+    expect(onCollapsedChange).toHaveBeenCalledWith(true);
   });
 });
 
