@@ -89,23 +89,25 @@ export const DashboardSidebar = ({
 
       <nav className="udb-sidebar__nav">
         <div className="udb-sidebar__groups">
-          {sidebarGroups.map((group) => {
+          {sidebarGroups.map((group, groupIndex) => {
             const filteredItems = filterSidebarItems(group.items, user);
 
             if (filteredItems.length === 0) return null;
 
-            const isGroupCollapsed = collapsedGroups[group.title];
+            const groupTitle = group.title;
+            const groupKey = groupTitle ?? `group-${groupIndex}`;
+            const isGroupCollapsed = groupTitle !== undefined && collapsedGroups[groupTitle];
 
             return (
-              <div key={group.title} className="udb-sidebar__group">
-                {!collapsed && (
+              <div key={groupKey} className="udb-sidebar__group">
+                {!collapsed && groupTitle !== undefined && (
                   <button
                     type="button"
-                    onClick={() => toggleGroup(group.title)}
+                    onClick={() => toggleGroup(groupTitle)}
                     className="udb-sidebar__group-toggle"
                   >
                     <span className="udb-sidebar__group-title">
-                      {group.title}
+                      {groupTitle}
                     </span>
 
                     <span className="udb-sidebar__group-chevron">

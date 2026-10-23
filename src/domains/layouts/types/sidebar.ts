@@ -12,6 +12,6 @@ export interface SidebarItem {
 }
 
 export interface SidebarGroup {
-    title: string;
+    title?: string;
     items: SidebarItem[];
 }

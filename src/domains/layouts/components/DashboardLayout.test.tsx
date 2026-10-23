@@ -197,6 +197,30 @@ describe("DashboardSidebar (secondaryLabel)", () => {
   });
 });
 
+describe("DashboardSidebar (untitled group)", () => {
+  const untitledConfig: DashboardLayoutConfig = {
+    sidebarGroups: [
+      {
+        items: [{ path: "/", label: "Home", icon: Home, end: false }],
+      },
+      {
+        title: "Main",
+        items: [{ path: "/main", label: "Main link", icon: Home, end: false }],
+      },
+    ],
+    brandName: "Test",
+    defaultTitle: "Workspace",
+  };
+
+  it("renders items without a group toggle and keeps titled groups toggleable", () => {
+    renderAt("/", { config: untitledConfig });
+    expect(screen.getByRole("link", { name: /home/i })).toBeTruthy();
+    const toggles = document.querySelectorAll("button.udb-sidebar__group-toggle");
+    expect(toggles.length).toBe(1);
+    expect(toggles[0].textContent).toContain("Main");
+  });
+});
+
 describe("DashboardLayout (contentFallback)", () => {
   const NeverResolves = lazy(() => new Promise<{ default: React.ComponentType }>(() => {}));
 
