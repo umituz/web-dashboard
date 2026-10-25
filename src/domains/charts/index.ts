@@ -1,6 +1,6 @@
 export { PALETTE, useTip, niceMax, gridTicks } from './utils';
 export type { TipRow, TipState } from './utils';
-export { ChartTip, ChartCard, Legend, Sparkline, HBars, BarChart, Donut, LineChart } from './components';
+export { ChartTip, ChartCard, Legend, Sparkline, HBars, BarChart, Donut, LineChart, ActivityHeatmap } from './components';
 export type {
   ChartCardProps,
   LegendItem,
@@ -9,4 +9,6 @@ export type {
   DonutSegment,
   LineSeries,
   LineChartPoint,
+  HeatmapCell,
+  ActivityHeatmapProps,
 } from './components';

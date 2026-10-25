@@ -621,3 +621,62 @@ export function LineChart({
 
   );
 }
+
+export interface HeatmapCell {
+  day: string;
+  value: number;
+}
+
+export interface ActivityHeatmapProps {
+  cells: HeatmapCell[];
+  max?: number;
+  titleFor?: (cell: HeatmapCell) => string;
+  ariaLabel?: string;
+  className?: string;
+  levelClassNames?: string[];
+}
+
+const DEFAULT_HEATMAP_LEVELS = [
+  'bg-muted/40 dark:bg-muted/30',
+  'bg-primary/20 text-primary',
+  'bg-primary/40 text-primary',
+  'bg-primary/70 text-primary-foreground',
+  'bg-primary text-primary-foreground',
+];
+
+export function ActivityHeatmap({
+  cells,
+  max,
+  titleFor,
+  ariaLabel = 'Activity heatmap',
+  className = '',
+  levelClassNames = DEFAULT_HEATMAP_LEVELS,
+}: ActivityHeatmapProps) {
+  const peak = Math.max(1, max ?? Math.max(0, ...cells.map((cell) => cell.value)));
+  const maxIntensity = levelClassNames.length - 1;
+
+  return (
+    <div
+      className={`grid grid-flow-col grid-rows-7 gap-1 ${className}`.trim()}
+      role="img"
+      aria-label={ariaLabel}
+    >
+      {cells.map((cell, index) => {
+        const intensity =
+          cell.value <= 0 ? 0 : Math.min(maxIntensity, Math.ceil((cell.value / peak) * maxIntensity));
+        const cellClass = levelClassNames[intensity] ?? levelClassNames[0];
+        const cellTitle = titleFor ? titleFor(cell) : `${cell.day}: ${cell.value}`;
+
+        return (
+          <span
+            key={`${cell.day}-${index}`}
+            className={`h-3.5 w-3.5 rounded-[3px] transition-colors ${cellClass}`}
+            title={cellTitle}
+          >
+            <span className="sr-only">{cellTitle}</span>
+          </span>
+        );
+      })}
+    </div>
+  );
+}

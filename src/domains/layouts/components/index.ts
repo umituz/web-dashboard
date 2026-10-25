@@ -21,3 +21,5 @@ export type {
   CheckFilterListProps,
   SingleSelectFilterListProps,
 } from './FilterPanel';
+export { NextSteps } from './NextSteps';
+export type { NextStepsProps, NextStepLink } from './NextSteps';

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { renderToString } from 'react-dom/server';
-import { BarChart, Donut, Legend, LineChart, Sparkline } from './components';
+import { ActivityHeatmap, BarChart, Donut, Legend, LineChart, Sparkline } from './components';
 
 describe('charts markup smoke', () => {
   it('Sparkline renders an svg path for enough data and null for less', () => {
@@ -120,5 +120,22 @@ describe('charts markup smoke', () => {
     expect(html).toContain('udb-chartlegend__hint');
     expect(html).toContain('(per month)');
     expect(html).toContain('#333333');
+  });
+
+  it('ActivityHeatmap renders 7 rows and cells with aria-label', () => {
+    const html = renderToString(
+      <ActivityHeatmap
+        cells={[
+          { day: '2026-10-01', value: 0 },
+          { day: '2026-10-02', value: 5 },
+          { day: '2026-10-03', value: 10 },
+        ]}
+        ariaLabel="Activity Grid"
+      />
+    );
+    expect(html).toContain('role="img"');
+    expect(html).toContain('aria-label="Activity Grid"');
+    expect(html).toContain('grid-rows-7');
+    expect(html).toContain('2026-10-02: 5');
   });
 });
