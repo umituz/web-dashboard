@@ -34,11 +34,12 @@ export interface ChartCardProps {
   hostRef?: React.Ref<HTMLDivElement>;
   onMouseLeave?: () => void;
   bare?: boolean;
+  className?: string;
 }
 
-export function ChartCard({ title, subtitle, legend, actions, children, tip, hostRef, onMouseLeave, bare }: ChartCardProps) {
+export function ChartCard({ title, subtitle, legend, actions, children, tip, hostRef, onMouseLeave, bare, className }: ChartCardProps) {
   return (
-    <div className="udb-chartcard">
+    <div className={['udb-chartcard', className].filter(Boolean).join(' ')}>
       <div className="udb-chartcard__head">
         <div className="udb-chartcard__heading">
           <div className="udb-chartcard__title">{title}</div>
