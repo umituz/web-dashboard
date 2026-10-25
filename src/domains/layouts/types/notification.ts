@@ -3,4 +3,6 @@ export interface DashboardNotification {
     text: string;
     read: boolean;
     createdAt: Date | string | number;
+    to?: string;
+    onSelect?: () => void;
 }

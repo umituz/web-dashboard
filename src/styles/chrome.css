@@ -690,6 +690,18 @@
   flex: 1;
   min-width: 0;
 }
+.udb-notif__body--link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.udb-notif__body--link:hover .udb-notif__text {
+  text-decoration: underline;
+}
 .udb-notif__text {
   margin: 0;
   font-size: var(--udb-font-size-md);

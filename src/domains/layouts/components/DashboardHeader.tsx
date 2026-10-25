@@ -142,30 +142,48 @@ export const DashboardHeader = ({
               </div>
 
               <div className="udb-notif__list">
-                {notifications.map((n) => (
-                  <div key={n.id} className={`udb-notif__item${!n.read ? " udb-notif__item--unread" : ""}`}>
-                    <div className="udb-notif__body">
+                {notifications.map((n) => {
+                  const actionable = Boolean(n.to || n.onSelect);
+                  const openNotification = () => {
+                    if (n.onSelect) n.onSelect();
+                    else if (n.to) navigate(n.to);
+                  };
+                  const body = (
+                    <>
                       <p className="udb-notif__text">{n.text}</p>
 
                       <p className="udb-notif__meta">
                         <span className="udb-notif__dot" />
                         {formatNotificationTime(n.createdAt)}
                       </p>
+                    </>
+                  );
+                  return (
+                    <div key={n.id} className={`udb-notif__item${!n.read ? " udb-notif__item--unread" : ""}`}>
+                      {actionable ? (
+                        <button
+                          type="button"
+                          onClick={openNotification}
+                          className="udb-notif__body udb-notif__body--link"
+                        >
+                          {body}
+                        </button>
+                      ) : (
+                        <div className="udb-notif__body">{body}</div>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => onDismissNotification?.(n.id)}
+                        className="udb-notif__dismiss"
+                        aria-label={labels.dismissNotification}
+                      >
+                        <X className="udb-notif__dismiss-icon" />
+                      </button>
 
                     </div>
-
-                    <button
-                      type="button"
-                      onClick={() => onDismissNotification?.(n.id)}
-                      className="udb-notif__dismiss"
-                      aria-label={labels.dismissNotification}
-                    >
-                      <X className="udb-notif__dismiss-icon" />
-                    </button>
-
-                  </div>
-
-                ))}
+                  );
+                })}
                 {notifications.length === 0 && (
                   <div className="udb-notif__empty">
                     <div className="udb-notif__empty-icon">
