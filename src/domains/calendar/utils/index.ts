@@ -1,6 +1,7 @@
 import type { CalendarConfig } from '../types/calendar.types';
 
 export { mapCalendarDocument, mapPostDocument } from './contentItemMapper';
+export * from './layout';
 export type { FirestoreDocument } from './contentItemMapper';
 
 export function getWeekDates(date: Date, startOfWeek: number = 0): Date[] {
