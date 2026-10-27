@@ -92,6 +92,17 @@ export function formatDayTitle(dayKey: string, locale = 'en-US'): string {
   });
 }
 
+export function formatAgendaTitle(anchorKey: string, days: number, locale = 'en-US'): string {
+  const span = Math.max(days - 1, 0);
+  const from = parseDayKey(anchorKey).toLocaleDateString(locale, { month: 'short', day: 'numeric' });
+  const to = parseDayKey(addDaysKey(anchorKey, span)).toLocaleDateString(locale, {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  return `${from} – ${to}`;
+}
+
 export function minutesToLabel(minutes: number): string {
   const normalized = ((Math.round(minutes) % DAY_MINUTES) + DAY_MINUTES) % DAY_MINUTES;
   return `${pad(Math.floor(normalized / 60))}:${pad(normalized % 60)}`;

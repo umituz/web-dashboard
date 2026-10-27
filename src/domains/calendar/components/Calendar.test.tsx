@@ -71,4 +71,24 @@ describe('Calendar', () => {
     const extra = screen.getByText('4 appointments').closest('.udb-cal-extra');
     expect(extra).toBeTruthy();
   });
+
+  it('switches to the agenda view with a window title', () => {
+    mount({ views: ['month', 'agenda'] });
+    fireEvent.click(screen.getByText('Agenda'));
+    expect(screen.getByText('Mar 10 – Apr 8, 2026')).toBeTruthy();
+    expect(screen.getByRole('button', { name: /Kickoff/ })).toBeTruthy();
+  });
+
+  it('shifts the agenda window by agendaDays', () => {
+    render(
+      <Calendar
+        items={[item('Kickoff', '2026-03-15', 600, 660)]}
+        initialCursor="2026-03-10"
+        views={['agenda']}
+        agendaDays={30}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }));
+    expect(screen.getByText('Apr 9 – May 8, 2026')).toBeTruthy();
+  });
 });

@@ -16,12 +16,14 @@ import {
   DEFAULT_MAX_PER_DAY,
   addDaysKey,
   addMonthsKey,
+  formatAgendaTitle,
   formatDayTitle,
   formatMonthTitle,
   formatWeekTitle,
   todayKey,
   weekDays,
 } from '../utils/layout';
+import { CalendarAgenda } from './CalendarAgenda';
 import { CalendarMonth } from './CalendarMonth';
 import { CalendarTimeGrid } from './CalendarTimeGrid';
 
@@ -37,10 +39,12 @@ export interface CalendarProps {
   dayStartMin?: number;
   dayEndMin?: number;
   maxPerDay?: number;
+  agendaDays?: number;
   locale?: string;
   labels?: Partial<CalendarLabels>;
   legend?: readonly CalendarLegendEntry[];
   toolbarExtra?: ReactNode;
+  emptyState?: ReactNode;
   onSelectItem?: (item: CalendarItem) => void;
   onSelectDay?: (dayKey: string) => void;
   onSlotClick?: (dayKey: string, minutes: number) => void;
@@ -59,10 +63,12 @@ export const Calendar = ({
   dayStartMin = DEFAULT_DAY_START_MIN,
   dayEndMin = DEFAULT_DAY_END_MIN,
   maxPerDay = DEFAULT_MAX_PER_DAY,
+  agendaDays = 30,
   locale = 'en-US',
   labels,
   legend,
   toolbarExtra,
+  emptyState,
   onSelectItem,
   onSelectDay,
   onSlotClick,
@@ -87,14 +93,16 @@ export const Calendar = ({
   const shift = (direction: number) => {
     if (activeView === 'month') applyCursor(addMonthsKey(activeCursor, direction));
     else if (activeView === 'week') applyCursor(addDaysKey(activeCursor, direction * 7));
+    else if (activeView === 'agenda') applyCursor(addDaysKey(activeCursor, direction * agendaDays));
     else applyCursor(addDaysKey(activeCursor, direction));
   };
 
   const title = useMemo(() => {
     if (activeView === 'day') return formatDayTitle(activeCursor, locale);
     if (activeView === 'week') return formatWeekTitle(activeCursor, locale);
+    if (activeView === 'agenda') return formatAgendaTitle(activeCursor, agendaDays, locale);
     return formatMonthTitle(activeCursor, locale);
-  }, [activeView, activeCursor, locale]);
+  }, [activeView, activeCursor, agendaDays, locale]);
 
   const handleSelectDay = (dayKey: string) => {
     applyCursor(dayKey);
@@ -167,6 +175,7 @@ export const Calendar = ({
           dayEndMin={dayEndMin}
           locale={locale}
           labels={labels}
+          emptyState={emptyState}
           onSelectItem={onSelectItem}
           onSlotClick={onSlotClick}
         />
@@ -180,8 +189,21 @@ export const Calendar = ({
           dayEndMin={dayEndMin}
           locale={locale}
           labels={labels}
+          emptyState={emptyState}
           onSelectItem={onSelectItem}
           onSlotClick={onSlotClick}
+        />
+      )}
+
+      {activeView === 'agenda' && (
+        <CalendarAgenda
+          items={items}
+          anchorKey={activeCursor}
+          agendaDays={agendaDays}
+          locale={locale}
+          labels={labels}
+          emptyState={emptyState}
+          onSelectItem={onSelectItem}
         />
       )}
     </div>

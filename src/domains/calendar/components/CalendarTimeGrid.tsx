@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import type { CSSProperties, MouseEvent } from 'react';
+import type { CSSProperties, MouseEvent, ReactNode } from 'react';
 import {
   DEFAULT_CALENDAR_LABELS,
   type CalendarItem,
@@ -26,6 +26,7 @@ export interface CalendarTimeGridProps {
   dayEndMin?: number;
   locale?: string;
   labels?: Partial<CalendarLabels>;
+  emptyState?: ReactNode;
   onSelectItem?: (item: CalendarItem) => void;
   onSlotClick?: (dayKey: string, minutes: number) => void;
 }
@@ -37,6 +38,7 @@ export const CalendarTimeGrid = ({
   dayEndMin = DEFAULT_DAY_END_MIN,
   locale = 'en-US',
   labels,
+  emptyState,
   onSelectItem,
   onSlotClick,
 }: CalendarTimeGridProps) => {
@@ -131,9 +133,8 @@ export const CalendarTimeGrid = ({
                   </button>
                 );
               })}
-              {days.length === 1 && dayItems.length === 0 && (
-                <p className="udb-cal-empty">{text.emptyDay}</p>
-              )}
+              {days.length === 1 && dayItems.length === 0 &&
+                (emptyState ?? <p className="udb-cal-empty">{text.emptyDay}</p>)}
             </div>
           </section>
         );

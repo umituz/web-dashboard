@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 export type CalendarTone = 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral' | 'accent';
 
-export type CalendarScreenView = 'month' | 'week' | 'day';
+export type CalendarScreenView = 'month' | 'week' | 'day' | 'agenda';
 
 export interface CalendarItem {
   id: string;
@@ -30,6 +30,7 @@ export interface CalendarLabels {
   month: string;
   week: string;
   day: string;
+  agenda: string;
   more: string;
   emptyDay: string;
 }
@@ -41,6 +42,7 @@ export const DEFAULT_CALENDAR_LABELS: CalendarLabels = {
   month: 'Month',
   week: 'Week',
   day: 'Day',
+  agenda: 'Agenda',
   more: '+{count} more',
   emptyDay: 'Nothing scheduled',
 };
