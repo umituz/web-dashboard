@@ -65,4 +65,10 @@ describe('Calendar', () => {
     mount({ legend: [{ tone: 'success', label: 'Confirmed' }] });
     expect(screen.getByText('Confirmed')).toBeTruthy();
   });
+
+  it('renders toolbar extras inside the toolbar', () => {
+    mount({ toolbarExtra: <span className="calendar-count">4 appointments</span> });
+    const extra = screen.getByText('4 appointments').closest('.udb-cal-extra');
+    expect(extra).toBeTruthy();
+  });
 });

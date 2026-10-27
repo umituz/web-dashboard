@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import type { ReactNode } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button, IconButton } from '@umituz/web-design-system/atoms';
 import { Segmented } from '@umituz/web-design-system/molecules';
@@ -39,6 +40,7 @@ export interface CalendarProps {
   locale?: string;
   labels?: Partial<CalendarLabels>;
   legend?: readonly CalendarLegendEntry[];
+  toolbarExtra?: ReactNode;
   onSelectItem?: (item: CalendarItem) => void;
   onSelectDay?: (dayKey: string) => void;
   onSlotClick?: (dayKey: string, minutes: number) => void;
@@ -60,6 +62,7 @@ export const Calendar = ({
   locale = 'en-US',
   labels,
   legend,
+  toolbarExtra,
   onSelectItem,
   onSelectDay,
   onSlotClick,
@@ -123,6 +126,7 @@ export const Calendar = ({
           </Button>
         </div>
         <div className="udb-cal-toolbar-side">
+          {toolbarExtra && <div className="udb-cal-extra">{toolbarExtra}</div>}
           {legend && legend.length > 0 && (
             <div className="udb-cal-legend">
               {legend.map((entry) => (

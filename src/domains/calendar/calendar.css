@@ -37,6 +37,13 @@
   gap: var(--udb-space-3, 12px);
 }
 
+.udb-cal-extra {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--udb-space-2, 8px);
+}
+
 .udb-cal-legend {
   display: flex;
   flex-wrap: wrap;

@@ -15,6 +15,7 @@ export interface CalendarItem {
   meta?: ReactNode;
   kind?: string;
   muted?: boolean;
+  payload?: unknown;
 }
 
 export interface CalendarLegendEntry {
