@@ -68,7 +68,8 @@
 .udb-cal-dot--primary,
 .udb-cal-chip--primary,
 .udb-cal-event--primary,
-.udb-cal-agenda-item--primary {
+.udb-cal-agenda-item--primary,
+.udb-cal-res-block--primary {
   background: color-mix(in srgb, var(--color-primary, #2563eb) 12%, transparent);
   color: var(--color-primary, #2563eb);
 }
@@ -76,7 +77,8 @@
 .udb-cal-dot--success,
 .udb-cal-chip--success,
 .udb-cal-event--success,
-.udb-cal-agenda-item--success {
+.udb-cal-agenda-item--success,
+.udb-cal-res-block--success {
   background: color-mix(in srgb, var(--color-success, #16a34a) 12%, transparent);
   color: var(--color-success, #16a34a);
 }
@@ -84,7 +86,8 @@
 .udb-cal-dot--warning,
 .udb-cal-chip--warning,
 .udb-cal-event--warning,
-.udb-cal-agenda-item--warning {
+.udb-cal-agenda-item--warning,
+.udb-cal-res-block--warning {
   background: color-mix(in srgb, var(--color-warning, #d97706) 16%, transparent);
   color: var(--color-warning, #d97706);
 }
@@ -92,7 +95,8 @@
 .udb-cal-dot--danger,
 .udb-cal-chip--danger,
 .udb-cal-event--danger,
-.udb-cal-agenda-item--danger {
+.udb-cal-agenda-item--danger,
+.udb-cal-res-block--danger {
   background: color-mix(in srgb, var(--color-destructive, #dc2626) 12%, transparent);
   color: var(--color-destructive, #dc2626);
 }
@@ -100,7 +104,8 @@
 .udb-cal-dot--info,
 .udb-cal-chip--info,
 .udb-cal-event--info,
-.udb-cal-agenda-item--info {
+.udb-cal-agenda-item--info,
+.udb-cal-res-block--info {
   background: color-mix(in srgb, var(--color-info, #0891b2) 12%, transparent);
   color: var(--color-info, #0891b2);
 }
@@ -108,7 +113,8 @@
 .udb-cal-dot--accent,
 .udb-cal-chip--accent,
 .udb-cal-event--accent,
-.udb-cal-agenda-item--accent {
+.udb-cal-agenda-item--accent,
+.udb-cal-res-block--accent {
   background: color-mix(in srgb, var(--color-accent, #7c3aed) 12%, transparent);
   color: var(--color-accent, #7c3aed);
 }
@@ -119,7 +125,8 @@
 
 .udb-cal-chip--neutral,
 .udb-cal-event--neutral,
-.udb-cal-agenda-item--neutral {
+.udb-cal-agenda-item--neutral,
+.udb-cal-res-block--neutral {
   background: var(--color-secondary, #f1f5f9);
   color: var(--color-secondary-foreground, #334155);
 }
@@ -249,6 +256,55 @@
   grid-template-columns: 3.5rem repeat(var(--udb-cal-days, 1), minmax(0, 1fr));
 }
 
+.udb-cal-days {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 3.5rem repeat(var(--udb-cal-days, 1), minmax(0, 1fr));
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+}
+
+.udb-cal-days-corner {
+  border-right: 1px solid var(--color-border, #e2e8f0);
+}
+
+.udb-cal-days .udb-cal-day-head + .udb-cal-day-head {
+  border-left: 1px solid var(--color-border, #e2e8f0);
+}
+
+.udb-cal-allday {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 3.5rem repeat(var(--udb-cal-days, 1), minmax(0, 1fr));
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+  background: color-mix(in srgb, var(--color-muted, #f8fafc) 45%, transparent);
+}
+
+.udb-cal-allday-corner {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 8px;
+  border-right: 1px solid var(--color-border, #e2e8f0);
+  font-size: var(--udb-font-size-xs, 11px);
+  color: var(--color-muted-foreground, #94a3b8);
+}
+
+.udb-cal-allday-cell {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  gap: 3px;
+  padding: 4px 6px;
+}
+
+.udb-cal-allday-cell + .udb-cal-allday-cell {
+  border-left: 1px solid var(--color-border, #eef2f7);
+}
+
+.udb-cal-allday-cell .udb-cal-chip {
+  max-width: 100%;
+}
+
 .udb-cal-gutter {
   position: relative;
   border-right: 1px solid var(--color-border, #e2e8f0);
@@ -273,7 +329,6 @@
   justify-content: center;
   gap: 6px;
   padding: 8px 4px;
-  border-bottom: 1px solid var(--color-border, #e2e8f0);
 }
 
 .udb-cal-day-head.is-today .udb-cal-daynum {
@@ -467,6 +522,129 @@
 }
 
 .udb-cal-agenda-empty-text {
+  margin: 0;
+  color: var(--color-muted-foreground, #94a3b8);
+}
+
+.udb-cal-res {
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 12px;
+  background: var(--color-card, #ffffff);
+  color: var(--color-foreground, #0f172a);
+  overflow: hidden;
+  font-size: var(--udb-font-size-sm, 12px);
+}
+
+.udb-cal-res-axis {
+  position: relative;
+  height: 26px;
+  margin-left: var(--udb-cal-res-label-width, 11rem);
+  border-bottom: 1px solid var(--color-border, #e2e8f0);
+  background: color-mix(in srgb, var(--color-muted, #f8fafc) 60%, transparent);
+}
+
+.udb-cal-res-axis-label {
+  position: absolute;
+  top: 6px;
+  transform: translateX(-50%);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  color: var(--color-muted-foreground, #94a3b8);
+}
+
+.udb-cal-res-row {
+  display: grid;
+  grid-template-columns: var(--udb-cal-res-label-width, 11rem) minmax(0, 1fr);
+}
+
+.udb-cal-res-row + .udb-cal-res-row {
+  border-top: 1px solid var(--color-border, #e2e8f0);
+}
+
+.udb-cal-res-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  min-width: 0;
+  padding: 6px 12px;
+  border-right: 1px solid var(--color-border, #e2e8f0);
+}
+
+.udb-cal-res-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.udb-cal-res-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--udb-font-size-xs, 11px);
+  color: var(--color-muted-foreground, #64748b);
+}
+
+.udb-cal-res-lane {
+  position: relative;
+  min-height: 56px;
+}
+
+.udb-cal-res-hour {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  border-left: 1px solid var(--color-border, #eef2f7);
+}
+
+.udb-cal-res-block {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 2px 6px;
+  border: none;
+  border-left: 3px solid currentColor;
+  border-radius: 5px;
+  overflow: hidden;
+  text-align: left;
+  font-size: var(--udb-font-size-xs, 11px);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.udb-cal-res-block:focus-visible {
+  outline: 2px solid var(--color-ring, #2563eb);
+  outline-offset: 1px;
+}
+
+.udb-cal-res-block.is-muted {
+  opacity: 0.45;
+}
+
+.udb-cal-res-block-time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.udb-cal-res-block-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.udb-cal-res-empty {
+  display: grid;
+  place-items: center;
+  padding: 48px 16px;
+}
+
+.udb-cal-res-empty-text {
   margin: 0;
   color: var(--color-muted-foreground, #94a3b8);
 }

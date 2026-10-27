@@ -54,7 +54,10 @@ export const CalendarTimeGrid = ({
   }, [dayStartMin, dayEndMin]);
 
   const timed = useMemo(() => items.filter((item) => item.startMin !== undefined), [items]);
-  const byDay = useMemo(() => groupByDayKey(timed), [timed]);
+  const untimed = useMemo(() => items.filter((item) => item.startMin === undefined), [items]);
+  const timedByDay = useMemo(() => groupByDayKey(timed), [timed]);
+  const untimedByDay = useMemo(() => groupByDayKey(untimed), [untimed]);
+  const hasAllDay = days.some((dayKey) => (untimedByDay.get(dayKey)?.length ?? 0) > 0);
 
   const positionOf = (minute: number): string =>
     `${((minute - dayStartMin) / total) * 100}%`;
@@ -74,6 +77,44 @@ export const CalendarTimeGrid = ({
       className="udb-cal-grid"
       style={{ ['--udb-cal-days' as string]: days.length } as CSSProperties}
     >
+      <div className="udb-cal-days">
+        <span className="udb-cal-days-corner" />
+        {days.map((dayKey) => (
+          <div
+            className={dayKey === today ? 'udb-cal-day-head is-today' : 'udb-cal-day-head'}
+            key={dayKey}
+          >
+            <span className="udb-cal-weekday">{formatWeekdayShort(dayKey, locale)}</span>
+            <span className="udb-cal-daynum">{formatDayNumber(dayKey)}</span>
+          </div>
+        ))}
+      </div>
+
+      {hasAllDay && (
+        <div className="udb-cal-allday">
+          <span className="udb-cal-allday-corner">{text.allDay}</span>
+          {days.map((dayKey) => (
+            <div className="udb-cal-allday-cell" key={dayKey}>
+              {(untimedByDay.get(dayKey) ?? []).map((item) => (
+                <button
+                  type="button"
+                  key={item.id}
+                  className={
+                    item.muted
+                      ? `udb-cal-chip udb-cal-chip--${item.tone ?? 'primary'} is-muted`
+                      : `udb-cal-chip udb-cal-chip--${item.tone ?? 'primary'}`
+                  }
+                  onClick={() => onSelectItem?.(item)}
+                >
+                  {item.icon}
+                  <span className="udb-cal-chip-title">{item.title}</span>
+                </button>
+              ))}
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="udb-cal-gutter" aria-hidden="true">
         {hours.map((minute) => (
           <div className="udb-cal-hour-label" style={{ top: positionOf(minute) }} key={minute}>
@@ -83,13 +124,10 @@ export const CalendarTimeGrid = ({
       </div>
 
       {days.map((dayKey) => {
-        const dayItems = byDay.get(dayKey) ?? [];
+        const laneItems = timedByDay.get(dayKey) ?? [];
+        const dayCount = laneItems.length + (untimedByDay.get(dayKey)?.length ?? 0);
         return (
           <section className="udb-cal-day" aria-label={dayKey} key={dayKey}>
-            <header className={dayKey === today ? 'udb-cal-day-head is-today' : 'udb-cal-day-head'}>
-              <span className="udb-cal-weekday">{formatWeekdayShort(dayKey, locale)}</span>
-              <span className="udb-cal-daynum">{formatDayNumber(dayKey)}</span>
-            </header>
             <div
               className="udb-cal-lane"
               role="grid"
@@ -103,7 +141,7 @@ export const CalendarTimeGrid = ({
                   key={minute}
                 />
               ))}
-              {layoutColumns(dayItems).map(({ item, column, columns }) => {
+              {layoutColumns(laneItems).map(({ item, column, columns }) => {
                 const geometry = eventGeometry(item, dayStartMin, dayEndMin);
                 return (
                   <button
@@ -133,7 +171,7 @@ export const CalendarTimeGrid = ({
                   </button>
                 );
               })}
-              {days.length === 1 && dayItems.length === 0 &&
+              {days.length === 1 && dayCount === 0 &&
                 (emptyState ?? <p className="udb-cal-empty">{text.emptyDay}</p>)}
             </div>
           </section>

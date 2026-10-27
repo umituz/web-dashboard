@@ -69,4 +69,31 @@ describe('CalendarTimeGrid', () => {
       expect.objectContaining({ id: 'Consult' }),
     );
   });
+
+  it('keeps untimed items in the all-day strip instead of dropping them', () => {
+    const { container } = mount({
+      days: ['2026-03-15', '2026-03-16'],
+      items: [
+        item('Consult', '2026-03-15', 600, 660),
+        { id: 'Permit expiry', dayKey: '2026-03-16', title: 'Permit expiry', tone: 'danger' },
+      ],
+    });
+    const strip = container.querySelector('.udb-cal-allday');
+    expect(strip).toBeTruthy();
+    expect(screen.getByText('All day')).toBeTruthy();
+    expect(strip?.textContent).toContain('Permit expiry');
+    expect(strip?.textContent).not.toContain('Consult');
+    expect(container.querySelectorAll('.udb-cal-event')).toHaveLength(1);
+  });
+
+  it('does not flag a single day as empty when it only holds all-day items', () => {
+    mount({ items: [{ id: 'Expiry', dayKey: '2026-03-15', title: 'Expiry' }] });
+    expect(screen.queryByText('Nothing scheduled')).toBeNull();
+    expect(screen.getByText('All day')).toBeTruthy();
+  });
+
+  it('omits the all-day strip when every item is timed', () => {
+    const { container } = mount({ items: [item('Consult', '2026-03-15', 600, 660)] });
+    expect(container.querySelector('.udb-cal-allday')).toBeNull();
+  });
 });

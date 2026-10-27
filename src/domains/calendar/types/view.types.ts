@@ -16,6 +16,7 @@ export interface CalendarItem {
   kind?: string;
   muted?: boolean;
   payload?: unknown;
+  resourceId?: string;
 }
 
 export interface CalendarLegendEntry {
@@ -31,6 +32,7 @@ export interface CalendarLabels {
   week: string;
   day: string;
   agenda: string;
+  allDay: string;
   more: string;
   emptyDay: string;
 }
@@ -43,6 +45,7 @@ export const DEFAULT_CALENDAR_LABELS: CalendarLabels = {
   week: 'Week',
   day: 'Day',
   agenda: 'Agenda',
+  allDay: 'All day',
   more: '+{count} more',
   emptyDay: 'Nothing scheduled',
 };
