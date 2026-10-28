@@ -74,9 +74,9 @@ export function createProductTour(config: TourConfig): TourEngineInstance {
     onStepChange,
   } = config;
 
-  const nextBtnDefault = labels.next ?? "İleri";
-  const prevBtnDefault = labels.prev ?? "Geri";
-  const doneBtnDefault = labels.done ?? "Tamamla";
+  const nextBtnDefault = labels.next;
+  const prevBtnDefault = labels.prev;
+  const doneBtnDefault = labels.done;
   const progressTextTemplate = labels.progress ?? "{{current}} / {{total}}";
 
   let completedSuccessfully = false;

@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useMemo, type ReactNode } from 
 import { Navigate } from "react-router";
 import { hasAnyPermission, hasPermission } from "./hasPermission";
 import type { Permission, PermissionMatrix, RoleKey } from "./types";
-import { AccessDenied } from "./AccessDenied";
+import { AccessDenied, type AccessDeniedProps } from "./AccessDenied";
 
 export interface PermissionsProviderProps {
   matrix: PermissionMatrix;
@@ -127,13 +127,14 @@ export interface ProtectedRouteProps {
   children: ReactNode;
   redirectTo?: string;
   fallback?: ReactNode;
+  accessDeniedProps?: AccessDeniedProps;
 }
 
 /**
  * Route-level permission guard. If the user lacks the permission:
  * - Renders `fallback` if provided
  * - Redirects to `redirectTo` if provided
- * - Otherwise displays the standard `<AccessDenied />` screen
+ * - Otherwise displays `<AccessDenied {...accessDeniedProps} />`
  */
 export const ProtectedRoute = ({
   permission,
@@ -141,13 +142,14 @@ export const ProtectedRoute = ({
   children,
   redirectTo,
   fallback,
+  accessDeniedProps,
 }: ProtectedRouteProps) => {
   const { can, canAny } = usePermissions();
   const allowed = resolveAllowed(can, canAny, permission, anyOf);
   if (!allowed) {
     if (fallback !== undefined) return <>{fallback}</>;
     if (redirectTo !== undefined) return <Navigate to={redirectTo} replace />;
-    return <AccessDenied />;
+    return <AccessDenied {...accessDeniedProps} />;
   }
   return <>{children}</>;
 };

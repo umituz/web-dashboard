@@ -172,15 +172,22 @@ describe("ProtectedRoute", () => {
     expect(screen.getByText("Protected Area")).not.toBeNull();
   });
 
-  it("renders fallback AccessDenied when unauthorized without redirect", () => {
+  it("renders fallback AccessDenied with custom props when unauthorized without redirect", () => {
     mount("viewer", (
       <MemoryRouter>
-        <ProtectedRoute permission="orders.edit">
+        <ProtectedRoute
+          permission="orders.edit"
+          accessDeniedProps={{
+            title: "Access Forbidden",
+            description: "You cannot view this area",
+          }}
+        >
           <span>Protected Area</span>
         </ProtectedRoute>
       </MemoryRouter>
     ));
     expect(screen.queryByText("Protected Area")).toBeNull();
-    expect(screen.getByText("Erişim Yetkisi Yok")).not.toBeNull();
+    expect(screen.getByText("Access Forbidden")).not.toBeNull();
+    expect(screen.getByText("You cannot view this area")).not.toBeNull();
   });
 });

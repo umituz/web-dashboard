@@ -24,7 +24,7 @@ export interface TourStep {
    */
   align?: TourAlign;
   /**
-   * Optional small badge text displayed before the title (e.g. "Yeni", "Adım 1").
+   * Optional small badge text displayed before the title (e.g. "New", "Step 1").
    */
   badge?: string;
 }
