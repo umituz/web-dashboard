@@ -106,7 +106,7 @@ export const Calendar = ({
 
   const handleSelectDay = (dayKey: string) => {
     applyCursor(dayKey);
-    if (activeView !== 'day') applyView('day');
+    if (activeView !== 'day' && views.includes('day')) applyView('day');
     onSelectDay?.(dayKey);
   };
 

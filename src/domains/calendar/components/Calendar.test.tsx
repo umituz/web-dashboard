@@ -49,6 +49,18 @@ describe('Calendar', () => {
     expect(screen.getByText('Sunday, March 15, 2026')).toBeTruthy();
   });
 
+  it('stays in the month view when the day view is not offered', () => {
+    render(
+      <Calendar
+        items={[{ id: 'Expiry', dayKey: '2026-03-15', title: 'Expiry' }]}
+        initialCursor="2026-03-10"
+        views={['month', 'agenda']}
+      />,
+    );
+    fireEvent.click(screen.getByRole('button', { name: '2026-03-15' }));
+    expect(screen.getByText('March 2026')).toBeTruthy();
+  });
+
   it('respects a controlled view', () => {
     mount({ view: 'day' });
     expect(screen.getByText('Tuesday, March 10, 2026')).toBeTruthy();
