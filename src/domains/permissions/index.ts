@@ -1,12 +1,19 @@
 export {
   PermissionsProvider,
   usePermissions,
+  usePermission,
   RequirePermission,
+  ProtectedRoute,
   Can,
   type PermissionsProviderProps,
   type RequirePermissionProps,
+  type ProtectedRouteProps,
   type CanProps,
 } from "./PermissionsContext";
+export {
+  AccessDenied,
+  type AccessDeniedProps,
+} from "./AccessDenied";
 export {
   hasPermission,
   hasAnyPermission,

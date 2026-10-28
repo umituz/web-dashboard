@@ -43,6 +43,7 @@ export interface HeaderProfileItem {
   danger?: boolean;
   roles?: readonly string[];
   permission?: string;
+  anyOf?: readonly string[];
   permissions?: readonly string[];
 }
 

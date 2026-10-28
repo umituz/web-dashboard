@@ -11,6 +11,7 @@ export interface SidebarItem {
     end?: boolean;
     roles?: readonly string[];
     permission?: string;
+    anyOf?: readonly string[];
     permissions?: readonly string[];
 }
 

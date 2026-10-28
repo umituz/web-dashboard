@@ -65,11 +65,15 @@ export function getPageTitle(
   return null;
 }
 
+import { hasAnyPermission, hasPermission } from "../../permissions/hasPermission";
+import type { PermissionMatrix } from "../../permissions/types";
+
 export interface AccessControllableItem {
   enabled?: boolean;
   requiredApp?: "mobile" | "web";
   roles?: readonly string[];
   permission?: string;
+  anyOf?: readonly string[];
   permissions?: readonly string[];
 }
 
@@ -77,6 +81,7 @@ export interface AccessControllableUser {
   role?: string;
   roles?: readonly string[];
   permissions?: readonly string[];
+  matrix?: PermissionMatrix;
   hasMobileApp?: boolean;
   hasWebApp?: boolean;
 }
@@ -100,17 +105,30 @@ export function isItemPermitted(
   }
 
   if (item.permission) {
-    const userPerms = user?.permissions ?? [];
-    if (!userPerms.includes("*") && !userPerms.includes(item.permission)) {
-      return false;
+    if (user?.matrix && user?.role) {
+      if (!hasPermission(user.matrix, user.role, item.permission)) {
+        return false;
+      }
+    } else {
+      const userPerms = user?.permissions ?? [];
+      if (!userPerms.includes("*") && !userPerms.includes(item.permission)) {
+        return false;
+      }
     }
   }
 
-  if (item.permissions && item.permissions.length > 0) {
-    const userPerms = user?.permissions ?? [];
-    if (!userPerms.includes("*")) {
-      const hasAny = item.permissions.some((p) => userPerms.includes(p));
-      if (!hasAny) return false;
+  const anyOfList = item.anyOf ?? item.permissions;
+  if (anyOfList && anyOfList.length > 0) {
+    if (user?.matrix && user?.role) {
+      if (!hasAnyPermission(user.matrix, user.role, anyOfList)) {
+        return false;
+      }
+    } else {
+      const userPerms = user?.permissions ?? [];
+      if (!userPerms.includes("*")) {
+        const hasAny = anyOfList.some((p) => userPerms.includes(p));
+        if (!hasAny) return false;
+      }
     }
   }
 

@@ -22,7 +22,9 @@ const grantIncludes = (grant: RoleGrant, permission: Permission): boolean => {
   if (grant === PERMISSION_WILDCARD) return true;
   return grant.some(
     (entry) =>
-      entry === permission || matchesModuleWildcard(entry, permission),
+      entry === PERMISSION_WILDCARD ||
+      entry === permission ||
+      matchesModuleWildcard(entry, permission),
   );
 };
 

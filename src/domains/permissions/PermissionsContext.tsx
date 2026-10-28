@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, type ReactNode } from 
 import { Navigate } from "react-router";
 import { hasAnyPermission, hasPermission } from "./hasPermission";
 import type { Permission, PermissionMatrix, RoleKey } from "./types";
+import { AccessDenied } from "./AccessDenied";
 
 export interface PermissionsProviderProps {
   matrix: PermissionMatrix;
@@ -105,4 +106,48 @@ export const Can = ({
   const { can, canAny } = usePermissions();
   const allowed = resolveAllowed(can, canAny, permission, anyOf);
   return allowed ? <>{children}</> : <>{fallback}</>;
+};
+
+/**
+ * Convenience hook that checks whether the current user has a specific permission.
+ *
+ * Example:
+ * ```tsx
+ * const canCreateProject = usePermission("projects.create");
+ * ```
+ */
+export const usePermission = (permission: Permission): boolean => {
+  const { can } = usePermissions();
+  return can(permission);
+};
+
+export interface ProtectedRouteProps {
+  permission?: Permission;
+  anyOf?: readonly Permission[];
+  children: ReactNode;
+  redirectTo?: string;
+  fallback?: ReactNode;
+}
+
+/**
+ * Route-level permission guard. If the user lacks the permission:
+ * - Renders `fallback` if provided
+ * - Redirects to `redirectTo` if provided
+ * - Otherwise displays the standard `<AccessDenied />` screen
+ */
+export const ProtectedRoute = ({
+  permission,
+  anyOf,
+  children,
+  redirectTo,
+  fallback,
+}: ProtectedRouteProps) => {
+  const { can, canAny } = usePermissions();
+  const allowed = resolveAllowed(can, canAny, permission, anyOf);
+  if (!allowed) {
+    if (fallback !== undefined) return <>{fallback}</>;
+    if (redirectTo !== undefined) return <Navigate to={redirectTo} replace />;
+    return <AccessDenied />;
+  }
+  return <>{children}</>;
 };

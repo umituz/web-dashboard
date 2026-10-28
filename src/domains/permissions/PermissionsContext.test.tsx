@@ -4,7 +4,9 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import {
   Can,
   PermissionsProvider,
+  ProtectedRoute,
   RequirePermission,
+  usePermission,
   usePermissions,
 } from "./PermissionsContext";
 import type { PermissionMatrix } from "./types";
@@ -140,5 +142,45 @@ describe("Can", () => {
       </Can>
     ));
     expect(screen.getByText("Orders")).not.toBeNull();
+  });
+});
+
+describe("usePermission", () => {
+  it("returns true when permission is granted and false otherwise", () => {
+    let allowed = false;
+    const Probe = () => {
+      allowed = usePermission("orders.edit");
+      return null;
+    };
+    mount("editor", <Probe />);
+    expect(allowed).toBe(true);
+
+    mount("viewer", <Probe />);
+    expect(allowed).toBe(false);
+  });
+});
+
+describe("ProtectedRoute", () => {
+  it("renders children when authorized", () => {
+    mount("editor", (
+      <MemoryRouter>
+        <ProtectedRoute permission="orders.edit">
+          <span>Protected Area</span>
+        </ProtectedRoute>
+      </MemoryRouter>
+    ));
+    expect(screen.getByText("Protected Area")).not.toBeNull();
+  });
+
+  it("renders fallback AccessDenied when unauthorized without redirect", () => {
+    mount("viewer", (
+      <MemoryRouter>
+        <ProtectedRoute permission="orders.edit">
+          <span>Protected Area</span>
+        </ProtectedRoute>
+      </MemoryRouter>
+    ));
+    expect(screen.queryByText("Protected Area")).toBeNull();
+    expect(screen.getByText("Erişim Yetkisi Yok")).not.toBeNull();
   });
 });

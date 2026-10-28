@@ -64,37 +64,55 @@ describe("getPageTitle", () => {
   });
 });
 
-describe("filterSidebarItems & filterProfileItems (Role & Permission Control)", () => {
-  it("filters items based on role access", () => {
+describe("filterSidebarItems & filterProfileItems (Dynamic RBAC & Permission Control)", () => {
+  it("filters items based on generic SaaS role access", () => {
     const items = [
       { path: "/overview", label: "Overview" },
-      { path: "/studio", label: "Teacher Studio", roles: ["teacher", "admin"] },
+      { path: "/editor-tools", label: "Editor Tools", roles: ["editor", "admin"] },
       { path: "/admin", label: "Admin Panel", roles: ["admin"] },
     ];
 
-    // Student user
-    const studentUser = { id: "1", role: "student" };
-    const studentItems = items.filter((item) =>
-      filterSidebarItems([item], studentUser).length > 0
-    );
-    expect(studentItems.map((i) => i.path)).toEqual(["/overview"]);
+    const viewerUser = { id: "1", role: "viewer" };
+    const viewerItems = filterSidebarItems(items, viewerUser);
+    expect(viewerItems.map((i) => i.path)).toEqual(["/overview"]);
 
-    // Teacher user
-    const teacherUser = { id: "2", role: "teacher" };
-    const teacherItems = items.filter((item) =>
-      filterSidebarItems([item], teacherUser).length > 0
-    );
-    expect(teacherItems.map((i) => i.path)).toEqual(["/overview", "/studio"]);
+    const editorUser = { id: "2", role: "editor" };
+    const editorItems = filterSidebarItems(items, editorUser);
+    expect(editorItems.map((i) => i.path)).toEqual(["/overview", "/editor-tools"]);
 
-    // Admin user
     const adminUser = { id: "3", role: "admin" };
-    const adminItems = items.filter((item) =>
-      filterSidebarItems([item], adminUser).length > 0
-    );
-    expect(adminItems.map((i) => i.path)).toEqual(["/overview", "/studio", "/admin"]);
+    const adminItems = filterSidebarItems(items, adminUser);
+    expect(adminItems.map((i) => i.path)).toEqual(["/overview", "/editor-tools", "/admin"]);
   });
 
-  it("filters items based on explicit permissions", () => {
+  it("filters items based on dynamic permission matrix", () => {
+    const matrix = {
+      viewer: ["projects.read"],
+      editor: ["projects.read", "projects.write"],
+      admin: ["*"],
+    };
+
+    const items = [
+      { path: "/projects", label: "Projects", permission: "projects.read" },
+      { path: "/projects/new", label: "Create Project", permission: "projects.write" },
+      { path: "/billing", label: "Billing", permission: "billing.manage" },
+    ];
+
+    expect(filterSidebarItems(items, { role: "viewer", matrix }).map((i) => i.path)).toEqual([
+      "/projects",
+    ]);
+    expect(filterSidebarItems(items, { role: "editor", matrix }).map((i) => i.path)).toEqual([
+      "/projects",
+      "/projects/new",
+    ]);
+    expect(filterSidebarItems(items, { role: "admin", matrix }).map((i) => i.path)).toEqual([
+      "/projects",
+      "/projects/new",
+      "/billing",
+    ]);
+  });
+
+  it("filters items based on explicit permissions array", () => {
     const items = [
       { path: "/public", label: "Public" },
       { path: "/billing", label: "Billing", permission: "billing.manage" },
