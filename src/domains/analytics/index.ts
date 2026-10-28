@@ -1,7 +1,4 @@
 export {
-  MetricCard,
-  AnalyticsChart,
-  AnalyticsCard,
   AnalyticsLayout,
 } from "./components";
 
@@ -11,7 +8,7 @@ export {
 } from "./hooks";
 export type {
   AnalyticsApiClient,
-  AnalyticsDataPayload,
+  AnalyticsPayload,
   UseAnalyticsOptions,
   UseAnalyticsReturn,
 } from "./hooks";
@@ -22,39 +19,25 @@ export {
   formatCurrency,
   calculateGrowth,
   getTrend,
-  createKPI,
-  createMetric,
-  formatMetricValue,
+  toKpiDelta,
+  toCsv,
+  downloadCsv,
+  exportCsv,
   calculateConversionRate,
   calculateDropOffRate,
-  createDateRangePreset,
-  getDateRangePresets,
   aggregateByPeriod,
   calculateMovingAverage,
   detectOutliers,
   roundTo,
-  generateColor,
-  generateChartColors,
 } from "./utils";
+export type { KpiDeltaLike } from "./utils";
 
 export type {
-  Metric,
+  KpiDatum,
+  TimeSeriesDatum,
   TimeSeriesData,
-  ChartData,
-  FunnelStep,
-  FunnelData,
-  CohortAnalysis,
-  UserSegment,
-  KPIData,
-  KPIs,
-  ChartType,
-  ChartConfig,
-  MetricCardProps,
-  AnalyticsCardProps,
+  AnalyticsLayoutLabels,
   AnalyticsLayoutProps,
-  AnalyticsPeriod,
-  AnalyticsConfig,
-  MetricConfig,
   DateRangePreset,
   DateRangeValue,
   ExportFormat,

@@ -1,8 +1,8 @@
-import type { ChartType } from '../domains/analytics/types/analytics';
+import type { ExportFormat } from '../domains/analytics/types/analytics';
+
+export type { ExportFormat };
 
 export type AnalyticsServiceType = 'traffic' | 'cohort' | 'funnel' | 'growth' | 'performance';
-
-export type ExportFormat = 'pdf' | 'excel' | 'csv' | 'json';
 
 export interface AnalyticsConfig {
     enabled?: boolean;
@@ -21,10 +21,8 @@ export interface DataConfig {
 }
 
 export interface ChartsConfig {
-    defaultType?: ChartType;
     theme?: 'light' | 'dark' | 'auto';
     animations?: boolean;
-    colors?: string[];
 }
 
 export interface PerformanceConfig {
@@ -47,17 +45,15 @@ export const DEFAULT_DASHBOARD_CONFIG: DashboardConfig = {
     realtime: true,
     export: {
       enabled: true,
-      formats: ['pdf', 'excel', 'csv'],
+      formats: ['pdf', 'xlsx', 'csv'],
     },
   },
   data: {
     refreshInterval: 30000,     cacheDuration: 300000,     retryAttempts: 3,
   },
   charts: {
-    defaultType: 'line',
     theme: 'auto',
     animations: true,
-    colors: ['#6366f1', '#a855f7', '#f59e0b', '#10b981'],
   },
   performance: {
     lazyLoad: true,

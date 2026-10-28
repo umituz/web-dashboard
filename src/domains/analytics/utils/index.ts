@@ -4,18 +4,15 @@ export {
   formatCurrency,
   calculateGrowth,
   getTrend,
-  createKPI,
-  createMetric,
-  formatMetricValue,
+  toKpiDelta,
+  toCsv,
+  downloadCsv,
+  exportCsv,
   calculateConversionRate,
   calculateDropOffRate,
-  createDateRangePreset,
-  getDateRangePresets,
   aggregateByPeriod,
   calculateMovingAverage,
   detectOutliers,
   roundTo,
-  generateColor,
-  generateChartColors,
 } from "./analytics";
-
+export type { KpiDeltaLike } from "./analytics";

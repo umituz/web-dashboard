@@ -1,57 +1,38 @@
 import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { presetRange } from "@umituz/web-design-system/organisms";
+import type { DateRange } from "@umituz/web-design-system/organisms";
 import type {
-  KPIs,
-  TimeSeriesData,
-  DateRangeValue,
   AnalyticsExportOptions,
+  KpiDatum,
+  TimeSeriesDatum,
 } from "../types/analytics";
 
 export interface AnalyticsApiClient {
-  loadAnalytics: (range: DateRangeValue) => Promise<AnalyticsDataPayload>;
-  exportAnalytics: (payload: AnalyticsDataPayload, options: AnalyticsExportOptions) => Promise<Blob>;
+  loadAnalytics: (range: DateRange) => Promise<AnalyticsPayload>;
+  exportAnalytics?: (payload: AnalyticsPayload, options: AnalyticsExportOptions) => Promise<Blob>;
 }
 
-export interface AnalyticsDataPayload {
-  kpis: KPIs;
-  timeSeries: TimeSeriesData[];
+export interface AnalyticsPayload {
+  kpis: KpiDatum[];
+  series: TimeSeriesDatum[];
 }
 
 export interface UseAnalyticsOptions {
-  initialDateRange?: DateRangeValue;
-    refreshInterval?: number;
+  initialRange?: DateRange;
+  refreshInterval?: number;
   apiClient: AnalyticsApiClient;
 }
 
 export interface UseAnalyticsReturn {
-  kpis: KPIs;
-  timeSeries: TimeSeriesData[];
+  kpis: KpiDatum[];
+  series: TimeSeriesDatum[];
   isLoading: boolean;
   error: string | null;
-  dateRange: DateRangeValue;
-  updateDateRange: (range: DateRangeValue) => void;
+  range: DateRange;
+  updateRange: (range: DateRange) => void;
   refresh: () => Promise<void>;
   exportData: (options: AnalyticsExportOptions) => Promise<void>;
 }
-
-const DEFAULT_RANGE_DAYS = 30;
-const MS_PER_DAY = 24 * 60 * 60 * 1000;
-
-const buildDefaultRange = (): DateRangeValue => {
-  const today = new Date();
-  const start = new Date(Date.now() - DEFAULT_RANGE_DAYS * MS_PER_DAY);
-  return {
-    from: start.toISOString().split("T")[0] as string,
-    to: today.toISOString().split("T")[0] as string,
-  };
-};
-
-const EMPTY_KPIS: KPIs = {
-  downloads: { current: 0, previous: 0, growth: 0 },
-  engagement: { current: 0, previous: 0, growth: 0 },
-  users: { current: 0, previous: 0, growth: 0 },
-  revenue: { current: 0, previous: 0, growth: 0 },
-  retention: { current: 0, previous: 0, growth: 0 },
-};
 
 const toErrorMessage = (err: unknown, fallback: string): string =>
   err instanceof Error && err.message ? err.message : fallback;
@@ -60,27 +41,25 @@ const toError = (err: unknown, fallback: string): Error =>
   err instanceof Error ? err : new Error(fallback);
 
 export function useAnalytics(options: UseAnalyticsOptions): UseAnalyticsReturn {
-  const { initialDateRange, refreshInterval = 0, apiClient } = options;
+  const { initialRange, refreshInterval = 0, apiClient } = options;
 
-  const [dateRange, setDateRange] = useState<DateRangeValue>(
-    initialDateRange ?? buildDefaultRange(),
-  );
-  const [kpis, setKpis] = useState<KPIs>(EMPTY_KPIS);
-  const [timeSeries, setTimeSeries] = useState<TimeSeriesData[]>([]);
+  const [range, setRange] = useState<DateRange>(initialRange ?? presetRange("30d"));
+  const [kpis, setKpis] = useState<KpiDatum[]>([]);
+  const [series, setSeries] = useState<TimeSeriesDatum[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-    const requestIdRef = useRef(0);
+  const requestIdRef = useRef(0);
 
   const refresh = useCallback(async () => {
     const requestId = ++requestIdRef.current;
     setIsLoading(true);
     setError(null);
     try {
-      const payload = await apiClient.loadAnalytics(dateRange);
+      const payload = await apiClient.loadAnalytics(range);
       if (requestIdRef.current === requestId) {
         setKpis(payload.kpis);
-        setTimeSeries(payload.timeSeries);
+        setSeries(payload.series);
       }
     } catch (err) {
       if (requestIdRef.current === requestId) {
@@ -91,34 +70,37 @@ export function useAnalytics(options: UseAnalyticsOptions): UseAnalyticsReturn {
         setIsLoading(false);
       }
     }
-  }, [apiClient, dateRange]);
+  }, [apiClient, range]);
 
-  const updateDateRange = useCallback((range: DateRangeValue) => {
-    setDateRange(range);
+  const updateRange = useCallback((nextRange: DateRange) => {
+    setRange(nextRange);
   }, []);
 
   const exportData = useCallback(
     async (exportOptions: AnalyticsExportOptions) => {
-      const payload: AnalyticsDataPayload = { kpis, timeSeries };
+      const exportAnalytics = apiClient.exportAnalytics;
+      if (!exportAnalytics) {
+        throw new Error('AnalyticsApiClient.exportAnalytics not configured');
+      }
+      const payload: AnalyticsPayload = { kpis, series };
       try {
-        const blob = await apiClient.exportAnalytics(payload, exportOptions);
+        const blob = await exportAnalytics(payload, exportOptions);
 
         const url = URL.createObjectURL(blob);
         const link = document.createElement("a");
         link.href = url;
         link.download =
-          exportOptions.filename ?? `analytics-${dateRange.from}-${dateRange.to}.${exportOptions.format}`;
+          exportOptions.filename ?? `analytics-${range.from}-${range.to}.${exportOptions.format}`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
       } catch (err) {
-
         setError(toErrorMessage(err, 'Failed to export analytics'));
         throw toError(err, 'Failed to export analytics');
       }
     },
-    [apiClient, dateRange.from, dateRange.to, kpis, timeSeries],
+    [apiClient, range.from, range.to, kpis, series],
   );
 
   useEffect(() => {
@@ -136,15 +118,15 @@ export function useAnalytics(options: UseAnalyticsOptions): UseAnalyticsReturn {
   return useMemo(
     () => ({
       kpis,
-      timeSeries,
+      series,
       isLoading,
       error,
-      dateRange,
-      updateDateRange,
+      range,
+      updateRange,
       refresh,
       exportData,
     }),
-    [kpis, timeSeries, isLoading, error, dateRange, updateDateRange, refresh, exportData],
+    [kpis, series, isLoading, error, range, updateRange, refresh, exportData],
   );
 }
 
@@ -153,7 +135,6 @@ export const createStubAnalyticsApiClient = (
 ): AnalyticsApiClient => {
   const notConfigured: AnalyticsApiClient = {
     loadAnalytics: () => Promise.reject(new Error('AnalyticsApiClient not configured')),
-    exportAnalytics: () => Promise.reject(new Error('AnalyticsApiClient not configured')),
   };
   return { ...notConfigured, ...overrides };
 };

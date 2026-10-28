@@ -1,151 +1,52 @@
-import type { ComponentType } from "react";
+import type { ReactNode } from "react";
+import type { DateRange, KpiIconTone, RangePreset } from "@umituz/web-design-system/organisms";
 
-export interface Metric {
+export interface KpiDatum {
     id: string;
-    name: string;
-    value: number;
+    label: string;
+    value: number | string;
     previousValue?: number;
-    unit?: string;
-    trend?: "up" | "down" | "stable";
-    icon?: ComponentType<{ className?: string }>;
+    format?: (value: number) => string;
+    goodWhen?: "up" | "down";
+    hint?: string;
+    icon?: ReactNode;
+    iconTone?: KpiIconTone;
+    spark?: readonly number[];
+    onClick?: () => void;
 }
 
-export interface TimeSeriesData {
+export interface TimeSeriesDatum {
     date: string;
     [key: string]: string | number;
 }
 
-export interface ChartData {
-    label: string;
-    value: number;
-    [key: string]: string | number | boolean;
-}
-
-export interface FunnelStep {
-    name: string;
-    count: number;
-    conversionRate: number;
-    dropOffRate: number;
-    averageTime?: number;
-}
-
-export interface FunnelData {
-    title: string;
-    steps: FunnelStep[];
-    totalUsers: number;
-    finalConversion: number;
-}
-
-export interface CohortAnalysis {
-    cohort: string;
-    size: number;
-    retention: number[];
-    averageRetention: number;
-}
-
-export interface UserSegment {
-    name: string;
-    count: number;
-    percentage: number;
-    characteristics: string[];
-    behavior: {
-    avgSessionDuration: number;
-    pagesPerSession: number;
-    bounceRate: number;
-  };
-}
-
-export interface KPIData {
-    current: number;
-    previous: number;
-    growth: number;
-}
-
-export interface KPIs {
-  downloads: KPIData;
-  engagement: KPIData;
-  users: KPIData;
-  revenue: KPIData;
-  retention: KPIData;
-}
-
-export type ChartType =
-  | "line"
-  | "bar"
-  | "area"
-  | "pie"
-  | "donut"
-  | "funnel"
-  | "heatmap"
-  | "metric"
-  | "table";
-
-export interface ChartConfig {
-    id: string;
-    type: ChartType;
-    title?: string;
-    description?: string;
-    data: TimeSeriesData[] | ChartData[] | Metric[];
-    xAxisKey?: string;
-    yAxisKeys?: string[];
-    colors?: string[];
-    showLegend?: boolean;
-    showGrid?: boolean;
-    showTooltip?: boolean;
-    height?: number | string;
-    aspectRatio?: string;
-}
-
-export type AnalyticsPeriod = '7d' | '30d' | '90d' | '1y' | (string & {});
-
-export interface MetricCardProps {
-    metric: Metric;
-    lastPeriodLabel?: string;
-    size?: "sm" | "md" | "lg";
-    showTrend?: boolean;
-    showIcon?: boolean;
-    className?: string;
-    onClick?: () => void;
-}
-
-export interface AnalyticsCardProps {
-    title?: string;
-    description?: string;
-    chart?: ChartConfig;
-    metrics?: Metric[];
-    size?: "sm" | "md" | "lg" | "full";
-    loading?: boolean;
-    error?: string;
-    className?: string;
-    children?: React.ReactNode;
-}
+export type TimeSeriesData = TimeSeriesDatum;
 
 export interface AnalyticsLayoutLabels {
-    title: string;
-    periodSelector: string;
-    periods: Record<AnalyticsPeriod, string>;
-    refresh: string;
-    export: string;
-    loading: string;
+    refresh?: string;
+    export?: string;
+    retry?: string;
+    range?: string;
 }
 
 export interface AnalyticsLayoutProps {
-    config?: AnalyticsConfig;
-    labels: AnalyticsLayoutLabels;
-    title?: string;
+    title: string;
     description?: string;
-    metrics?: Metric[];
-    loading?: boolean;
-    period?: AnalyticsPeriod;
-    onPeriodChange?: (period: AnalyticsPeriod) => void;
-    showDateRange?: boolean;
-    showRefresh?: boolean;
-    showExport?: boolean;
-    charts?: ChartConfig[];
+    range?: DateRange;
+    onRangeChange?: (range: DateRange) => void;
+    presets?: readonly RangePreset[];
     onRefresh?: () => void;
+    refreshing?: boolean;
     onExport?: () => void;
-    headerContent?: React.ReactNode;
-    children?: React.ReactNode;
+    kpis?: readonly KpiDatum[];
+    charts?: ReactNode;
+    filters?: ReactNode;
+    loading?: boolean;
+    error?: string | null;
+    onRetry?: () => void;
+    children?: ReactNode;
+    className?: string;
+    labels?: AnalyticsLayoutLabels;
 }
 
 export interface DateRangePreset {
@@ -171,21 +72,3 @@ export interface AnalyticsExportOptions {
     dateRange?: DateRangeValue;
     filename?: string;
 }
-
-export interface AnalyticsConfig {
-    brandName: string;
-    defaultPeriod?: string;
-    availablePeriods?: string[];
-    showExport?: boolean;
-    showRefresh?: boolean;
-    enableRealTime?: boolean;
-    metrics?: MetricConfig[];
-}
-
-export interface MetricConfig {
-    id: string;
-    name: string;
-    unit?: string;
-    icon?: string;
-}
-

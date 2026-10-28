@@ -1,89 +1,100 @@
-import { useMemo } from "react";
-import { RefreshCw, Download, Calendar, Loader2 } from "lucide-react";
+import { Download, RefreshCw } from "lucide-react";
 import { cn } from "@umituz/web-design-system/utils/cn";
-import { Button } from "@umituz/web-design-system/atoms";
-import type { AnalyticsLayoutProps, AnalyticsPeriod } from "../types/analytics";
-import { AnalyticsCard } from "./AnalyticsCard";
-import { MetricCard } from "./MetricCard";
+import { Button, Skeleton } from "@umituz/web-design-system/atoms";
+import {
+  DateRangePicker,
+  DEFAULT_RANGE_PRESETS,
+  EmptyState,
+  KpiCard,
+} from "@umituz/web-design-system/organisms";
+import type { KpiCardProps, RangePreset } from "@umituz/web-design-system/organisms";
+import { toKpiDelta } from "../utils/analytics";
+import type { AnalyticsLayoutLabels, AnalyticsLayoutProps, KpiDatum } from "../types/analytics";
 
-const DEFAULT_PERIODS: AnalyticsPeriod[] = ["7d", "30d", "90d", "1y"];
+const DEFAULT_PRESETS: readonly RangePreset[] = ["7d", "30d", "90d", "month"];
 
-export const AnalyticsLayout = ({
-  config,
-  labels,
+const DEFAULT_LABELS: Required<AnalyticsLayoutLabels> = {
+  refresh: "Refresh",
+  export: "Export",
+  retry: "Retry",
+  range: "Date range",
+};
+
+function toKpiCardProps(kpi: KpiDatum): KpiCardProps {
+  return {
+    label: kpi.label,
+    value:
+      typeof kpi.value === "number"
+        ? kpi.format
+          ? kpi.format(kpi.value)
+          : String(kpi.value)
+        : kpi.value,
+    delta: toKpiDelta(kpi.value, kpi.previousValue, kpi.goodWhen),
+    hint: kpi.hint,
+    icon: kpi.icon,
+    iconTone: kpi.iconTone,
+    spark: kpi.spark,
+    onClick: kpi.onClick,
+  };
+}
+
+export function AnalyticsLayout({
   title,
   description,
-  metrics,
-  loading = false,
-  period,
-  onPeriodChange,
-  showDateRange = true,
-  showRefresh = true,
-  showExport = true,
-  charts,
-  headerContent,
+  range,
+  onRangeChange,
+  presets = DEFAULT_PRESETS,
   onRefresh,
+  refreshing = false,
   onExport,
+  kpis,
+  charts,
+  filters,
+  loading = false,
+  error,
+  onRetry,
   children,
-}: AnalyticsLayoutProps) => {
-  const visibleMetrics = useMemo(() => metrics ?? [], [metrics]);
-
-  const showRefreshAction = showRefresh && Boolean(onRefresh);
-  const showExportAction = showExport && Boolean(onExport);
+  className,
+  labels: labelOverrides,
+}: AnalyticsLayoutProps) {
+  const labels = { ...DEFAULT_LABELS, ...labelOverrides };
+  const presetOptions = DEFAULT_RANGE_PRESETS.filter((option) => presets.includes(option.id));
+  const busy = loading || refreshing;
 
   return (
-    <div className="udb-analytics">
+    <div className={cn("udb-analytics", className)}>
       <div className="udb-analytics__header">
         <div className="udb-analytics__heading">
-          <h1 className="udb-analytics__title">{title ?? labels.title}</h1>
-
-          {description && (
-            <p className="udb-analytics__description">{description}</p>
-
-          )}
+          <h1 className="udb-analytics__title">{title}</h1>
+          {description && <p className="udb-analytics__description">{description}</p>}
         </div>
 
         <div className="udb-analytics__actions">
-          {showDateRange && onPeriodChange && period && (
-            <label className="udb-period-select">
-              <Calendar className="udb-period-select__icon" aria-hidden="true" />
-              <span className="udb-sr-only">{labels.periodSelector}</span>
-
-              <select
-                className="udb-period-select__select"
-                value={period}
-                onChange={(e) => onPeriodChange(e.target.value as AnalyticsPeriod)}
-                aria-label={labels.periodSelector}
-              >
-                {(config?.availablePeriods ?? DEFAULT_PERIODS).map((p) => (
-                  <option key={p} value={p}>
-                    {labels.periods[p] ?? p}
-                  </option>
-
-                ))}
-              </select>
-
-            </label>
-
+          {range !== undefined && onRangeChange !== undefined && (
+            <DateRangePicker
+              value={range}
+              onChange={onRangeChange}
+              presets={presetOptions}
+              aria-label={labels.range}
+            />
           )}
 
-          {showRefreshAction && (
+          {onRefresh !== undefined && (
             <Button
               variant="ghost"
               size="sm"
               onClick={onRefresh}
-              disabled={loading}
+              disabled={busy}
               aria-label={labels.refresh}
             >
               <RefreshCw
-                className={cn("udb-analytics__action-icon", loading && "udb-spin")}
+                className={cn("udb-analytics__action-icon", busy && "udb-spin")}
                 aria-hidden="true"
               />
             </Button>
-
           )}
 
-          {showExportAction && (
+          {onExport !== undefined && (
             <Button
               variant="ghost"
               size="sm"
@@ -93,61 +104,48 @@ export const AnalyticsLayout = ({
             >
               <Download className="udb-analytics__action-icon" aria-hidden="true" />
               <span>{labels.export}</span>
-
             </Button>
-
           )}
-
-          {headerContent}
         </div>
-
       </div>
 
-      {loading && (
-        <div
-          className="udb-analytics__loading"
-          role="status"
-          aria-live="polite"
-        >
-          <Loader2 className="udb-spin udb-analytics__loading-spinner" aria-hidden="true" />
-          <span className="udb-sr-only">{labels.loading}</span>
+      {filters}
 
-        </div>
-
-      )}
-
-      {!loading && visibleMetrics.length > 0 && (
-        <div
-          className={cn(
-            "udb-analytics__metrics",
-            visibleMetrics.length >= 4 && "udb-analytics__metrics--wide",
+      {error != null ? (
+        <EmptyState
+          className="udb-analytics__error"
+          title={error}
+          action={onRetry !== undefined ? { label: labels.retry, onClick: onRetry } : undefined}
+        />
+      ) : loading ? (
+        <>
+          <div className="udb-analytics__metrics" role="status" aria-live="polite">
+            {Array.from({ length: 4 }, (_, i) => (
+              <Skeleton key={i} className="udb-analytics__kpi-skeleton" />
+            ))}
+          </div>
+          <Skeleton className="udb-analytics__chart-skeleton" />
+        </>
+      ) : (
+        <>
+          {kpis !== undefined && kpis.length > 0 && (
+            <div
+              className={cn(
+                "udb-analytics__metrics",
+                kpis.length >= 4 && "udb-analytics__metrics--wide",
+              )}
+            >
+              {kpis.map((kpi) => (
+                <KpiCard key={kpi.id} {...toKpiCardProps(kpi)} />
+              ))}
+            </div>
           )}
-        >
-          {visibleMetrics.map((metric) => (
-            <MetricCard key={metric.id} metric={metric} />
-          ))}
-        </div>
 
+          {charts !== undefined && charts !== null && <div className="udb-analytics__charts">{charts}</div>}
+
+          {children}
+        </>
       )}
-
-      {!loading && charts && charts.length > 0 && (
-        <div className="udb-analytics__charts">
-          {charts.map((chartConfig) => (
-            <AnalyticsCard
-              key={chartConfig.id}
-              title={chartConfig.title}
-              description={chartConfig.description}
-              chart={chartConfig}
-            />
-          ))}
-        </div>
-
-      )}
-
-      {!loading && children}
     </div>
-
   );
-};
-
-export default AnalyticsLayout;
+}

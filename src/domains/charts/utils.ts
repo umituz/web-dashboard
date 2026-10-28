@@ -2,6 +2,21 @@ import { useRef, useState } from 'react';
 
 export const PALETTE = ['#357344', '#b06e22', '#3e5f80', '#7a6ba8', '#8a5a3b', '#5e7d5a', '#a8b5a0', '#c9862f'];
 
+export const SERIES_COLORS = [
+  'var(--udb-chart-1, #357344)',
+  'var(--udb-chart-2, #b06e22)',
+  'var(--udb-chart-3, #3e5f80)',
+  'var(--udb-chart-4, #7a6ba8)',
+  'var(--udb-chart-5, #8a5a3b)',
+  'var(--udb-chart-6, #5e7d5a)',
+  'var(--udb-chart-7, #a8b5a0)',
+  'var(--udb-chart-8, #c9862f)',
+] as const;
+
+export function seriesColor(index: number): string {
+  return SERIES_COLORS[index % SERIES_COLORS.length]!;
+}
+
 export interface TipRow {
   label: string;
   value: string;

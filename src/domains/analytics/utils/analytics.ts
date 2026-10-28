@@ -1,6 +1,4 @@
-import type { TimeSeriesData } from "../types/analytics";
-
-import type { Metric, KPIData, DateRangePreset } from "../types/analytics";
+import type { TimeSeriesDatum } from "../types/analytics";
 
 export function formatNumber(num: number, decimals: number = 1): string {
   if (num >= 1_000_000_000) {
@@ -44,50 +42,62 @@ export function getTrend(growth: number): "up" | "down" | "stable" {
   return "stable";
 }
 
-export function createKPI(current: number, previous: number): KPIData {
-  const growth = calculateGrowth(current, previous);
-  return {
-    current,
-    previous,
-    growth,
-  };
+export interface KpiDeltaLike {
+  value: string;
+  direction: "up" | "down" | "flat";
+  good: boolean;
 }
 
-export function createMetric(
-  id: string,
-  name: string,
-  value: number,
+export function toKpiDelta(
+  value: number | string,
   previousValue?: number,
-  unit?: string
-): Metric {
-  const growth = previousValue !== undefined ? calculateGrowth(value, previousValue) : 0;
-  return {
-    id,
-    name,
-    value,
-    previousValue,
-    unit,
-    trend: getTrend(growth),
-  };
+  goodWhen: "up" | "down" = "up",
+): KpiDeltaLike | undefined {
+  if (previousValue === undefined || previousValue === 0) return undefined;
+  const current = typeof value === "number" ? value : Number(value);
+  if (!Number.isFinite(current)) return undefined;
+  const change = ((current - previousValue) / previousValue) * 100;
+  if (Math.abs(change) < 0.05) {
+    return { value: `${change.toFixed(1)}%`, direction: "flat", good: true };
+  }
+  const direction = change > 0 ? "up" : "down";
+  const good = direction === goodWhen;
+  return { value: `${change > 0 ? "+" : ""}${change.toFixed(1)}%`, direction, good };
 }
 
-export function formatMetricValue(metric: Metric): string {
-  const { value, unit } = metric;
+export function toCsv(
+  headers: readonly string[],
+  rows: readonly (readonly (string | number)[])[],
+): string {
+  const escapeCell = (cell: string | number): string => {
+    const text = String(cell);
+    return /[",\n;]/.test(text) ? `"${text.replaceAll('"', '""')}"` : text;
+  };
+  const lines = [
+    headers.map(escapeCell).join(","),
+    ...rows.map((row) => row.map(escapeCell).join(",")),
+  ];
+  return `﻿${lines.join("\r\n")}`;
+}
 
-  switch (unit) {
-    case "%":
-      return formatPercentage(value);
-    case "$":
-    case "€":
-    case "£":
-      return formatCurrency(value, unit === "$" ? "USD" : unit === "€" ? "EUR" : "GBP");
-    case "K":
-    case "M":
-    case "B":
-      return formatNumber(value);
-    default:
-      return value.toLocaleString();
-  }
+export function downloadCsv(filename: string, csv: string): void {
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+export function exportCsv(options: {
+  filename: string;
+  headers: readonly string[];
+  rows: readonly (readonly (string | number)[])[];
+}): void {
+  downloadCsv(options.filename, toCsv(options.headers, options.rows));
 }
 
 export function calculateConversionRate(converted: number, total: number): number {
@@ -98,30 +108,6 @@ export function calculateConversionRate(converted: number, total: number): numbe
 export function calculateDropOffRate(current: number, previous: number): number {
   if (previous === 0) return 0;
   return ((previous - current) / previous) * 100;
-}
-
-export function createDateRangePreset(label: string, days: number): DateRangePreset {
-  const to = new Date();
-  const from = new Date();
-  from.setDate(from.getDate() - days);
-
-  return {
-    label,
-    value: label.toLowerCase().replace(/\s+/g, "-"),
-    days,
-    from: from.toISOString().split("T")[0],
-    to: to.toISOString().split("T")[0],
-  };
-}
-
-export function getDateRangePresets(): DateRangePreset[] {
-  return [
-    createDateRangePreset("Last 7 Days", 7),
-    createDateRangePreset("Last 30 Days", 30),
-    createDateRangePreset("Last 90 Days", 90),
-    createDateRangePreset("This Year", 365),
-    createDateRangePreset("All Time", 365 * 10),
-  ];
 }
 
 export function aggregateByPeriod(
@@ -155,7 +141,7 @@ export function aggregateByPeriod(
   });
 
   return Array.from(grouped.entries()).map(([date, items]) => {
-    const aggregated: TimeSeriesData = { date };
+    const aggregated: TimeSeriesDatum = { date };
 
     items.forEach((item) => {
       Object.entries(item).forEach(([key, value]) => {
@@ -204,13 +190,4 @@ export function detectOutliers(data: number[], threshold: number = 2): number[] 
 export function roundTo(num: number, decimals: number = 2): number {
   const multiplier = Math.pow(10, decimals);
   return Math.round(num * multiplier) / multiplier;
-}
-
-export function generateColor(index: number, alpha: number = 1): string {
-  const hue = (index * 137.508) % 360;
-  return `hsla(${hue}, 70%, 50%, ${alpha})`;
-}
-
-export function generateChartColors(count: number, alpha: number = 1): string[] {
-  return Array.from({ length: count }, (_, i) => generateColor(i, alpha));
 }

@@ -19,7 +19,7 @@ import "@umituz/web-dashboard/styles.css";
 
 Peers: `react` + `react-dom` (^18 or ^19), `react-router-dom` (^6 or ^7),
 and `framer-motion` (^12, onboarding animations only).
-Runtime deps: `@umituz/web-design-system` (^4.9),
+Runtime deps: `@umituz/web-design-system` (^5.0),
 `@umituz/web-localization`, `lucide-react`.
 
 ### Tailwind hosts
@@ -51,10 +51,11 @@ hosts set dark values on the DS variables under `[data-theme="dark"]` /
 @umituz/web-dashboard/layouts       # DashboardLayout, DashboardSidebar, DashboardHeader
 @umituz/web-dashboard/settings      # SettingsLayout, admin skeletons (users, matrix, audit)
 @umituz/web-dashboard/onboarding    # OnboardingFlow + 15 screens, persistence, analytics
-@umituz/web-dashboard/analytics     # AnalyticsLayout, SVG AnalyticsChart, services
+@umituz/web-dashboard/analytics     # AnalyticsLayout v2, useAnalytics, CSV export
 @umituz/web-dashboard/calendar      # useCalendar, CalendarService (injected DB)
 @umituz/web-dashboard/config        # dashboard config helpers
 @umituz/web-dashboard/charts        # dependency-free SVG chart components
+@umituz/web-dashboard/charts/charts.css  # chart stylesheet (also chained by styles.css)
 ```
 
 Each domain also exposes `components`, `hooks`, `utils`, `types`
@@ -173,12 +174,59 @@ import { NotificationCenter, NotificationsPage } from "@umituz/web-dashboard/not
 <NotificationsPage typeMeta={TYPE_META} attentionLabel="Needs attention" />
 ```
 
+### Charts
+
+Dependency-free SVG charts under `@umituz/web-dashboard/charts`:
+`ChartCard`/`ChartTip`, `Legend`, `Sparkline`, `HBars`, `BarChart`
+(grouped or `stacking="stacked"` with a tooltip total row), `Donut`,
+`LineChart` (dual axes, band, crosshair, `areaFill: "gradient"`), and
+`ActivityHeatmap` (CSS-var level classes, `levelClassNames` escape hatch).
+
+Series colors resolve through the `--udb-chart-1..8` tokens (each with an
+inline fallback hex), so a theme overrides its whole chart palette from one
+place:
+
+```css
+:root {
+  --udb-chart-1: #0e7490;
+  --udb-chart-2: #f59e0b;
+}
+```
+
+`styles.css` chains `charts/charts.css` transitively. Tailwind hosts that
+import `chrome.css` directly add one line beside it:
+
+```css
+@import "@umituz/web-dashboard/charts/charts.css";
+```
+
 ### Analytics
 
-`AnalyticsChart` consumes `ChartConfig` for line/area/bar/pie/donut. Tooltips
-are native SVG `<title>` elements; legends are color chips; unsupported types
-render an empty state. `useAnalytics` stays dependency-injected
-(`createStubAnalyticsApiClient`).
+`AnalyticsLayout` composes design-system primitives — `DateRangePicker`
+(presets default to 7d/30d/90d/month), a `KpiCard` grid, skeleton loading and
+an `EmptyState` error panel with retry. Charts are a `ReactNode` slot (drop
+`ChartCard`s in), filters too:
+
+```tsx
+import { AnalyticsLayout, useAnalytics } from "@umituz/web-dashboard/analytics";
+import { ChartCard, LineChart } from "@umituz/web-dashboard/charts";
+
+const { kpis, series, range, updateRange, isLoading } = useAnalytics({ apiClient });
+
+<AnalyticsLayout
+  title="analytics.title"
+  range={range}
+  onRangeChange={updateRange}
+  kpis={kpis}
+  loading={isLoading}
+  charts={<ChartCard title="Trend" tip={null}><LineChart labels={labels} series={[...]} /></ChartCard>}
+/>;
+```
+
+`useAnalytics` stays dependency-injected (`createStubAnalyticsApiClient`);
+`loadAnalytics(range)` is required, `exportAnalytics` optional. CSV exports
+are one call — `exportCsv({ filename, headers, rows })` (BOM + CRLF +
+Excel-safe quoting) — no dead adapters.
 
 ## i18n contract
 
@@ -197,7 +245,6 @@ provider, `useT()` falls back to `defaultT`, which humanizes keys
 readably. The per-domain key catalogs are the string contract:
 
 ```ts
-import { ANALYTICS_KEYS } from "@umituz/web-dashboard/analytics";
 import { SETTINGS_ADMIN_KEYS } from "@umituz/web-dashboard/settings/utils";
 import { PERMISSIONS_KEYS } from "@umituz/web-dashboard/permissions";
 ```

@@ -1,17 +1,20 @@
-import { describe, it, expect } from "vitest";
+import { afterEach, describe, it, expect, vi } from "vitest";
 import {
   formatNumber,
   formatPercentage,
   formatCurrency,
   calculateGrowth,
   getTrend,
+  toKpiDelta,
+  toCsv,
+  downloadCsv,
+  exportCsv,
   calculateConversionRate,
   calculateDropOffRate,
   calculateMovingAverage,
   detectOutliers,
   aggregateByPeriod,
   roundTo,
-  createDateRangePreset,
 } from "./analytics";
 
 describe("formatNumber", () => {
@@ -82,6 +85,68 @@ describe("getTrend", () => {
   });
 });
 
+describe("toKpiDelta", () => {
+  it("returns undefined without a usable previous value", () => {
+    expect(toKpiDelta(5)).toBeUndefined();
+    expect(toKpiDelta(5, 0)).toBeUndefined();
+    expect(toKpiDelta("not-a-number", 10)).toBeUndefined();
+  });
+
+  it("computes an up delta and marks it good by default", () => {
+    expect(toKpiDelta(120, 100)).toEqual({ value: "+20.0%", direction: "up", good: true });
+  });
+
+  it("marks a down delta bad by default and good when goodWhen is down", () => {
+    expect(toKpiDelta(80, 100)).toEqual({ value: "-20.0%", direction: "down", good: false });
+    expect(toKpiDelta(80, 100, "down")).toEqual({ value: "-20.0%", direction: "down", good: true });
+  });
+
+  it("goes flat under a 0.05% change", () => {
+    expect(toKpiDelta(100.01, 100)).toEqual({ value: "0.0%", direction: "flat", good: true });
+  });
+
+  it("accepts numeric strings", () => {
+    expect(toKpiDelta("110", 100)).toEqual({ value: "+10.0%", direction: "up", good: true });
+  });
+});
+
+describe("toCsv", () => {
+  it("joins headers and rows with a BOM and CRLF line endings", () => {
+    expect(toCsv(["a", "b"], [[1, 2], [3, 4]])).toBe("﻿a,b\r\n1,2\r\n3,4");
+  });
+
+  it("quotes cells containing commas, quotes, newlines or semicolons", () => {
+    expect(toCsv(["Name", "Note"], [["A", "has, comma"]])).toBe(
+      '﻿Name,Note\r\nA,"has, comma"',
+    );
+    expect(toCsv(["q"], [['say "hi"']])).toBe('﻿q\r\n"say ""hi"""');
+    expect(toCsv(["s"], [["a;b"]])).toBe('﻿s\r\n"a;b"');
+    expect(toCsv(["n"], [["l1\nl2"]])).toBe('﻿n\r\n"l1\nl2"');
+  });
+});
+
+describe("downloadCsv / exportCsv", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("triggers a browser download and revokes the object url", () => {
+    const createObjectURL = vi.fn(() => "blob:csv");
+    const revokeObjectURL = vi.fn();
+    Object.defineProperty(URL, "createObjectURL", { value: createObjectURL, configurable: true });
+    Object.defineProperty(URL, "revokeObjectURL", { value: revokeObjectURL, configurable: true });
+    const click = vi.spyOn(HTMLAnchorElement.prototype, "click").mockImplementation(() => {});
+
+    exportCsv({ filename: "report.csv", headers: ["a"], rows: [[1]] });
+
+    expect(click).toHaveBeenCalledTimes(1);
+    expect(revokeObjectURL).toHaveBeenCalledWith("blob:csv");
+
+    downloadCsv("x.csv", "﻿a");
+    expect(click).toHaveBeenCalledTimes(2);
+  });
+});
+
 describe("calculateConversionRate", () => {
   it("returns 0 for an empty total", () => {
     expect(calculateConversionRate(5, 0)).toBe(0);
@@ -146,6 +211,21 @@ describe("aggregateByPeriod", () => {
     ]);
   });
 
+  it("groups by the Sunday-starting week key", () => {
+    const result = aggregateByPeriod(
+      [
+        { date: "2026-01-01", value: 1 },
+        { date: "2026-01-02", value: 2 },
+        { date: "2026-01-04", value: 3 },
+      ],
+      "week",
+    );
+    expect(result).toEqual([
+      { date: "2025-12-28", value: 3 },
+      { date: "2026-01-04", value: 3 },
+    ]);
+  });
+
   it("groups by month key when period is month", () => {
     const result = aggregateByPeriod(
       [
@@ -161,16 +241,5 @@ describe("aggregateByPeriod", () => {
 describe("roundTo", () => {
   it("rounds to the given decimals", () => {
     expect(roundTo(3.14159, 2)).toBe(3.14);
-  });
-});
-
-describe("createDateRangePreset", () => {
-  it("resolves from/to dates around today", () => {
-    const preset = createDateRangePreset("Last 7 Days", 7);
-    const today = new Date().toISOString().split("T")[0];
-    expect(preset.value).toBe("last-7-days");
-    expect(preset.to).toBe(today);
-    expect(preset.from).toBeDefined();
-    expect(preset.from).not.toBe(preset.to);
   });
 });

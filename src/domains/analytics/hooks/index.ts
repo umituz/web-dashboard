@@ -1,7 +1,7 @@
 export { useAnalytics, createStubAnalyticsApiClient } from "./useAnalytics";
 export type {
   AnalyticsApiClient,
-  AnalyticsDataPayload,
+  AnalyticsPayload,
   UseAnalyticsOptions,
   UseAnalyticsReturn,
 } from "./useAnalytics";
