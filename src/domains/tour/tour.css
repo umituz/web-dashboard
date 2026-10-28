@@ -1,0 +1,187 @@
+@import "driver.js/dist/driver.css";
+
+/* ==========================================================================
+   Driver.js Popover Styling — Design System Token Integration
+   ========================================================================== */
+
+.driver-popover {
+  background-color: var(--color-surface, #ffffff);
+  color: var(--color-ink, #0f172a);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--color-line, rgba(0, 0, 0, 0.08));
+  max-width: 380px;
+  min-width: 280px;
+  font-family: inherit;
+  z-index: 1000000000;
+}
+
+.dark .driver-popover {
+  background-color: var(--color-surface, #1e293b);
+  color: var(--color-ink, #f8fafc);
+  border-color: var(--color-line, rgba(255, 255, 255, 0.12));
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.driver-popover-title {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+  color: var(--color-ink, #0f172a);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.dark .driver-popover-title {
+  color: var(--color-ink, #f8fafc);
+}
+
+.driver-popover-description {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--color-ink-2, #475569);
+  margin-bottom: 1.25rem;
+}
+
+.dark .driver-popover-description {
+  color: var(--color-ink-2, #94a3b8);
+}
+
+.driver-popover-close-btn {
+  top: 1rem;
+  right: 1rem;
+  color: var(--color-ink-3, #94a3b8);
+  font-size: 1.25rem;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  transition: all 150ms ease;
+}
+
+.driver-popover-close-btn:hover {
+  color: var(--color-ink, #0f172a);
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.dark .driver-popover-close-btn:hover {
+  color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.driver-popover-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-line, rgba(0, 0, 0, 0.06));
+}
+
+.dark .driver-popover-footer {
+  border-top-color: var(--color-line, rgba(255, 255, 255, 0.08));
+}
+
+.driver-popover-progress-text {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-ink-3, #94a3b8);
+}
+
+.dark .driver-popover-progress-text {
+  color: var(--color-ink-3, #64748b);
+}
+
+.driver-popover-navigation-btns {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.driver-popover-footer-btn {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid transparent;
+}
+
+.driver-popover-prev-btn {
+  background-color: transparent;
+  color: var(--color-ink-2, #475569);
+  border-color: var(--color-line, rgba(0, 0, 0, 0.12));
+}
+
+.driver-popover-prev-btn:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+  color: var(--color-ink, #0f172a);
+}
+
+.dark .driver-popover-prev-btn {
+  color: var(--color-ink-2, #94a3b8);
+  border-color: var(--color-line, rgba(255, 255, 255, 0.15));
+}
+
+.dark .driver-popover-prev-btn:hover {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.driver-popover-next-btn {
+  background-color: var(--color-primary, #3b7a5e);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.driver-popover-next-btn:hover {
+  filter: brightness(1.08);
+  transform: translateY(-0.5px);
+}
+
+.dark .driver-popover-next-btn {
+  background-color: var(--color-primary, #448f6e);
+  color: #ffffff;
+}
+
+.driver-popover-arrow {
+  border-color: var(--color-surface, #ffffff);
+}
+
+.driver-popover-arrow-side-left {
+  border-left-color: var(--color-surface, #ffffff);
+}
+
+.driver-popover-arrow-side-right {
+  border-right-color: var(--color-surface, #ffffff);
+}
+
+.driver-popover-arrow-side-top {
+  border-top-color: var(--color-surface, #ffffff);
+}
+
+.driver-popover-arrow-side-bottom {
+  border-bottom-color: var(--color-surface, #ffffff);
+}
+
+.dark .driver-popover-arrow-side-left {
+  border-left-color: var(--color-surface, #1e293b);
+}
+
+.dark .driver-popover-arrow-side-right {
+  border-right-color: var(--color-surface, #1e293b);
+}
+
+.dark .driver-popover-arrow-side-top {
+  border-top-color: var(--color-surface, #1e293b);
+}
+
+.dark .driver-popover-arrow-side-bottom {
+  border-bottom-color: var(--color-surface, #1e293b);
+}

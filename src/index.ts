@@ -1,6 +1,9 @@
 export * from './domains/layouts';
 export * from './domains/settings';
 export * from './domains/calendar';
+export * from './domains/permissions';
+export * from './domains/organization';
+export * from './domains/tour';
 export {
   useAnalytics,
   MetricCard,

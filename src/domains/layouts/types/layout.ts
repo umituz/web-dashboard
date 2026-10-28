@@ -41,6 +41,9 @@ export interface HeaderProfileItem {
   to?: string;
   onSelect?: () => void;
   danger?: boolean;
+  roles?: readonly string[];
+  permission?: string;
+  permissions?: readonly string[];
 }
 
 export interface SidebarAction {

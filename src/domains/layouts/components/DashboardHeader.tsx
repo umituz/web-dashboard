@@ -15,6 +15,7 @@ import type {
 } from "../types/layout";
 import type { DashboardNotification } from "../types/notification";
 import type { DashboardUser } from "../types/user";
+import { filterProfileItems } from "../utils/dashboard";
 
 interface DashboardHeaderPropsExtended extends DashboardHeaderProps {
   user?: DashboardUser;
@@ -63,7 +64,8 @@ export const DashboardHeader = ({
   const navigate = useNavigate();
 
   const unreadCount = notifications.filter((n) => !n.read).length;
-  const customItems = profileItems ?? extraProfileItems;
+  const rawCustomItems = profileItems ?? extraProfileItems;
+  const customItems = filterProfileItems(rawCustomItems, user);
 
   const handleLogout = async () => {
     try {

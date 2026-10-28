@@ -9,6 +9,9 @@ export interface SidebarItem {
     badge?: string | number;
     secondaryLabel?: string;
     end?: boolean;
+    roles?: readonly string[];
+    permission?: string;
+    permissions?: readonly string[];
 }
 
 export interface SidebarGroup {

@@ -65,19 +65,70 @@ export function getPageTitle(
   return null;
 }
 
-export function filterSidebarItems<T extends { enabled?: boolean; requiredApp?: "mobile" | "web" }>(
+export interface AccessControllableItem {
+  enabled?: boolean;
+  requiredApp?: "mobile" | "web";
+  roles?: readonly string[];
+  permission?: string;
+  permissions?: readonly string[];
+}
+
+export interface AccessControllableUser {
+  role?: string;
+  roles?: readonly string[];
+  permissions?: readonly string[];
+  hasMobileApp?: boolean;
+  hasWebApp?: boolean;
+}
+
+export function isItemPermitted(
+  item: AccessControllableItem,
+  user?: AccessControllableUser
+): boolean {
+  if (item.enabled === false) return false;
+
+  if (item.requiredApp === "mobile" && !user?.hasMobileApp) return false;
+  if (item.requiredApp === "web" && !user?.hasWebApp) return false;
+
+  if (item.roles && item.roles.length > 0) {
+    const userRoles = [
+      ...(user?.role ? [user.role] : []),
+      ...(user?.roles ?? []),
+    ];
+    const hasRole = item.roles.some((r) => userRoles.includes(r));
+    if (!hasRole) return false;
+  }
+
+  if (item.permission) {
+    const userPerms = user?.permissions ?? [];
+    if (!userPerms.includes("*") && !userPerms.includes(item.permission)) {
+      return false;
+    }
+  }
+
+  if (item.permissions && item.permissions.length > 0) {
+    const userPerms = user?.permissions ?? [];
+    if (!userPerms.includes("*")) {
+      const hasAny = item.permissions.some((p) => userPerms.includes(p));
+      if (!hasAny) return false;
+    }
+  }
+
+  return true;
+}
+
+export function filterSidebarItems<T extends AccessControllableItem>(
   items: T[],
-  user?: { hasMobileApp?: boolean; hasWebApp?: boolean }
+  user?: AccessControllableUser
 ): T[] {
-  return items.filter((item) => {
-    if (item.enabled === false) return false;
+  return items.filter((item) => isItemPermitted(item, user));
+}
 
-    if (!item.requiredApp) return true;
-    if (item.requiredApp === "mobile") return user?.hasMobileApp ?? false;
-    if (item.requiredApp === "web") return user?.hasWebApp ?? false;
-
-    return true;
-  });
+export function filterProfileItems<T extends AccessControllableItem>(
+  items: T[],
+  user?: AccessControllableUser
+): T[] {
+  return items.filter((item) => isItemPermitted(item, user));
 }
 
 export function generateNotificationId(): string {

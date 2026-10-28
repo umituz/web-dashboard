@@ -5,6 +5,9 @@ export interface DashboardUser {
     name?: string;
     email?: string;
     avatar?: string;
+    role?: string;
+    roles?: readonly string[];
+    permissions?: readonly string[];
     hasMobileApp?: boolean;
     hasWebApp?: boolean;
 }

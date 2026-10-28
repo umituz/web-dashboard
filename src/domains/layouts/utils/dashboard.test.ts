@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getActiveSidebarItem, getPageTitle, isPathActive } from "./dashboard";
+import { filterSidebarItems, getActiveSidebarItem, getPageTitle, isPathActive } from "./dashboard";
 
 describe("isPathActive", () => {
   it("matches exact paths regardless of end", () => {
@@ -61,5 +61,52 @@ describe("getPageTitle", () => {
 
     expect(getPageTitle("/app/courses/lesson-1/summary", nested)).toBe("Courses");
     expect(getActiveSidebarItem("/nowhere", nested)).toBeNull();
+  });
+});
+
+describe("filterSidebarItems & filterProfileItems (Role & Permission Control)", () => {
+  it("filters items based on role access", () => {
+    const items = [
+      { path: "/overview", label: "Overview" },
+      { path: "/studio", label: "Teacher Studio", roles: ["teacher", "admin"] },
+      { path: "/admin", label: "Admin Panel", roles: ["admin"] },
+    ];
+
+    // Student user
+    const studentUser = { id: "1", role: "student" };
+    const studentItems = items.filter((item) =>
+      filterSidebarItems([item], studentUser).length > 0
+    );
+    expect(studentItems.map((i) => i.path)).toEqual(["/overview"]);
+
+    // Teacher user
+    const teacherUser = { id: "2", role: "teacher" };
+    const teacherItems = items.filter((item) =>
+      filterSidebarItems([item], teacherUser).length > 0
+    );
+    expect(teacherItems.map((i) => i.path)).toEqual(["/overview", "/studio"]);
+
+    // Admin user
+    const adminUser = { id: "3", role: "admin" };
+    const adminItems = items.filter((item) =>
+      filterSidebarItems([item], adminUser).length > 0
+    );
+    expect(adminItems.map((i) => i.path)).toEqual(["/overview", "/studio", "/admin"]);
+  });
+
+  it("filters items based on explicit permissions", () => {
+    const items = [
+      { path: "/public", label: "Public" },
+      { path: "/billing", label: "Billing", permission: "billing.manage" },
+    ];
+
+    expect(filterSidebarItems(items, { permissions: [] }).map((i) => i.path)).toEqual(["/public"]);
+    expect(
+      filterSidebarItems(items, { permissions: ["billing.manage"] }).map((i) => i.path)
+    ).toEqual(["/public", "/billing"]);
+    expect(filterSidebarItems(items, { permissions: ["*"] }).map((i) => i.path)).toEqual([
+      "/public",
+      "/billing",
+    ]);
   });
 });

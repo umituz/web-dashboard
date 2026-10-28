@@ -47,6 +47,8 @@
     "./settings/utils": "./src/domains/settings/utils/index.ts",
     "./timing": "./src/domains/timing/index.ts",
     "./timing/hooks": "./src/domains/timing/hooks/index.ts",
+    "./tour": "./src/domains/tour/index.ts",
+    "./tour/tour.css": "./src/domains/tour/tour.css",
     "./search": "./src/domains/search/index.ts",
     "./search/utils": "./src/domains/search/searchItems.ts",
     "./styles.css": "./src/styles/dashboard.css"
@@ -76,6 +78,7 @@
     }
   },
   "dependencies": {
+    "driver.js": "^1.10.2",
     "lucide-react": "^0.577.0"
   },
   "devDependencies": {
