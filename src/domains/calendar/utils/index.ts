@@ -4,20 +4,25 @@ export { mapCalendarDocument, mapPostDocument } from './contentItemMapper';
 export * from './layout';
 export type { FirestoreDocument } from './contentItemMapper';
 
-export function getWeekDates(date: Date, startOfWeek: number = 0): Date[] {
-  const week: Date[] = [];
-  const current = new Date(date);
+/** Always seven consecutive days starting at the week anchor — the tuple
+ *  type states that guarantee, so index access stays `Date` (not
+ *  `Date | undefined`) under consumer `noUncheckedIndexedAccess`. */
+export function getWeekDates(
+  date: Date,
+  startOfWeek: number = 0,
+): [Date, Date, Date, Date, Date, Date, Date] {
+  const anchor = new Date(date);
 
-  const day = current.getDay();
+  const day = anchor.getDay();
   const diff = (day < startOfWeek ? 7 : 0) + day - startOfWeek;
-  current.setDate(current.getDate() - diff);
+  anchor.setDate(anchor.getDate() - diff);
 
-  for (let i = 0; i < 7; i++) {
-    week.push(new Date(current));
-    current.setDate(current.getDate() + 1);
-  }
-
-  return week;
+  const at = (offset: number): Date => {
+    const dayAt = new Date(anchor);
+    dayAt.setDate(anchor.getDate() + offset);
+    return dayAt;
+  };
+  return [at(0), at(1), at(2), at(3), at(4), at(5), at(6)];
 }
 
 export function getMonthDays(date: Date): Date[] {
