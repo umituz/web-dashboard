@@ -221,6 +221,43 @@ describe("DashboardSidebar (untitled group)", () => {
   });
 });
 
+describe("DashboardSidebar (exclusive accordion)", () => {
+  const accordionConfig: DashboardLayoutConfig = {
+    sidebarGroups: [
+      {
+        title: "Alpha",
+        items: [{ path: "/alpha", label: "Alpha page", icon: Home, end: false }],
+      },
+      {
+        title: "Beta",
+        items: [{ path: "/beta", label: "Beta page", icon: Home, end: false }],
+      },
+    ],
+    brandName: "Test",
+    defaultTitle: "Workspace",
+  };
+
+  it("opens only the group containing the active route", () => {
+    renderAt("/alpha", { config: accordionConfig });
+    expect(screen.getByRole("link", { name: /alpha page/i })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /beta page/i })).toBeNull();
+  });
+
+  it("switches to the clicked group and closes the previous one", () => {
+    renderAt("/alpha", { config: accordionConfig });
+    fireEvent.click(screen.getByRole("button", { name: /beta/i }));
+    expect(screen.getByRole("link", { name: /beta page/i })).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /alpha page/i })).toBeNull();
+  });
+
+  it("closes the open group on a second click", () => {
+    renderAt("/alpha", { config: accordionConfig });
+    const alpha = screen.getByRole("button", { name: /alpha/i });
+    fireEvent.click(alpha);
+    expect(screen.queryByRole("link", { name: /alpha page/i })).toBeNull();
+  });
+});
+
 describe("DashboardLayout (contentFallback)", () => {
   const NeverResolves = lazy(() => new Promise<{ default: React.ComponentType }>(() => {}));
 

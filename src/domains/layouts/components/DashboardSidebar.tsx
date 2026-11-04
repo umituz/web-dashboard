@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation } from "react-router";
 
 import { Button } from "@umituz/web-design-system/atoms";
@@ -33,13 +33,21 @@ export const DashboardSidebar = ({
   user,
 }: DashboardSidebarPropsExtended) => {
   const location = useLocation();
-  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
+  const activeGroupTitle = () =>
+    sidebarGroups.find(group =>
+      group.items.some(item => isPathActive(location.pathname, item.path, item.end))
+    )?.title ?? null;
+  const [openGroup, setOpenGroup] = useState<string | null>(activeGroupTitle);
+
+  useEffect(() => {
+    setOpenGroup(prev => {
+      const next = activeGroupTitle();
+      return next === null ? prev : next;
+    });
+  }, [location.pathname]);
 
   const toggleGroup = (title: string) => {
-    setCollapsedGroups(prev => ({
-      ...prev,
-      [title]: !prev[title]
-    }));
+    setOpenGroup(prev => (prev === title ? null : title));
   };
 
   const renderAction = (label: string, icon: ReactNode, linkProps?: { to: string }) => {
@@ -95,7 +103,7 @@ export const DashboardSidebar = ({
 
             const groupTitle = group.title;
             const groupKey = groupTitle ?? `group-${groupIndex}`;
-            const isGroupCollapsed = groupTitle !== undefined && collapsedGroups[groupTitle];
+            const isGroupOpen = groupTitle !== undefined && openGroup === groupTitle;
 
             return (
               <div key={groupKey} className="udb-sidebar__group">
@@ -110,10 +118,10 @@ export const DashboardSidebar = ({
                     </span>
 
                     <span className="udb-sidebar__group-chevron">
-                      {isGroupCollapsed ? (
-                        <ChevronRight className="udb-sidebar__chevron-icon" />
-                      ) : (
+                      {isGroupOpen ? (
                         <ChevronDown className="udb-sidebar__chevron-icon" />
+                      ) : (
+                        <ChevronRight className="udb-sidebar__chevron-icon" />
                       )}
                     </span>
 
@@ -121,7 +129,7 @@ export const DashboardSidebar = ({
 
                 )}
 
-                {(!isGroupCollapsed || collapsed) && filteredItems.map((item) => {
+                {(groupTitle === undefined || isGroupOpen || collapsed) && filteredItems.map((item) => {
                   const active = isPathActive(location.pathname, item.path, item.end);
                   const collapsedTitle =
                     item.badge !== undefined && item.badge !== ""
