@@ -1,6 +1,6 @@
 import {
   Bell, X, Sun, Moon, Menu, User, Settings, LogOut,
-  ChevronDown, Search
+  ChevronDown, Search, PanelLeftOpen, PanelLeftClose
 } from "lucide-react";
 import { Button, Kbd } from "@umituz/web-design-system/atoms";
 import { Avatar, AvatarImage } from "@umituz/web-design-system/molecules";
@@ -82,12 +82,18 @@ export const DashboardHeader = ({
           <Menu className="udb-header__toggle-icon" />
         </Button>
 
-        {collapsed && (
-          <Button variant="ghost" size="icon" className="udb-header__desktop-toggle" onClick={() => setCollapsed(false)}>
-            <Menu className="udb-header__toggle-icon" />
-          </Button>
-
-        )}
+        <Button
+          variant="ghost"
+          size="icon"
+          className="udb-header__desktop-toggle"
+          onClick={() => setCollapsed(!collapsed)}
+          title={collapsed ? labels.expandSidebar : labels.collapseSidebar}
+          aria-label={collapsed ? labels.expandSidebar : labels.collapseSidebar}
+        >
+          {collapsed
+            ? <PanelLeftOpen className="udb-header__toggle-icon" aria-hidden="true" />
+            : <PanelLeftClose className="udb-header__toggle-icon" aria-hidden="true" />}
+        </Button>
         <h2 className="udb-header__title">
           {title}
         </h2>

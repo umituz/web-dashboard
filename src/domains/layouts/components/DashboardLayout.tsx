@@ -190,7 +190,6 @@ export const DashboardLayout = ({
       >
         <DashboardSidebar
           collapsed={collapsed}
-          setCollapsed={setCollapsed}
           {...sidebarProps}
         />
       </aside>
@@ -206,7 +205,6 @@ export const DashboardLayout = ({
           >
             <DashboardSidebar
               collapsed={false}
-              setCollapsed={() => setMobileOpen(false)}
               {...sidebarProps}
             />
           </aside>

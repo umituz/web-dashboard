@@ -5,7 +5,7 @@ import { Button } from "@umituz/web-design-system/atoms";
 import { cn } from "@umituz/web-design-system/utils/cn";
 import { BrandLogo } from "./BrandLogo";
 import { isPathActive } from "../utils/dashboard";
-import { Menu, ChevronLeft, ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import type { DashboardSidebarProps, SidebarAction } from "../types/layout";
 import type { DashboardUser } from "../types/user";
 import type { SidebarGroup } from "../types/sidebar";
@@ -23,7 +23,6 @@ interface DashboardSidebarPropsExtended extends DashboardSidebarProps {
 
 export const DashboardSidebar = ({
   collapsed,
-  setCollapsed,
   sidebarGroups,
   brandName,
   brandTagline,
@@ -158,20 +157,17 @@ export const DashboardSidebar = ({
 
       </nav>
 
-      <div className="udb-sidebar__footer">
-        {sidebarFooter && <div className="udb-sidebar__footer-slot">{sidebarFooter}</div>}
+      {(sidebarFooter || (!collapsed && labels?.system)) && (
+        <div className="udb-sidebar__footer">
+          {sidebarFooter && <div className="udb-sidebar__footer-slot">{sidebarFooter}</div>}
 
-        {!collapsed && labels?.system && (
-          <p className="udb-sidebar__footer-label">
-            {labels.system}
-          </p>
-
-        )}
-        <Button variant="ghost" size="icon" onClick={() => setCollapsed(!collapsed)} className="udb-sidebar__footer-btn">
-          {collapsed ? <Menu className="udb-sidebar__footer-icon" /> : <ChevronLeft className="udb-sidebar__footer-icon" />}
-        </Button>
-
-      </div>
+          {!collapsed && labels?.system && (
+            <p className="udb-sidebar__footer-label">
+              {labels.system}
+            </p>
+          )}
+        </div>
+      )}
 
     </div>
 

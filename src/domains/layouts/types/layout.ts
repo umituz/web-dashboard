@@ -1,4 +1,6 @@
 export interface DashboardHeaderLabels {
+  expandSidebar: string;
+  collapseSidebar: string;
   switchToLight: string;
   switchToDark: string;
   notificationsTitle: string;
@@ -74,7 +76,6 @@ export interface CommandPaletteConfig {
 
 export interface DashboardSidebarProps {
   collapsed: boolean;
-  setCollapsed: (collapsed: boolean) => void;
   labels?: DashboardSidebarLabels;
 }
 

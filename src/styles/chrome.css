@@ -335,13 +335,6 @@
   letter-spacing: 0.1em;
   color: var(--udb-sidebar-muted);
 }
-.udb-sidebar__footer-btn {
-  color: var(--udb-sidebar-text);
-}
-.udb-sidebar__footer-icon {
-  width: 16px;
-  height: 16px;
-}
 .udb-header {
   display: flex;
   height: var(--udb-header-height);
