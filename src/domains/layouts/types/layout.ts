@@ -63,7 +63,6 @@ export interface HeaderSearchAction {
 }
 
 export interface CommandPaletteConfig {
-  /** Static entry groups; palettes driven purely by `search` may omit them. */
   groups?: import("@umituz/web-design-system/organisms").CommandGroup[];
   placeholder?: string;
   emptyLabel?: string;

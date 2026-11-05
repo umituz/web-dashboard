@@ -3,7 +3,6 @@ import { NavLink } from 'react-router';
 export interface TabNavItem {
   to: string;
   label: string;
-  /** Should the route match only exactly (e.g. the index tab). */
   end?: boolean;
 }
 
@@ -12,7 +11,6 @@ export interface TabNavProps {
   className?: string;
 }
 
-/** Route-connected section tabs with an active underline. */
 export function TabNav({ items, className }: TabNavProps) {
   return (
     <nav className={className !== undefined ? `udb-tabnav ${className}` : 'udb-tabnav'} aria-label="Section tabs">

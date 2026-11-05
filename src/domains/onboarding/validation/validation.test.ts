@@ -40,10 +40,8 @@ describe('flow-structure-check (§23.1)', () => {
 
 describe('screen-config-check (§23.2)', () => {
   it('rejects malformed screens', () => {
-    // @ts-expect-error deliberately malformed input
-    expect(checkScreenConfig(null).ok).toBe(false);
-    // @ts-expect-error deliberately malformed input
-    expect(checkScreenConfig({ type: 'welcome' }).ok).toBe(false);
+    expect(checkScreenConfig(null as unknown as OnboardingScreen).ok).toBe(false);
+    expect(checkScreenConfig({ type: 'welcome' } as unknown as OnboardingScreen).ok).toBe(false);
     expect(checkScreenConfig({ id: '', type: 'welcome' } as OnboardingScreen).ok).toBe(false);
     expect(
       checkScreenConfig({ id: 'x', type: 'unknown' } as unknown as OnboardingScreen).ok,

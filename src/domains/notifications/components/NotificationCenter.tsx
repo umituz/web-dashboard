@@ -14,9 +14,7 @@ export interface NotificationCenterLabels extends NotificationListLabels {
   title: string;
   markAllLabel: string;
   viewAllLabel: string;
-  /** "{n} more" hint under a truncated popover list. */
   morePattern: string;
-  /** "{n} unread" — the bell's accessible name when the badge has a count. */
   bellPattern: string;
 }
 
@@ -35,18 +33,14 @@ const DEFAULT_LABELS: NotificationCenterLabels = {
 };
 
 export interface NotificationCenterProps {
-  /** `popover` anchors under the bell; `drawer` opens the design-system Drawer. */
   variant?: "popover" | "drawer";
-  /** Rows shown before the popover truncates into the "more" hint. */
   itemLimit?: number;
-  /** Page path for the "View all" link; omit to hide the footer link. */
   viewAllTo?: string;
   typeMeta?: NotificationTypeMeta;
   timeFormatter?: (iso: string) => string;
   labels?: Partial<NotificationCenterLabels>;
 }
 
-/** Header bell + unread badge + feed surface; reads the NotificationsProvider. */
 export const NotificationCenter = ({
   variant = "popover",
   itemLimit = 8,

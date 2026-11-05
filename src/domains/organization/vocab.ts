@@ -1,10 +1,6 @@
 import { statusVocab, type StatusVocab } from "@umituz/web-design-system/organisms";
 import type { InvitationStatus, MemberStatus } from "./types";
 
-/**
- * Up to two leading initials from a display name ("Northwind Labs" -> "NL",
- * "madeline" -> "M"). Used wherever an avatar block needs stable letters.
- */
 export const initialsOf = (name: string): string =>
   name
     .trim()
@@ -26,10 +22,6 @@ const MEMBER_STATUS_TONES: Record<MemberStatus, "info" | "success" | "warning"> 
   suspended: "warning",
 };
 
-/**
- * Status vocab for membership rows — label overrides merge over the
- * fleet-wide defaults (invited/active/suspended).
- */
 export const memberStatusVocab = (
   labelOverrides?: Partial<Record<MemberStatus, string>>,
 ): StatusVocab =>
@@ -57,10 +49,6 @@ const INVITATION_STATUS_TONES: Record<
   declined: "neutral",
 };
 
-/**
- * Status vocab for invitation rows — label overrides merge over the
- * industry lifecycle defaults (pending/accepted/revoked/expired/declined).
- */
 export const invitationStatusVocab = (
   labelOverrides?: Partial<Record<InvitationStatus, string>>,
 ): StatusVocab =>

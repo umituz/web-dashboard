@@ -4,9 +4,6 @@ export { mapCalendarDocument, mapPostDocument } from './contentItemMapper';
 export * from './layout';
 export type { FirestoreDocument } from './contentItemMapper';
 
-/** Always seven consecutive days starting at the week anchor — the tuple
- *  type states that guarantee, so index access stays `Date` (not
- *  `Date | undefined`) under consumer `noUncheckedIndexedAccess`. */
 export function getWeekDates(
   date: Date,
   startOfWeek: number = 0,

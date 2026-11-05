@@ -2446,7 +2446,6 @@
   font-size: var(--udb-font-size-sm);
 }
 
-/* ------------------------------------------------------------- tab nav */
 
 .udb-tabnav {
   display: flex;
@@ -2484,7 +2483,6 @@
   background: var(--color-primary);
 }
 
-/* --------------------------------------------------------- filter panel */
 
 .udb-filter-panel {
   background: var(--color-card);
@@ -2538,7 +2536,6 @@
   gap: var(--udb-space-2);
 }
 
-/* --------------------------------------------------------- check list */
 
 .udb-check-filter {
   list-style: none;
@@ -2617,9 +2614,6 @@
   color: var(--color-muted-foreground);
 }
 
-/* ------------------------------------------------------------------ */
-/* Notifications (udb-notif-*)                                         */
-/* ------------------------------------------------------------------ */
 .udb-notif-list {
   list-style: none;
   margin: 0;
@@ -2715,7 +2709,6 @@
   flex: none;
 }
 
-/* Bell + popover */
 .udb-notif-center {
   position: relative;
 }
@@ -2804,7 +2797,6 @@
   text-decoration: underline;
 }
 
-/* Page skeleton */
 .udb-notif-page {
   display: flex;
   flex-direction: column;

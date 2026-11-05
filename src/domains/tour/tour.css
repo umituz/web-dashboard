@@ -1,8 +1,5 @@
 @import "driver.js/dist/driver.css";
 
-/* ==========================================================================
-   Driver.js Popover Styling — Design System Token Integration
-   ========================================================================== */
 
 .driver-popover {
   background-color: var(--color-surface, #ffffff);

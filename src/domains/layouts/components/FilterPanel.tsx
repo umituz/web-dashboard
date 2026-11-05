@@ -10,7 +10,6 @@ export interface FilterPanelProps {
   className?: string;
 }
 
-/** Sidebar container for a set of filter sections. */
 export function FilterPanel({
   title = 'Filters',
   onClear,
@@ -58,7 +57,6 @@ export interface CheckFilterListProps {
   options: readonly FilterListOption[];
   selected: readonly string[];
   onToggle: (value: string) => void;
-  /** Limit visible options; hidden-but-selected ones stay visible with a "+N more" note. */
   maxVisible?: number;
 }
 
@@ -103,7 +101,6 @@ export interface SingleSelectFilterListProps {
   onChange: (value: string | null) => void;
 }
 
-/** Radio-style list where one option (or none) is active. */
 export function SingleSelectFilterList({ options, value, onChange }: SingleSelectFilterListProps) {
   return (
     <ul className="udb-check-filter" role="group">

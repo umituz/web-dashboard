@@ -9,9 +9,6 @@ function getStorageKey(tourId: string, userId?: string): string {
   return userId ? `${STORAGE_PREFIX}${userId}_${tourId}` : `${STORAGE_PREFIX}${tourId}`;
 }
 
-/**
- * Checks whether a given tour has been completed or dismissed by the user.
- */
 export function isTourCompleted(tourId: string, userId?: string): boolean {
   const key = getStorageKey(tourId, userId);
   if (typeof window === "undefined" || !window.localStorage) {
@@ -24,9 +21,6 @@ export function isTourCompleted(tourId: string, userId?: string): boolean {
   }
 }
 
-/**
- * Marks a tour as completed in localStorage (with in-memory fallback).
- */
 export function markTourCompleted(tourId: string, userId?: string): void {
   const key = getStorageKey(tourId, userId);
   memoryTourStore.set(key, "completed");
@@ -34,13 +28,9 @@ export function markTourCompleted(tourId: string, userId?: string): void {
   try {
     window.localStorage.setItem(key, "completed");
   } catch {
-    // ignore storage errors
   }
 }
 
-/**
- * Resets the tour completion state so it can be re-run.
- */
 export function resetTourCompletion(tourId: string, userId?: string): void {
   const key = getStorageKey(tourId, userId);
   memoryTourStore.delete(key);
@@ -48,15 +38,11 @@ export function resetTourCompletion(tourId: string, userId?: string): void {
   try {
     window.localStorage.removeItem(key);
   } catch {
-    // ignore storage errors
   }
 }
 
 let activeDriverInstance: Driver | null = null;
 
-/**
- * Instantiates and returns a TourEngineInstance wrapping driver.js.
- */
 export function createProductTour(config: TourConfig): TourEngineInstance {
   const {
     tourId,
@@ -152,7 +138,6 @@ export function createProductTour(config: TourConfig): TourEngineInstance {
         try {
           activeDriverInstance.destroy();
         } catch {
-          // ignore
         }
       }
       activeDriverInstance = driverObj;

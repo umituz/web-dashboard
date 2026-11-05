@@ -2,7 +2,6 @@ import { NativeSelect } from "@umituz/web-design-system/atoms";
 import type { OrganizationRecord } from "../types";
 
 export interface PersonalWorkspace {
-  /** Stable id the host uses to scope data outside any organization. */
   id: string;
   label: string;
 }
@@ -12,10 +11,6 @@ export interface OrganizationSwitcherProps {
   activeOrganizationId?: string;
   onSwitch: (organizationId: string) => void;
   label?: string;
-  /**
-   * Side-by-side architecture (Clerk/GitHub style): the personal workspace
-   * stays intact next to team organizations and leads the switcher.
-   */
   personalWorkspace?: PersonalWorkspace;
 }
 

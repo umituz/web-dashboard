@@ -140,7 +140,6 @@ export interface OrganizationDetailsData {
 
 export type OrganizationDetailsScreenConfig = BaseScreen<'organization-details', OrganizationDetailsData> & {
   namePlaceholder?: string;
-  /** Omit to skip the team-size question; otherwise ids map to host labels. */
   teamSizeOptions?: ReadonlyArray<OnboardingOption>;
 };
 

@@ -108,14 +108,6 @@ export const Can = ({
   return allowed ? <>{children}</> : <>{fallback}</>;
 };
 
-/**
- * Convenience hook that checks whether the current user has a specific permission.
- *
- * Example:
- * ```tsx
- * const canCreateProject = usePermission("projects.create");
- * ```
- */
 export const usePermission = (permission: Permission): boolean => {
   const { can } = usePermissions();
   return can(permission);
@@ -130,12 +122,6 @@ export interface ProtectedRouteProps {
   accessDeniedProps?: AccessDeniedProps;
 }
 
-/**
- * Route-level permission guard. If the user lacks the permission:
- * - Renders `fallback` if provided
- * - Redirects to `redirectTo` if provided
- * - Otherwise displays `<AccessDenied {...accessDeniedProps} />`
- */
 export const ProtectedRoute = ({
   permission,
   anyOf,

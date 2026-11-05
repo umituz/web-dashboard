@@ -40,9 +40,7 @@ const DEFAULT_LABELS: NotificationsPageLabels = {
 };
 
 export interface NotificationsPageProps {
-  /** Adds one segment per type; types with zero records stay hidden. */
   typeMeta?: NotificationTypeMeta;
-  /** When set, adds a segment for warning/danger records (e.g. "Needs attention"). */
   attentionLabel?: string;
   timeFormatter?: (iso: string) => string;
   labels?: Partial<NotificationsPageLabels>;
@@ -50,7 +48,6 @@ export interface NotificationsPageProps {
 
 const needsAttention = (severity: string): boolean => severity === "warning" || severity === "danger";
 
-/** Full-page feed skeleton: filter segments, mark-all-read, and the shared list. */
 export const NotificationsPage = ({ typeMeta, attentionLabel, timeFormatter, labels }: NotificationsPageProps) => {
   const text = { ...DEFAULT_LABELS, ...labels };
   const { notifications, unreadCount, loaded, markAllAsRead, markRead, dismiss, canDismiss } =

@@ -11,7 +11,6 @@ import type {
 export interface OrganizationDetailsScreenProps {
   config: OrganizationDetailsScreenConfig;
   onNext: (data: OrganizationDetailsData) => void;
-  /** Previously collected answer, restored when the user navigates back. */
   initial?: OrganizationDetailsData;
 }
 

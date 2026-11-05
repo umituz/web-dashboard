@@ -28,12 +28,10 @@ export interface NotificationItemProps {
   typeMeta?: NotificationTypeMeta;
   onMarkRead?: (id: string) => void;
   onDismiss?: (id: string) => void;
-  /** Overrides the relative-time renderer; defaults to `timeAgo`. */
   timeFormatter?: (iso: string) => string;
   labels?: Partial<NotificationItemLabels>;
 }
 
-/** One feed row; navigates when the record carries a link and marks read on the way. */
 export const NotificationItem = ({
   notification,
   typeMeta,

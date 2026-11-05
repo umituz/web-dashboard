@@ -20,7 +20,6 @@ export const DEFAULT_TIME_AGO_LABELS: TimeAgoLabels = {
 
 const fill = (pattern: string, value: number): string => pattern.replace("{n}", String(value));
 
-/** Relative time for feeds; beyond a week it falls back to the locale date. */
 export function timeAgo(
   iso: string,
   labels: Partial<TimeAgoLabels> = {},
@@ -37,7 +36,6 @@ export function timeAgo(
   return new Date(time).toLocaleDateString();
 }
 
-/** The feed tables stamp whichever column they have; `at` wins over `createdAt`. */
 export function timestampOf(record: NotificationRecord): string | undefined {
   return record.at ?? record.createdAt;
 }

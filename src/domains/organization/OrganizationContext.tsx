@@ -9,13 +9,9 @@ import type {
 
 export interface OrganizationProviderProps {
   organization: OrganizationRecord;
-  /** Omit when membership lives outside this provider's scope. */
   members?: readonly OrgMember[];
-  /** Resolves `currentMember` from the member list by id. */
   currentUserId?: string;
-  /** Optional permission bridge; without it `can` always resolves false. */
   permissions?: OrganizationPermissionBridge;
-  /** Multi-organization support: pass the full org list to enable switching. */
   organizations?: readonly OrganizationRecord[];
   activeOrganizationId?: string;
   onSwitchOrganization?: (organizationId: string) => void;

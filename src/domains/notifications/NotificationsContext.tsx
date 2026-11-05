@@ -13,9 +13,7 @@ export interface NotificationsContextValue {
 }
 
 export interface NotificationsProviderProps {
-  /** The host's current feed — a new array reference re-seeds the local copy. */
   notifications: readonly NotificationRecord[];
-  /** False while the host is still fetching; pages can render their own loading row. */
   loaded?: boolean;
   onMarkAllRead?: () => void;
   onMarkRead?: (id: string) => void;
@@ -25,7 +23,6 @@ export interface NotificationsProviderProps {
 
 const NotificationsContext = createContext<NotificationsContextValue | null>(null);
 
-/** Shared feed state so the header bell and the page stay in sync. */
 export function NotificationsProvider({
   notifications,
   loaded = true,
@@ -34,8 +31,6 @@ export function NotificationsProvider({
   onDismiss,
   children,
 }: NotificationsProviderProps) {
-  // Optimistic local copy: reads/dismisses land instantly while the host
-  // persists through the callbacks; a fresh array from the host re-seeds it.
   const [items, setItems] = useState<NotificationRecord[]>(() => [...notifications]);
 
   useEffect(() => {

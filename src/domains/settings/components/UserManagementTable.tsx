@@ -9,7 +9,6 @@ export interface ManagedUser {
   email: string;
   role: RoleKey;
   status?: string;
-  /** Owner rows are shielded from removal/role changes when `isRowLocked` is not overridden. */
   isOwner?: boolean;
 }
 
@@ -20,7 +19,6 @@ export interface UserManagementTableLabels {
   empty: string;
   statusColumn?: string;
   actionsColumn?: string;
-  /** @deprecated use actionsColumn — the column now hosts every row action. */
   removeColumn?: string;
   removeLabel?: string;
 }
@@ -30,13 +28,9 @@ export interface UserManagementTableProps {
   roles: RoleInfo[];
   labels: UserManagementTableLabels;
   onRoleChange?: (userId: string, role: RoleKey) => void;
-  /** Renders a status column with badges when provided. */
   statusVocab?: StatusVocab;
-  /** Renders a remove action column when provided; guarded rows stay hidden. */
   onRemove?: (userId: string) => void;
-  /** Extra row-level actions (e.g. "Make owner"), rendered before Remove. */
   rowActions?: (user: ManagedUser) => ReactNode;
-  /** Rows that must never be removed or role-changed; defaults to owner rows. */
   isRowLocked?: (user: ManagedUser) => boolean;
 }
 

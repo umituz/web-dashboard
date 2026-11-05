@@ -13,7 +13,6 @@ export interface OrganizationCardLabels {
 export interface OrganizationCardProps {
   organization: OrganizationRecord;
   memberCount?: number;
-  /** Shows the "invite your team" hint + CTA when memberCount is 1. */
   onInvite?: () => void;
   labels?: Partial<OrganizationCardLabels>;
   onClick?: () => void;

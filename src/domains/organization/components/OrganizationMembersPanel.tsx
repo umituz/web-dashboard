@@ -34,17 +34,12 @@ export interface OrganizationMembersPanelLabels {
 export interface OrganizationMembersPanelProps {
   members: readonly OrgMember[];
   roles: readonly RoleInfo[];
-  /** Self rows are always locked; owner rows lock by default. */
   currentMemberId?: string;
-  /** Outstanding invitations, rendered in their own section. */
   invitations?: readonly OrgInvitation[];
-  /** Blocks the invite form once members reach the seat limit. */
   seatLimit?: number;
   onRoleChange?: (memberId: string, role: RoleKey) => void;
   onRemove?: (memberId: string) => void;
-  /** Atomic backend transfer is the host's job; the old owner usually drops to admin. */
   onTransferOwnership?: (memberId: string) => void;
-  /** Self-service exit; hide it for owners — the last owner cannot leave. */
   onLeave?: () => void;
   onInvite?: (input: OrgInviteInput) => void;
   onRevokeInvitation?: (invitationId: string) => void;
