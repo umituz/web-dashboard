@@ -3,7 +3,7 @@ import { CheckCheck } from "lucide-react";
 import { Button } from "@umituz/web-design-system/atoms";
 import { Segmented } from "@umituz/web-design-system/molecules";
 import type { SegmentedOption } from "@umituz/web-design-system/molecules";
-import { PageHeader } from "../../layouts/components";
+import { PageHeader } from "@umituz/web-design-system/templates";
 import { useNotifications } from "../NotificationsContext";
 import { severityOf } from "../time";
 import type { NotificationListLabels, NotificationTypeMeta } from "../types";

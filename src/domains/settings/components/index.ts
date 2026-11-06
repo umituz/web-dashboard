@@ -9,7 +9,6 @@ export {
   PermissionMatrixScreen,
   type PermissionMatrixScreenProps,
 } from './PermissionMatrixScreen';
-export { AuditLogList, type AuditLogListProps, type AuditEntry } from './AuditLogList';
 export {
   OrganizationProfileForm,
   type OrganizationProfileFormProps,

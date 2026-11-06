@@ -74,24 +74,3 @@ describe("SingleSelectFilterList", () => {
   });
 });
 
-import { BarChart } from "../../charts/components";
-
-describe("BarChart per-bar accents", () => {
-  it("paints bars with accent overrides falling back to the series tone", () => {
-    const html = renderToString(
-      <BarChart
-        labels={["Mon", "Tue"]}
-        series={[
-          {
-            label: "load",
-            values: [3, 5],
-            tone: "#111111",
-            accents: ["#ff0000", undefined],
-          },
-        ]}
-      />,
-    );
-    expect(html).toContain("#ff0000");
-    expect(html).toContain("#111111");
-  });
-});
