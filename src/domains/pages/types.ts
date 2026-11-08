@@ -29,6 +29,7 @@ export interface ListPageProps<T> {
   kicker?: ReactNode;
   meta?: ReactNode;
   actions?: ReactNode;
+  notice?: ReactNode;
   data: readonly T[];
   columns: readonly Column<T>[];
   search?: ListPageSearchConfig<T>;

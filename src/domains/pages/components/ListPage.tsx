@@ -22,6 +22,7 @@ export function ListPage<T>({
   kicker,
   meta,
   actions,
+  notice,
   data,
   columns,
   search,
@@ -66,6 +67,8 @@ export function ListPage<T>({
         meta={meta}
         actions={actions}
       />
+
+      {notice}
 
       {hasToolbar && (
         <FilterBar

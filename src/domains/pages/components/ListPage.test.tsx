@@ -129,6 +129,11 @@ describe('ListPage', () => {
     expect(screen.queryByText('Lobby Camera')).toBeNull();
   });
 
+  it('renders the notice slot between header and toolbar', () => {
+    mount({ notice: <div role="alert">offline note</div> });
+    expect(screen.getByRole('alert').textContent).toBe('offline note');
+  });
+
   it('honours label overrides', () => {
     mount({
       search: { terms: (row) => row.name },
