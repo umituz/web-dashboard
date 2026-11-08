@@ -1,4 +1,5 @@
 export * from './domains/layouts';
+export * from './domains/pages';
 export * from './domains/settings';
 export * from './domains/calendar';
 export * from './domains/permissions';
