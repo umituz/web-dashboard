@@ -1,21 +1,10 @@
-import { useMemo, useState, type ReactNode } from 'react';
-import { Link } from 'react-router';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
 import { PageHeader } from '@umituz/web-design-system/templates';
-import {
-  EmptyState,
-  FilterBar,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@umituz/web-design-system/organisms';
+import { DataTable, FilterBar } from '@umituz/web-design-system/organisms';
 import { FilterSelect } from '@umituz/web-design-system/molecules';
-import { Skeleton } from '@umituz/web-design-system/atoms';
 import {
   defaultListPageLabels,
-  type ListPageColumn,
   type ListPageFilter,
   type ListPageLabels,
   type ListPageProps,
@@ -34,54 +23,39 @@ export function ListPage<T>({
   meta,
   actions,
   data,
-  getRowId,
   columns,
   search,
   filters,
   matchFilter,
   rowLink,
-  rowActions,
-  loading = false,
-  empty,
   toolbar,
   footer,
   labels,
+  table,
 }: ListPageProps<T>) {
   const merged: ListPageLabels = { ...defaultListPageLabels, ...labels };
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [values, setValues] = useState<Record<string, string>>({});
 
-  const activeFilters = useMemo(
-    () => Object.entries(values).filter(([, value]) => value !== ''),
-    [values],
-  );
-
   const rows = useMemo(() => {
     let list = data as readonly T[];
-    for (const [id, value] of activeFilters) {
+    for (const filter of filters ?? []) {
+      const value = values[filter.id] ?? '';
+      if (value === '') continue;
       const match = matchFilter ?? matchesFilterDefault;
-      list = list.filter((row) => match(row, id, value));
+      list = list.filter((row) => match(row, filter.id, value));
     }
     const q = query.trim().toLowerCase();
     if (q !== '' && search) {
       list = list.filter((row) =>
-        toSearchTerms(search.terms(row)).some((term) =>
-          term.toLowerCase().includes(q),
-        ),
+        toSearchTerms(search.terms(row)).some((term) => term.toLowerCase().includes(q)),
       );
     }
     return list;
-  }, [data, activeFilters, query, search, matchFilter]);
+  }, [data, filters, values, query, search, matchFilter]);
 
   const hasToolbar = Boolean(search || (filters && filters.length > 0) || toolbar);
-  const showEmpty = !loading && rows.length === 0;
-
-  const renderCell = (column: ListPageColumn<T>, row: T, isFirst: boolean): ReactNode => {
-    const content = column.render ? column.render(row) : String((row as Record<string, unknown>)[column.key] ?? '');
-    const href = isFirst && rowLink ? rowLink(row) : undefined;
-    if (href === undefined) return content;
-    return <Link to={href}>{content}</Link>;
-  };
 
   return (
     <div className="flex w-full flex-col gap-6">
@@ -117,9 +91,7 @@ export function ListPage<T>({
             <FilterSelect
               key={filter.id}
               value={values[filter.id] ?? ''}
-              onChange={(value) =>
-                setValues((prev) => ({ ...prev, [filter.id]: value }))
-              }
+              onChange={(value) => setValues((prev) => ({ ...prev, [filter.id]: value }))}
               options={filter.options}
               ariaLabel={filter.label}
               allLabel={merged.filterAll}
@@ -128,65 +100,19 @@ export function ListPage<T>({
         </FilterBar>
       )}
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            {columns.map((column) => (
-              <TableHead key={column.key} className={column.headerClassName}>
-                {column.header}
-              </TableHead>
-            ))}
-            {rowActions && <TableHead className="w-0" />}
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {loading && data.length === 0
-            ? Array.from({ length: 5 }, (_, rowIndex) => (
-                <TableRow key={`skeleton-${rowIndex}`}>
-                  {columns.map((column) => (
-                    <TableCell key={column.key}>
-                      <Skeleton variant="text" />
-                    </TableCell>
-                  ))}
-                  {rowActions && <TableCell />}
-                </TableRow>
-              ))
-            : showEmpty
-              ? (
-                  <TableRow>
-                    <TableCell colSpan={columns.length + (rowActions ? 1 : 0)}>
-                      <EmptyState
-                        title={empty?.title ?? merged.emptyTitle}
-                        description={empty?.description}
-                        icon={empty?.icon}
-                        action={
-                          empty?.action ? (
-                            empty.action.to ? (
-                              <Link to={empty.action.to}>{empty.action.label}</Link>
-                            ) : empty.action.onClick ? (
-                              {
-                                label: empty.action.label,
-                                onClick: empty.action.onClick,
-                              }
-                            ) : undefined
-                          ) : undefined
-                        }
-                      />
-                    </TableCell>
-                  </TableRow>
-                )
-              : rows.map((row) => (
-                  <TableRow key={getRowId(row)}>
-                    {columns.map((column, columnIndex) => (
-                      <TableCell key={column.key} className={column.className}>
-                        {renderCell(column, row, columnIndex === 0)}
-                      </TableCell>
-                    ))}
-                    {rowActions && <TableCell>{rowActions(row)}</TableCell>}
-                  </TableRow>
-                ))}
-        </TableBody>
-      </Table>
+      <DataTable
+        {...table}
+        data={[...rows]}
+        columns={[...columns]}
+        onRowClick={
+          rowLink
+            ? (row) => {
+                const href = rowLink(row);
+                if (href !== undefined) navigate(href);
+              }
+            : table?.onRowClick
+        }
+      />
 
       {footer}
     </div>

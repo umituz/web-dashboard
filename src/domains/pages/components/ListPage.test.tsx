@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router';
+import type { Column } from '@umituz/web-design-system/organisms';
 import { ListPage } from './ListPage';
 
 interface Device {
@@ -16,22 +17,35 @@ const DEVICES: readonly Device[] = [
   { id: 'dev-3', name: 'Lobby Camera', status: 'online', site: 'HQ' },
 ];
 
-const COLUMNS = [
-  { key: 'name', header: 'Device' },
-  { key: 'status', header: 'Status' },
+const COLUMNS: readonly Column<Device>[] = [
+  { id: 'name', header: 'Device', accessor: 'name' },
+  { id: 'status', header: 'Status', accessor: 'status' },
 ];
+
+function LocationProbe() {
+  const location = useLocation();
+  return <output data-testid="location">{location.pathname}</output>;
+}
 
 function mount(props: Partial<Parameters<typeof ListPage<Device>>[0]> = {}) {
   return render(
     <MemoryRouter>
-      <ListPage<Device>
-        title="Devices"
-        description="Field hardware"
-        data={DEVICES}
-        getRowId={(row) => row.id}
-        columns={COLUMNS}
-        {...props}
-      />
+      <LocationProbe />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ListPage<Device>
+              title="Devices"
+              description="Field hardware"
+              data={DEVICES}
+              columns={COLUMNS}
+              {...props}
+            />
+          }
+        />
+        <Route path="/devices/:id" element={<output>detail</output>} />
+      </Routes>
     </MemoryRouter>,
   );
 }
@@ -46,11 +60,8 @@ describe('ListPage', () => {
   });
 
   it('filters rows by search terms', () => {
-    mount({
-      search: { terms: (row) => [row.name, row.site] },
-    });
-    const input = screen.getByPlaceholderText('Search…');
-    fireEvent.change(input, { target: { value: 'camera' } });
+    mount({ search: { terms: (row) => [row.name, row.site] } });
+    fireEvent.change(screen.getByPlaceholderText('Search…'), { target: { value: 'camera' } });
     expect(screen.getByText('Lobby Camera')).toBeDefined();
     expect(screen.queryByText('North Gate Reader')).toBeNull();
   });
@@ -64,48 +75,58 @@ describe('ListPage', () => {
     expect(screen.getByText('Lobby Camera')).toBeDefined();
   });
 
-  it('shows the count of shown vs total', () => {
+  it('honours a custom matchFilter', () => {
     mount({
-      search: { terms: (row) => row.name },
+      filters: [{ id: 'campus', label: 'Campus', options: [{ value: 'hq', label: 'HQ' }] }],
+      matchFilter: (row, id, value) => id === 'campus' && row.site.toLowerCase() === value,
     });
+    fireEvent.change(screen.getByLabelText('Campus'), { target: { value: 'hq' } });
+    expect(screen.getByText('Lobby Camera')).toBeDefined();
+    expect(screen.queryByText('Server Door Sensor')).toBeNull();
+  });
+
+  it('shows the count of shown vs total', () => {
+    mount({ search: { terms: (row) => row.name } });
     fireEvent.change(screen.getByPlaceholderText('Search…'), { target: { value: 'gate' } });
     expect(screen.getByTestId('list-page-count').textContent).toBe('1 of 3');
   });
 
-  it('renders first column as a link via rowLink', () => {
+  it('navigates via rowLink on row click', () => {
     mount({ rowLink: (row) => `/devices/${row.id}` });
-    const link = screen.getByText('Lobby Camera').closest('a');
-    expect(link?.getAttribute('href')).toBe('/devices/dev-3');
+    fireEvent.click(screen.getByText('Lobby Camera'));
+    expect(screen.getByTestId('location').textContent).toBe('/devices/dev-3');
   });
 
-  it('renders custom cells and per-row actions', () => {
+  it('keeps table passthrough escape hatches working', () => {
+    const onRowClick = vi.fn();
+    mount({
+      columns: [{ id: 'name', header: 'Device', accessor: 'name' }],
+      table: { onRowClick, sortable: true },
+    });
+    fireEvent.click(screen.getByText('Lobby Camera'));
+    expect(onRowClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders custom cells from column config', () => {
     mount({
       columns: [
-        { key: 'name', header: 'Device', render: (row) => `${row.name}!` },
-        { key: 'status', header: 'Status', render: (row) => <em>{row.status}</em> },
+        { id: 'name', header: 'Device', cell: (row) => `${row.name}!` },
+        { id: 'status', header: 'Status', cell: (row) => <em>{row.status}</em> },
       ],
-      rowActions: (row) => <button type="button">open-{row.id}</button>,
     });
     expect(screen.getByText('Lobby Camera!')).toBeDefined();
     expect(screen.getAllByText('online', { selector: 'em' }).length).toBe(2);
-    expect(screen.getByText('open-dev-3')).toBeDefined();
   });
 
-  it('shows the empty state when no row matches', () => {
+  it('shows the DataTable empty state when no row matches', () => {
     mount({
       search: { terms: (row) => row.name },
-      empty: { title: 'No devices', description: 'Try another search' },
+      table: { emptyState: { title: 'No devices', description: 'Try another search' } },
     });
     fireEvent.change(screen.getByPlaceholderText('Search…'), { target: { value: 'zzz' } });
     expect(screen.getByText('No devices')).toBeDefined();
     expect(screen.getByText('Try another search')).toBeDefined();
     expect(screen.queryByText('Lobby Camera')).toBeNull();
-  });
-
-  it('renders skeleton rows while loading an empty dataset', () => {
-    const { container } = mount({ data: [], loading: true, empty: { title: 'No devices' } });
-    expect(screen.queryByText('No devices')).toBeNull();
-    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
   });
 
   it('honours label overrides', () => {
@@ -115,15 +136,5 @@ describe('ListPage', () => {
     });
     expect(screen.getByPlaceholderText('Cihaz ara')).toBeDefined();
     expect(screen.getByTestId('list-page-count').textContent).toBe('üç');
-  });
-
-  it('fires the empty action onClick', () => {
-    const onClick = vi.fn();
-    mount({
-      data: [],
-      empty: { title: 'No devices', action: { label: 'Add device', onClick } },
-    });
-    fireEvent.click(screen.getByText('Add device'));
-    expect(onClick).toHaveBeenCalledTimes(1);
   });
 });
