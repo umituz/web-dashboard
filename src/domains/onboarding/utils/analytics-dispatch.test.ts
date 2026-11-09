@@ -26,7 +26,7 @@ describe('analytics-dispatch — the "never throws" contract', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     expect(() => dispatchAnalyticsEvent(event, 'custom', undefined)).not.toThrow();
     expect(warn).toHaveBeenCalledTimes(1);
-    expect(warn.mock.calls[0][0]).toContain('customTracker');
+    expect(warn.mock.calls[0]?.[0]).toContain('customTracker');
   });
 
   it('never throws when the custom tracker itself throws', () => {
@@ -36,7 +36,7 @@ describe('analytics-dispatch — the "never throws" contract', () => {
     };
     expect(() => dispatchAnalyticsEvent(event, 'custom', tracker)).not.toThrow();
     expect(error).toHaveBeenCalledTimes(1);
-    expect(error.mock.calls[0][0]).toContain('dropped');
+    expect(error.mock.calls[0]?.[0]).toContain('dropped');
   });
 
   it('is a no-op without a provider', () => {

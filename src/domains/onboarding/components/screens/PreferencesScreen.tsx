@@ -82,7 +82,7 @@ export function PreferencesScreen({ config, onNext }: PreferencesScreenProps) {
 
 interface PreferenceRowProps {
   item: PreferenceItem;
-  value: PrefValue;
+  value: PrefValue | undefined;
   onChange: (value: PrefValue) => void;
 }
 

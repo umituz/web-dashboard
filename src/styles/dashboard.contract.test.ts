@@ -56,7 +56,7 @@ describe("dashboard stylesheet contract", () => {
       "utf8",
     );
     const dsDefined = new Set([...dsCss.matchAll(/(--[a-z][a-z0-9-]*)\s*:/g)].map((m) => m[1]));
-    const read = new Set([...sheet.matchAll(/var\((--[a-z][a-z0-9-]*)[,)]/g)].map((m) => m[1]));
+    const read = new Set([...sheet.matchAll(/var\((--[a-z][a-z0-9-]*)[,)]/g)].map((m) => m[1] ?? ''));
     const missing = [...read].filter(
       (v) => !v.startsWith("--udb-") && !dsDefined.has(v) && !optional.has(v),
     );

@@ -18,6 +18,10 @@ export function SocialProofScreen({ config, onNext }: SocialProofScreenProps) {
   const total = config.testimonials.length;
   const current = config.testimonials[index];
 
+  if (!current) {
+    return null;
+  }
+
   function go(delta: number) {
     setIndex((i) => (i + delta + total) % total);
   }

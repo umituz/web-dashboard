@@ -70,8 +70,8 @@ describe("buildNav", () => {
       "nav.commercial",
       "nav.insight",
     ]);
-    expect(nav[0].items.map((item) => item.label)).toEqual(["nav.dashboard"]);
-    expect(nav[2].items.map((item) => item.label)).toEqual(["nav.reports"]);
+    expect(nav[0]?.items.map((item) => item.label)).toEqual(["nav.dashboard"]);
+    expect(nav[2]?.items.map((item) => item.label)).toEqual(["nav.reports"]);
   });
 
   it("hides detail routes (inNav: false)", () => {

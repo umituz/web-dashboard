@@ -104,8 +104,8 @@ describe('slider-value-bounds (§22.4)', () => {
     try {
       expect(clampValueToBounds(50, 100, 10, 'mood')).toBe(50);
       expect(errorSpy).toHaveBeenCalledTimes(1);
-      expect(errorSpy.mock.calls[0][0]).toContain('mood');
-      expect(errorSpy.mock.calls[0][0]).toContain('min > max');
+      expect(errorSpy.mock.calls[0]?.[0]).toContain('mood');
+      expect(errorSpy.mock.calls[0]?.[0]).toContain('min > max');
     } finally {
       errorSpy.mockRestore();
     }

@@ -217,7 +217,7 @@ describe("DashboardSidebar (untitled group)", () => {
     expect(screen.getByRole("link", { name: /home/i })).toBeTruthy();
     const toggles = document.querySelectorAll("button.udb-sidebar__group-toggle");
     expect(toggles.length).toBe(1);
-    expect(toggles[0].textContent).toContain("Main");
+    expect(toggles[0]?.textContent).toContain("Main");
   });
 });
 

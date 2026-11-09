@@ -32,7 +32,10 @@ export function TinderCardsScreen({ config, onNext }: TinderCardsScreenProps) {
   const handleDecision = useCallback(
     (likedStatement: boolean) => {
       if (likedStatement) {
-        setLiked((prev) => [...prev, config.statements[indexRef.current].id]);
+        const statement = config.statements[indexRef.current];
+        if (statement) {
+          setLiked((prev) => [...prev, statement.id]);
+        }
       }
       setIndex((i) => i + 1);
     },

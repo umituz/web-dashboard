@@ -93,5 +93,5 @@ export function doesIconNameResolve(name: string | undefined): boolean {
 
 export function resolveIconByName(name: string | undefined): LucideIcon | null {
   if (!doesIconNameResolve(name)) return null;
-  return ICON_REGISTRY[name as string];
+  return ICON_REGISTRY[name as string] ?? null;
 }
