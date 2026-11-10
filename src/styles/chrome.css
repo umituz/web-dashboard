@@ -129,6 +129,20 @@
   margin: 0 auto;
   max-width: var(--udb-content-max-width, none);
 }
+.udb-layout__content:has(.udb-fill-page) {
+  display: flex;
+  flex-direction: column;
+}
+.udb-layout__content:has(.udb-fill-page) > .udb-layout__page {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+}
+.udb-fill-page {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
 @media (min-width: 768px) {
   .udb-layout__sidebar {
     display: flex;
