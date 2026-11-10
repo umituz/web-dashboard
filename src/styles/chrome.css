@@ -871,6 +871,18 @@
   flex: 1;
   overflow-y: auto;
   padding: var(--udb-space-3) var(--udb-space-2);
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.udb-settings__nav::-webkit-scrollbar {
+  display: none;
+}
+.udb-no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.udb-no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 .udb-settings__mobile {
   position: fixed;
