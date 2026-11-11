@@ -133,6 +133,7 @@ export type ValueDeliveryScreenConfig<TResult = unknown> = BaseScreen<
   title: string;
   result: TResult;
   items?: ReadonlyArray<ValueDeliveryItem>;
+  itemsFromCollected?: (collected: Record<string, unknown>) => ReadonlyArray<ValueDeliveryItem>;
     shareConfig?: {
     text: string;
     url?: string;

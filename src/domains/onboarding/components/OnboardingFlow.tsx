@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import type { OnboardingScreen } from '../types/screens';
+import type { OnboardingScreen, ValueDeliveryScreenConfig } from '../types/screens';
 import type { OnboardingConfig } from '../types/config';
 import { useOnboardingProgress } from '../hooks/useOnboardingProgress';
 import { useOnboardingAnalytics } from '../hooks/useOnboardingAnalytics';
@@ -111,8 +111,18 @@ function renderScreen(
       return <ProcessingScreen config={screen} onComplete={(data) => onStepCompleted(data)} />;
     case 'app-demo':
       return <AppDemoScreen config={screen} onNext={(data) => onStepCompleted(data)} />;
-    case 'value-delivery':
-      return <ValueDeliveryScreen config={screen} onNext={() => onStepCompleted(undefined)} />;
+    case 'value-delivery': {
+      const deliveryConfig = screen as ValueDeliveryScreenConfig;
+      const resolvedItems = deliveryConfig.itemsFromCollected
+        ? deliveryConfig.itemsFromCollected(progress.collected)
+        : deliveryConfig.items;
+      return (
+        <ValueDeliveryScreen
+          config={{ ...screen, items: resolvedItems } as typeof screen}
+          onNext={() => onStepCompleted(undefined)}
+        />
+      );
+    }
     case 'account-gate':
       return <AccountGateScreen config={screen} onNext={(data) => onStepCompleted(data)} />;
     case 'paywall':
