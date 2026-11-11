@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@umituz/web-design-system/atoms';
 import { Sparkles } from 'lucide-react';
 import { PrimaryButton } from '../PrimaryButton';
+import { renderBundledIcon } from '../renderBundledIcon';
 import { useOnboardingIntl } from '../OnboardingIntl';
 import type { ValueDeliveryScreenConfig } from '../../types/screens';
 
@@ -54,10 +55,21 @@ export function ValueDeliveryScreen<TResult = unknown>({
 
       <h2 className="udb-onb-title udb-onb-title--display">{config.title}</h2>
 
-      <div className="udb-onb-result">
-        <pre className="udb-onb-result__pre">{JSON.stringify(config.result, null, 2)}</pre>
-
-      </div>
+      {config.items && config.items.length > 0 ? (
+        <ul className="udb-onb-result__list">
+          {config.items.map((item) => (
+            <li key={item.id} className="udb-onb-result__row">
+              {renderBundledIcon(item.iconName, 'udb-onb-result__row-icon')}
+              <span className="udb-onb-result__row-label">{item.label}</span>
+              {item.value != null && <span className="udb-onb-result__row-value">{item.value}</span>}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="udb-onb-result">
+          <pre className="udb-onb-result__pre">{JSON.stringify(config.result, null, 2)}</pre>
+        </div>
+      )}
 
       {config.shareConfig && (
         <div className="udb-onb-share">

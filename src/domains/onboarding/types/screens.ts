@@ -119,12 +119,20 @@ export type AppDemoScreenConfig = BaseScreen<'app-demo', unknown> & {
   demo: DemoConfig;
 };
 
+export interface ValueDeliveryItem {
+  id: string;
+  label: string;
+  value?: string;
+  iconName?: string;
+}
+
 export type ValueDeliveryScreenConfig<TResult = unknown> = BaseScreen<
   'value-delivery',
   TResult
 > & {
   title: string;
   result: TResult;
+  items?: ReadonlyArray<ValueDeliveryItem>;
     shareConfig?: {
     text: string;
     url?: string;

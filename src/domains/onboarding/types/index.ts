@@ -4,6 +4,8 @@ export type {
   OnboardingOption,
   OrganizationDetailsData,
   OrganizationDetailsScreenConfig,
+  ValueDeliveryItem,
+  ValueDeliveryScreenConfig,
 } from './screens';
 export type {
   OnboardingConfig,

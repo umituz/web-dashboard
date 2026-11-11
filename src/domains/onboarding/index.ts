@@ -141,4 +141,6 @@ export type {
   OnboardingResult,
   OrganizationDetailsData,
   OrganizationDetailsScreenConfig,
+  ValueDeliveryItem,
+  ValueDeliveryScreenConfig,
 } from './types';
