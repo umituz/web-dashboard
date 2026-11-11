@@ -538,6 +538,25 @@
 .udb-header__search-kbd {
   margin-left: var(--udb-space-2);
 }
+@media (max-width: 639px) {
+  .udb-header {
+    gap: var(--udb-space-2);
+    padding: 0 var(--udb-space-3);
+  }
+  .udb-header__actions,
+  .udb-header__extra {
+    gap: var(--udb-space-1);
+  }
+  .udb-header__search {
+    width: 34px;
+    justify-content: center;
+    padding: 0;
+  }
+  .udb-header__search-text,
+  .udb-header__search-kbd {
+    display: none;
+  }
+}
 .udb-profile-btn[data-state="open"] .udb-profile-btn__chevron {
   transform: rotate(180deg);
 }
