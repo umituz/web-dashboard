@@ -1503,38 +1503,43 @@
   font-size: var(--udb-font-size-md);
   line-height: 1.5;
 }
-.udb-onb h1,
-.udb-onb h2,
-.udb-onb h3,
-.udb-onb p,
-.udb-onb ul,
-.udb-onb ol,
-.udb-onb figure,
-.udb-onb blockquote,
-.udb-onb pre {
-  margin: 0;
-}
-.udb-onb ul,
-.udb-onb ol {
-  list-style: none;
-  padding: 0;
-}
-.udb-onb button,
-.udb-onb input,
-.udb-onb select,
-.udb-onb textarea {
-  font: inherit;
-  color: inherit;
-  margin: 0;
-}
-.udb-onb button {
-  padding: 0;
-  background: none;
-  border: 0;
-  cursor: pointer;
-}
-.udb-onb cite {
-  font-style: normal;
+/* Element resets live in the base layer so consumer utility classes
+ * (e.g. a Button's bg-primary/p-4 from @umituz/web-design-system) can
+ * override them — unlayered resets would always win the cascade. */
+@layer base {
+  .udb-onb h1,
+  .udb-onb h2,
+  .udb-onb h3,
+  .udb-onb p,
+  .udb-onb ul,
+  .udb-onb ol,
+  .udb-onb figure,
+  .udb-onb blockquote,
+  .udb-onb pre {
+    margin: 0;
+  }
+  .udb-onb ul,
+  .udb-onb ol {
+    list-style: none;
+    padding: 0;
+  }
+  .udb-onb button,
+  .udb-onb input,
+  .udb-onb select,
+  .udb-onb textarea {
+    font: inherit;
+    color: inherit;
+    margin: 0;
+  }
+  .udb-onb button {
+    padding: 0;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+  .udb-onb cite {
+    font-style: normal;
+  }
 }
 .udb-onb img,
 .udb-onb svg {
