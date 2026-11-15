@@ -140,6 +140,18 @@ string.
 
 ### Calendar
 
+The presentation organisms (`Calendar`, `CalendarMonth`, `CalendarTimeGrid`,
+`CalendarAgenda`, `CalendarResourceTimeline`), their view types and the day-key
+layout engine live in the design system (`@umituz/web-design-system/organisms`)
+since DS 6.26.0; this package re-exports them from the same sub-entries
+(`calendar/components`, `calendar/types`, `calendar/utils`), so existing
+imports keep working. Calendar styles ship inside the DS stylesheet chain
+(`app.css` / `styles.css`) — `@umituz/web-dashboard/calendar/calendar.css`
+remains as an empty compatibility stub and can be dropped from host imports.
+
+The data layer stays here: `ContentItem` storage, `CalendarService` with an
+injected database, `useCalendar`, the mappers and `DEFAULT_CALENDAR_CONFIG`.
+
 ```tsx
 import { CalendarService, createInMemoryCalendarDatabase } from "@umituz/web-dashboard/calendar/services";
 
