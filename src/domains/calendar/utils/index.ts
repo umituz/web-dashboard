@@ -1,40 +1,39 @@
+import {
+  addDays,
+  eachDayOfInterval,
+  endOfMonth,
+  endOfWeek,
+  formatDate as formatDateWithStyle,
+  formatTime,
+  startOfMonth,
+  startOfWeek,
+  type WeekStartsOn,
+} from '@umituz/web-design-system';
 import type { CalendarConfig } from '../types/calendar.types';
 
 export { mapCalendarDocument, mapPostDocument } from './contentItemMapper';
 export * from './layout';
 export type { FirestoreDocument } from './contentItemMapper';
+export { isSameDay } from '@umituz/web-design-system';
 
 export function getWeekDates(
   date: Date,
-  startOfWeek: number = 0,
+  weekStartsOn: number = 0,
 ): [Date, Date, Date, Date, Date, Date, Date] {
-  const anchor = new Date(date);
-
-  const day = anchor.getDay();
-  const diff = (day < startOfWeek ? 7 : 0) + day - startOfWeek;
-  anchor.setDate(anchor.getDate() - diff);
-
-  const at = (offset: number): Date => {
-    const dayAt = new Date(anchor);
-    dayAt.setDate(anchor.getDate() + offset);
-    return dayAt;
-  };
-  return [at(0), at(1), at(2), at(3), at(4), at(5), at(6)];
+  const anchor = startOfWeek(date, weekStartsOn as WeekStartsOn);
+  return [
+    addDays(anchor, 0),
+    addDays(anchor, 1),
+    addDays(anchor, 2),
+    addDays(anchor, 3),
+    addDays(anchor, 4),
+    addDays(anchor, 5),
+    addDays(anchor, 6),
+  ];
 }
 
 export function getMonthDays(date: Date): Date[] {
-  const year = date.getFullYear();
-  const month = date.getMonth();
-  const days: Date[] = [];
-
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-
-  for (let d = new Date(firstDay); d <= lastDay; d.setDate(d.getDate() + 1)) {
-    days.push(new Date(d));
-  }
-
-  return days;
+  return eachDayOfInterval({ start: startOfMonth(date), end: endOfMonth(date) });
 }
 
 export function isDateInRange(date: Date, range: { start: Date; end: Date }): boolean {
@@ -47,25 +46,14 @@ export function formatDate(
   locale: string = 'en-US',
 ): string {
   if (format === 'time') {
-    return date.toLocaleTimeString(locale, {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return formatTime(date, { locale });
   }
 
-  return date.toLocaleDateString(locale, {
+  return formatDateWithStyle(date, 'long', {
+    weekday: 'none',
     month: format === 'long' ? 'long' : 'short',
-    day: 'numeric',
-    year: 'numeric',
+    locale,
   });
-}
-
-export function isSameDay(date1: Date, date2: Date): boolean {
-  return (
-    date1.getFullYear() === date2.getFullYear() &&
-    date1.getMonth() === date2.getMonth() &&
-    date1.getDate() === date2.getDate()
-  );
 }
 
 export function getViewRange(
@@ -73,17 +61,10 @@ export function getViewRange(
   date: Date,
 ): { start: Date; end: Date } {
   if (view === 'month') {
-    const start = new Date(date.getFullYear(), date.getMonth(), 1);
-    const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-    return { start, end };
+    return { start: startOfMonth(date), end: endOfMonth(date) };
   }
 
-  const week = getWeekDates(date);
-  const firstDay = new Date(week[0]);
-  firstDay.setHours(0, 0, 0, 0);
-  const lastDay = new Date(week[6]);
-  lastDay.setHours(23, 59, 59, 999);
-  return { start: firstDay, end: lastDay };
+  return { start: startOfWeek(date), end: endOfWeek(date) };
 }
 
 export function generateTimeSlots(
