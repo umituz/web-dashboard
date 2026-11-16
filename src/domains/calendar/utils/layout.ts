@@ -1,14 +1,16 @@
 export {
-  DAY_MINUTES,
-  DEFAULT_DAY_START_MIN,
-  DEFAULT_DAY_END_MIN,
-  DEFAULT_MAX_PER_DAY,
-  SLOT_QUANTUM_MIN,
   parseDayKey,
   toDayKey,
   todayKey,
   addDaysKey,
   addMonthsKey,
+} from '@umituz/web-design-system/utils';
+export {
+  DAY_MINUTES,
+  DEFAULT_DAY_START_MIN,
+  DEFAULT_DAY_END_MIN,
+  DEFAULT_MAX_PER_DAY,
+  SLOT_QUANTUM_MIN,
   startOfWeekKey,
   weekDays,
   monthMatrix,
