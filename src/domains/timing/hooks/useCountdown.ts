@@ -5,7 +5,9 @@ export function useCountdown(seconds: number | null, onFinish?: () => void) {
   const [running, setRunning] = useState(seconds != null);
   const finishedRef = useRef(false);
   const onFinishRef = useRef(onFinish);
-  onFinishRef.current = onFinish;
+  useEffect(() => {
+    onFinishRef.current = onFinish;
+  });
 
   useEffect(() => {
     setRemaining(seconds ?? 0);

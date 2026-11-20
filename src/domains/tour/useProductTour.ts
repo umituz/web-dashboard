@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { TourConfig, TourEngineInstance, UseProductTourOptions, UseProductTourReturn } from "./types";
 import { createProductTour, isTourCompleted, resetTourCompletion } from "./tourEngine";
+import { useReducedMotion } from "../onboarding/hooks/useReducedMotion";
 
 export function useProductTour(options: UseProductTourOptions): UseProductTourReturn {
   const {
@@ -33,11 +34,15 @@ export function useProductTour(options: UseProductTourOptions): UseProductTourRe
   }, [isCompleted, tourId, userId]);
 
   const onCompleteRef = useRef(onComplete);
-  onCompleteRef.current = onComplete;
   const onSkipRef = useRef(onSkip);
-  onSkipRef.current = onSkip;
   const onStepChangeRef = useRef(onStepChange);
-  onStepChangeRef.current = onStepChange;
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+    onSkipRef.current = onSkip;
+    onStepChangeRef.current = onStepChange;
+  });
+
+  const prefersReducedMotion = useReducedMotion();
 
   const config: TourConfig = useMemo(
     () => ({
@@ -49,8 +54,8 @@ export function useProductTour(options: UseProductTourOptions): UseProductTourRe
       overlayOpacity,
       stagePadding,
       stageRadius,
-      animate,
-      smoothScroll,
+      animate: prefersReducedMotion ? false : animate,
+      smoothScroll: prefersReducedMotion ? false : smoothScroll,
       allowClose,
       onComplete: () => {
         setHasCompleted(true);
@@ -78,6 +83,7 @@ export function useProductTour(options: UseProductTourOptions): UseProductTourRe
       animate,
       smoothScroll,
       allowClose,
+      prefersReducedMotion,
     ],
   );
 
