@@ -2,13 +2,8 @@ import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { CircleAlert, Clock, Search } from 'lucide-react';
 import { Badge, Button, Input, NativeSelect } from '@umituz/web-design-system/atoms';
-import {
-  Card,
-  Column,
-  DataTable,
-  EmptyState,
-  TablePagination,
-} from '@umituz/web-design-system/organisms';
+import { Card, DataTable, EmptyState, TablePagination } from '@umituz/web-design-system/organisms';
+import type { Column } from '@umituz/web-design-system/organisms';
 import { cn } from '@umituz/web-design-system/utils';
 import type { AdminAuditChange, AdminAuditEntry, AdminAuditSeverity } from '../types';
 
