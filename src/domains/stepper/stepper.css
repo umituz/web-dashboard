@@ -1,0 +1,145 @@
+.udb-stepper {
+  display: flex;
+  width: 100%;
+}
+
+.udb-stepper--horizontal {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.udb-stepper--vertical {
+  flex-direction: column;
+  gap: 0;
+}
+
+.udb-step {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  flex: 1;
+}
+
+.udb-stepper--vertical .udb-step {
+  flex: none;
+  padding-bottom: 24px;
+}
+
+.udb-stepper--vertical .udb-step:last-child {
+  padding-bottom: 0;
+}
+
+.udb-step__node {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  border: 2px solid var(--line-border, rgba(0, 0, 0, 0.15));
+  background: var(--surface, #ffffff);
+  color: var(--text-tertiary, #94a3b8);
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.udb-step--current .udb-step__node {
+  border-color: var(--signal-600, #3b82f6);
+  background: var(--signal-600, #3b82f6);
+  color: #ffffff;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--signal-600, #3b82f6) 20%, transparent);
+}
+
+.udb-step--done .udb-step__node {
+  border-color: var(--signal-600, #3b82f6);
+  background: var(--signal-600, #3b82f6);
+  color: #ffffff;
+}
+
+.udb-step--fail .udb-step__node {
+  border-color: #ef4444;
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.udb-step__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.udb-step__label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #475569);
+  transition: color 0.2s ease;
+}
+
+.udb-step--current .udb-step__label {
+  color: var(--text-primary, #0f172a);
+}
+
+.udb-step--done .udb-step__label {
+  color: var(--text-primary, #0f172a);
+}
+
+.udb-step__desc {
+  font-size: 11px;
+  color: var(--text-tertiary, #94a3b8);
+}
+
+.udb-step__connector {
+  position: absolute;
+  background: var(--line-border, rgba(0, 0, 0, 0.1));
+  z-index: 0;
+}
+
+.udb-stepper--horizontal .udb-step__connector {
+  top: 14px;
+  left: calc(-50% + 14px);
+  right: calc(50% + 14px);
+  height: 2px;
+}
+
+.udb-stepper--vertical .udb-step__connector {
+  left: 13px;
+  top: 30px;
+  bottom: 0;
+  width: 2px;
+}
+
+.udb-step--clickable {
+  cursor: pointer;
+}
+
+.udb-step--clickable:hover .udb-step__node {
+  border-color: var(--signal-600, #3b82f6);
+}
+
+.udb-wizard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+
+.udb-wizard__body {
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+}
+
+.udb-wizard__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line-border, rgba(0, 0, 0, 0.08));
+}

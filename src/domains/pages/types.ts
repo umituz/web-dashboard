@@ -47,3 +47,63 @@ export const defaultListPageLabels: ListPageLabels = {
   filterAll: 'All',
   countShown: (shown, total) => `${shown} of ${total}`,
 };
+
+export interface DetailPageKpi {
+  readonly label: string;
+  readonly value: ReactNode;
+  readonly hint?: ReactNode;
+  readonly delta?: {
+    readonly value: ReactNode;
+    readonly direction?: 'up' | 'down' | 'flat';
+  };
+  readonly tone?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'neutral';
+}
+
+export interface DetailPageTab {
+  readonly id: string;
+  readonly label: ReactNode;
+  readonly count?: number;
+  readonly badge?: ReactNode;
+  readonly icon?: ReactNode;
+  readonly content?: ReactNode;
+  readonly disabled?: boolean;
+}
+
+export interface DetailPageMetaItem {
+  readonly label?: ReactNode;
+  readonly value: ReactNode;
+  readonly icon?: ReactNode;
+}
+
+export interface DetailPageBackTo {
+  readonly href: string;
+  readonly label?: string;
+}
+
+export interface DetailPageNotFoundConfig {
+  readonly title?: string;
+  readonly description?: string;
+  readonly backHref?: string;
+  readonly backLabel?: string;
+}
+
+export interface DetailPageProps<T = unknown> {
+  readonly backTo?: DetailPageBackTo;
+  readonly title: ReactNode;
+  readonly kicker?: ReactNode;
+  readonly badge?: ReactNode;
+  readonly description?: ReactNode;
+  readonly meta?: readonly (DetailPageMetaItem | ReactNode)[];
+  readonly actions?: ReactNode;
+  readonly notice?: ReactNode;
+  readonly kpis?: readonly DetailPageKpi[];
+  readonly tabs?: readonly DetailPageTab[];
+  readonly activeTab?: string;
+  readonly defaultTab?: string;
+  readonly onTabChange?: (tabId: string) => void;
+  readonly sidebar?: ReactNode;
+  readonly children?: ReactNode;
+  readonly notFound?: boolean | DetailPageNotFoundConfig;
+  readonly payload?: T;
+  readonly className?: string;
+}
