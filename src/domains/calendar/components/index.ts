@@ -13,3 +13,8 @@ export type {
   CalendarResource,
   CalendarResourceTimelineProps,
 } from '@umituz/web-design-system/organisms';
+export { CalendarPage } from './CalendarPage';
+export {
+  CalendarSelectedDayPanel,
+  type CalendarSelectedDayPanelProps,
+} from './CalendarSelectedDayPanel';
