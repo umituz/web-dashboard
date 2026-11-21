@@ -20,3 +20,5 @@ export const defaultLayoutLabels: DashboardLayoutLabels = {
   },
   sidebar: { system: 'System' },
 };
+
+export const DEFAULT_DASHBOARD_LABELS = defaultLayoutLabels;

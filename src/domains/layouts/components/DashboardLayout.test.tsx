@@ -278,3 +278,22 @@ describe("DashboardLayout (contentFallback)", () => {
     expect(main?.textContent).toContain("loading-page");
   });
 });
+
+describe("DashboardLayout (default labels)", () => {
+  it("renders with default labels when labels prop is omitted", () => {
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <Routes>
+          <Route
+            path="*"
+            element={<DashboardLayout config={config} />}
+          >
+            <Route path="*" element={<div>content-no-labels</div>} />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+    expect(screen.getByRole("link", { name: /skip to content/i })).toBeTruthy();
+    expect(document.getElementById("udb-main")?.textContent).toContain("content-no-labels");
+  });
+});

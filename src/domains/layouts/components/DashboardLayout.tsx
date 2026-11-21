@@ -5,13 +5,14 @@ import { CommandPalette, type CommandGroup, type CommandItem } from "@umituz/web
 import { DashboardSidebar } from "./DashboardSidebar";
 import { DashboardHeader } from "./DashboardHeader";
 import { getActiveSidebarItem } from "../utils/dashboard";
+import { defaultLayoutLabels } from "./labels";
 import type { DashboardLayoutConfig, DashboardLayoutLabels } from "../types/layout";
 import type { DashboardNotification } from "../types/notification";
 import type { DashboardUser } from "../types/user";
 
-interface DashboardLayoutProps {
+export interface DashboardLayoutProps {
   config: DashboardLayoutConfig;
-  labels: DashboardLayoutLabels;
+  labels?: Partial<DashboardLayoutLabels> | DashboardLayoutLabels;
   user?: DashboardUser;
   authLoading?: boolean;
   isAuthenticated?: boolean;
@@ -33,7 +34,7 @@ interface DashboardLayoutProps {
 
 export const DashboardLayout = ({
   config,
-  labels,
+  labels: labelsProp,
   user,
   authLoading = false,
   isAuthenticated = true,
@@ -52,6 +53,19 @@ export const DashboardLayout = ({
   contentFallback,
   formatNotificationTime,
 }: DashboardLayoutProps) => {
+  const labels: DashboardLayoutLabels = {
+    skipToContent: labelsProp?.skipToContent ?? defaultLayoutLabels.skipToContent,
+    navigation: labelsProp?.navigation ?? defaultLayoutLabels.navigation,
+    searchResults: labelsProp?.searchResults ?? defaultLayoutLabels.searchResults,
+    header: {
+      ...defaultLayoutLabels.header,
+      ...labelsProp?.header,
+    },
+    sidebar: {
+      ...defaultLayoutLabels.sidebar,
+      ...labelsProp?.sidebar,
+    },
+  };
   const location = useLocation();
   const navigate = useNavigate();
   const [internalCollapsed, setInternalCollapsed] = useState(false);
