@@ -4,6 +4,7 @@ export * from './domains/settings';
 export * from './domains/calendar';
 export * from './domains/kanban';
 export * from './domains/activity';
+export * from './domains/admin';
 export * from './domains/filters';
 export * from './domains/stepper';
 export * from './domains/permissions';

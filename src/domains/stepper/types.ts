@@ -11,8 +11,10 @@ export interface StepItem {
 
 export interface StepperProps {
   readonly steps: readonly StepItem[] | readonly string[];
-  readonly currentStep: number;
+  readonly currentStep?: number;
+  readonly currentIndex?: number;
   readonly failStep?: number;
+  readonly failIndex?: number;
   readonly orientation?: 'horizontal' | 'vertical';
   readonly clickable?: boolean;
   readonly onStepClick?: (stepIndex: number) => void;

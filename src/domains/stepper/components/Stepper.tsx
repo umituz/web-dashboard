@@ -12,12 +12,17 @@ function normalizeStep(step: StepItem | string, index: number): StepItem {
 export function Stepper({
   steps,
   currentStep,
+  currentIndex,
   failStep,
+  failIndex,
   orientation = 'horizontal',
   clickable = false,
   onStepClick,
   className,
 }: StepperProps) {
+  const activeIndex = currentStep ?? currentIndex ?? 0;
+  const failureIndex = failStep ?? failIndex;
+
   return (
     <div
       className={cn(
@@ -31,8 +36,8 @@ export function Stepper({
       {steps.map((rawStep, i) => {
         const step = normalizeStep(rawStep, i);
         const state =
-          failStep === i ? 'fail' : i < currentStep ? 'done' : i === currentStep ? 'current' : 'pending';
-        const isClickable = clickable && !step.disabled && i <= currentStep;
+          failureIndex === i ? 'fail' : i < activeIndex ? 'done' : i === activeIndex ? 'current' : 'pending';
+        const isClickable = clickable && !step.disabled && i <= activeIndex;
 
         return (
           <div
