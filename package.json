@@ -1,6 +1,6 @@
 {
   "name": "@umituz/web-dashboard",
-  "version": "11.11.0",
+  "version": "11.12.0",
   "description": "Installable app skeleton for the fleet — layouts, analytics (dependency-free SVG charts), calendar, onboarding flow permissions/module registry; udb-* stylesheet on design-system tokens",
   "type": "module",
   "main": "./src/index.ts",
@@ -25,6 +25,10 @@
     "./calendar/utils": "./src/domains/calendar/utils/index.ts",
     "./chrome.css": "./src/styles/chrome.css",
     "./config": "./src/config/index.ts",
+    "./kanban": "./src/domains/kanban/index.ts",
+    "./kanban/kanban.css": "./src/domains/kanban/kanban.css",
+    "./kanban/components": "./src/domains/kanban/components/index.ts",
+    "./kanban/types": "./src/domains/kanban/types.ts",
     "./layouts": "./src/domains/layouts/index.ts",
     "./layouts/components": "./src/domains/layouts/components/index.ts",
     "./layouts/hooks": "./src/domains/layouts/hooks/index.ts",

@@ -2,6 +2,7 @@ export * from './domains/layouts';
 export * from './domains/pages';
 export * from './domains/settings';
 export * from './domains/calendar';
+export * from './domains/kanban';
 export * from './domains/permissions';
 export * from './domains/organization';
 export * from './domains/tour';
