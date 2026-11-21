@@ -64,3 +64,32 @@ export interface AdminTenantSummary {
   readonly mrr?: string | number;
   readonly createdAt?: string | number | Date;
 }
+
+export type AdminAuditSeverity = 'info' | 'warning' | 'danger';
+
+export interface AdminAuditChange {
+  readonly field: string;
+  readonly from?: string;
+  readonly to?: string;
+}
+
+export interface AdminAuditEntry<TMeta = Record<string, unknown>> {
+  readonly id: string;
+  readonly actor: string;
+  readonly actorName?: string;
+  readonly action: string;
+  readonly target?: string;
+  readonly entityType?: string;
+  readonly timestamp: string | number | Date;
+  readonly severity?: AdminAuditSeverity;
+  readonly changes?: readonly AdminAuditChange[];
+  readonly metadata?: TMeta;
+}
+
+export type AdminModerationAction = 'ban' | 'suspend' | 'activate' | 'reinstate';
+
+export interface AdminModerationPayload {
+  readonly action: AdminModerationAction;
+  readonly reason?: string;
+  readonly durationDays?: number;
+}

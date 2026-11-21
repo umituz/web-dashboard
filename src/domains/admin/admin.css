@@ -185,3 +185,73 @@
   background: var(--surface-hover, rgba(0, 0, 0, 0.03));
   border-color: var(--line-300, rgba(0, 0, 0, 0.15));
 }
+
+.udb-admin-audit-feed {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.udb-admin-audit-feed-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--line-200, rgba(0, 0, 0, 0.08));
+  transition: background-color 150ms ease;
+}
+
+.udb-admin-audit-feed-item:last-child {
+  border-bottom: none;
+}
+
+.udb-admin-audit-feed-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.udb-admin-audit-feed-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.udb-admin-audit-action {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--fg-900, #111827);
+}
+
+.udb-admin-audit-target {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--fg-700, #374151);
+}
+
+.udb-admin-audit-feed-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-size: 0.75rem;
+  color: var(--fg-500, #6b7280);
+  margin-top: 0.125rem;
+}
+
+.udb-admin-audit-feed-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.udb-admin-audit-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  color: var(--fg-500, #6b7280);
+  font-size: 0.875rem;
+}

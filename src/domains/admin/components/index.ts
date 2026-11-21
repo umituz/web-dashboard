@@ -3,3 +3,7 @@ export * from './AdminGate';
 export * from './AdminHealthCard';
 export * from './AdminOverview';
 export * from './AdminUsersTable';
+export * from './AdminAuditFeed';
+export * from './AdminAuditTable';
+export * from './AdminModerationModal';
+export * from './AdminKpiGrid';
