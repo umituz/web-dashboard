@@ -78,8 +78,14 @@ export const DashboardHeader = ({
   return (
     <header className="udb-header">
       <div className="udb-header__lead">
-        <Button variant="ghost" size="icon" className="udb-header__mobile-toggle" onClick={() => setMobileOpen(true)}>
-          <Menu className="udb-header__toggle-icon" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="udb-header__mobile-toggle"
+          onClick={() => setMobileOpen(true)}
+          aria-label={labels.openSidebar ?? labels.expandSidebar}
+        >
+          <Menu className="udb-header__toggle-icon" aria-hidden="true" />
         </Button>
 
         <Button
@@ -132,7 +138,7 @@ export const DashboardHeader = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="udb-header__icon-btn" aria-label={labels.notificationsTitle}>
-                <Bell className="udb-header__icon" />
+                <Bell className="udb-header__icon" aria-hidden="true" />
                 {unreadCount > 0 && <span className="udb-header__unread"><span className="udb-header__unread-core" /></span>}
 
               </Button>

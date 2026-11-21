@@ -1,6 +1,7 @@
 export interface DashboardHeaderLabels {
   expandSidebar: string;
   collapseSidebar: string;
+  openSidebar?: string;
   switchToLight: string;
   switchToDark: string;
   notificationsTitle: string;

@@ -100,7 +100,11 @@
 .udb-layout__backdrop {
   position: absolute;
   inset: 0;
+  border: 0;
+  padding: 0;
+  margin: 0;
   background: rgba(15, 23, 42, 0.45);
+  cursor: pointer;
 }
 .udb-layout__mobile-sidebar {
   position: absolute;

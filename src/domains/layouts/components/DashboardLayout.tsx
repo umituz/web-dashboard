@@ -196,7 +196,12 @@ export const DashboardLayout = ({
 
       {mobileOpen && (
         <div className="udb-layout__mobile">
-          <div className="udb-layout__backdrop" onClick={() => setMobileOpen(false)} />
+          <button
+            type="button"
+            className="udb-layout__backdrop"
+            onClick={() => setMobileOpen(false)}
+            aria-label={labels.header.collapseSidebar}
+          />
           <aside
             className="udb-layout__mobile-sidebar"
             role="dialog"
