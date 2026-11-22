@@ -1,4 +1,4 @@
-export { SettingsLayout, SettingsSection } from './components';
+export * from './components';
 export { useSettings } from './hooks';
 export {
   findSettingsItem,
