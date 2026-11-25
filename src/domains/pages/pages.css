@@ -1,0 +1,349 @@
+.udb-overview-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 100%;
+}
+
+.udb-overview-banner {
+  width: 100%;
+}
+
+.udb-overview-split {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .udb-overview-split {
+    grid-template-columns: 1.4fr 1fr;
+  }
+}
+
+.udb-overview-primary {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.udb-overview-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+}
+
+.udb-stat-grid {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+}
+
+.udb-stat-grid--cols-1 {
+  grid-template-columns: 1fr;
+}
+
+.udb-stat-grid--cols-2 {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.udb-stat-grid--cols-3 {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.udb-stat-grid--cols-4 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.udb-stat-grid--auto {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.udb-stat-skeleton {
+  padding: 1rem;
+  border-radius: var(--radius, 8px);
+  border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+  background: var(--surface, #ffffff);
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  animation: udb-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.udb-stat-skeleton-label {
+  height: 0.75rem;
+  width: 40%;
+  border-radius: 4px;
+  background: var(--surface-200, rgba(0, 0, 0, 0.06));
+}
+
+.udb-stat-skeleton-val {
+  height: 1.75rem;
+  width: 60%;
+  border-radius: 4px;
+  background: var(--surface-300, rgba(0, 0, 0, 0.1));
+}
+
+.udb-stat-skeleton-hint {
+  height: 0.625rem;
+  width: 50%;
+  border-radius: 4px;
+  background: var(--surface-200, rgba(0, 0, 0, 0.06));
+}
+
+.udb-streak-banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius, 12px);
+  border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.06) 0%, rgba(42, 157, 143, 0.04) 100%);
+}
+
+.udb-streak-left {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.udb-streak-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(234, 88, 12, 0.25);
+  flex-shrink: 0;
+}
+
+.udb-streak-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.udb-streak-headline {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ink, #0f172a);
+}
+
+.udb-streak-title {
+  font-weight: 700;
+}
+
+.udb-streak-dot {
+  opacity: 0.4;
+}
+
+.udb-streak-count {
+  font-weight: 600;
+  color: var(--ink-2, #334155);
+}
+
+.udb-streak-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+}
+
+.udb-streak-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.udb-streak-milestones {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.udb-streak-milestone-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--line, rgba(0, 0, 0, 0.1));
+  transition: background-color 150ms ease;
+}
+
+.udb-streak-milestone-dot.is-filled {
+  background: #ea580c;
+}
+
+.udb-streak-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-family: var(--font-mono, monospace);
+  font-weight: 600;
+  color: var(--accent, #ea580c);
+  text-decoration: none;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.udb-streak-action:hover {
+  text-decoration: underline;
+}
+
+.udb-attention-queue {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.udb-attention-queue--dense {
+  gap: 0.25rem;
+}
+
+.udb-attention-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: var(--radius, 8px);
+  border: 1px solid var(--line, rgba(0, 0, 0, 0.08));
+  background: var(--surface, #ffffff);
+  text-decoration: none;
+  color: inherit;
+  transition: all 150ms ease;
+}
+
+.udb-attention-queue--dense .udb-attention-item {
+  padding: 0.5rem 0.75rem;
+}
+
+.udb-attention-item.is-clickable {
+  cursor: pointer;
+}
+
+.udb-attention-item.is-clickable:hover {
+  background: var(--surface-hover, rgba(0, 0, 0, 0.02));
+  border-color: var(--line-strong, rgba(0, 0, 0, 0.16));
+}
+
+.udb-attention-item-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.udb-attention-item-icon {
+  color: var(--text-muted, #64748b);
+  flex-shrink: 0;
+}
+
+.udb-attention-item-texts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.udb-attention-item-title {
+  font-size: 0.875rem;
+  color: var(--ink, #0f172a);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.udb-attention-item-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted, #64748b);
+}
+
+.udb-attention-item-right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+
+.udb-attention-item-meta {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+  color: var(--ink-2, #334155);
+}
+
+.udb-metric-progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.udb-metric-progress-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ink, #0f172a);
+  margin-bottom: 0.25rem;
+}
+
+.udb-metric-progress-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.udb-metric-progress-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  text-decoration: none;
+  color: inherit;
+  padding: 0.25rem 0;
+}
+
+.udb-metric-progress-item.is-clickable {
+  cursor: pointer;
+}
+
+.udb-metric-progress-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.udb-metric-progress-label {
+  color: var(--text-muted, #64748b);
+}
+
+.udb-metric-progress-stats {
+  display: flex;
+  align-items: baseline;
+  gap: 0.375rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8125rem;
+}
+
+.udb-metric-progress-dot {
+  opacity: 0.4;
+}
+
+.udb-metric-progress-val {
+  color: var(--ink, #0f172a);
+  font-weight: 500;
+}

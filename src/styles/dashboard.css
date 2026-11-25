@@ -2,3 +2,4 @@
 @import "./chrome.css";
 @import "../domains/calendar/calendar.css";
 @import "../domains/kanban/kanban.css";
+@import "../domains/pages/pages.css";
