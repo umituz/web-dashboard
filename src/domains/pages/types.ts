@@ -220,3 +220,24 @@ export interface OverviewPageProps {
   readonly sidebar?: ReactNode;
   readonly className?: string;
 }
+
+export interface GoalProgressAction {
+  readonly label: string;
+  readonly href?: string;
+  readonly onClick?: () => void;
+}
+
+export interface GoalProgressCardProps {
+  readonly title: ReactNode;
+  readonly current: number;
+  readonly target: number;
+  readonly unit?: string;
+  readonly subtitle?: ReactNode;
+  readonly icon?: ReactNode;
+  readonly tone?: 'primary' | 'success' | 'warning' | 'destructive' | 'neutral';
+  readonly action?: GoalProgressAction | ReactNode;
+  readonly remainingLabel?: (remaining: number) => ReactNode;
+  readonly completedLabel?: ReactNode;
+  readonly showPercent?: boolean;
+  readonly className?: string;
+}

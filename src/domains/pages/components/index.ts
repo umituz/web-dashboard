@@ -5,3 +5,4 @@ export { StreakBanner } from './StreakBanner';
 export { AttentionQueue } from './AttentionQueue';
 export { MetricProgressList } from './MetricProgressList';
 export { OverviewPage } from './OverviewPage';
+export { GoalProgressCard } from './GoalProgressCard';

@@ -6,6 +6,7 @@ export {
   AttentionQueue,
   MetricProgressList,
   OverviewPage,
+  GoalProgressCard,
 } from './components';
 
 export {
@@ -37,4 +38,6 @@ export {
   type MetricProgressListProps,
   type OverviewPageHeaderProps,
   type OverviewPageProps,
+  type GoalProgressAction,
+  type GoalProgressCardProps,
 } from './types';
