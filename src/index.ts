@@ -70,3 +70,18 @@ export {
   type PerformanceConfig as DashboardPerformanceConfig,
   type DashboardConfig as DashboardConfigType,
 } from './config';
+
+export {
+  useCommandPalette,
+  CommandPalette,
+  CommandDialog,
+  searchItems,
+  hitsToCommandItems,
+  type UseCommandPaletteOptions,
+  type SearchHit,
+  type NavigateFn,
+  type CommandPaletteProps,
+  type CommandDialogProps,
+  type CommandGroup,
+  type CommandItem,
+} from './domains/search';
